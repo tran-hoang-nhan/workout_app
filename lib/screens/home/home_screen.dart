@@ -30,15 +30,15 @@ class HomeScreen extends StatelessWidget {
               color: AppColors.grey,
             ),
           ),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.lg),
           
           // Stats Section
           const StatsSection(),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.lg),
           
           // Plan Section (includes next workout)
           const PlanSection(),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.lg),
           
           // Quick Workout Section
           const QuickWorkoutSection(),

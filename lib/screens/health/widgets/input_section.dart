@@ -336,7 +336,7 @@ class InputSection extends ConsumerWidget {
                 ),
               ),
               onPressed: onSave,
-              child: const Text('Lưu cân nặng',
+              child: const Text('Lưu',
                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
             ),
           ),
