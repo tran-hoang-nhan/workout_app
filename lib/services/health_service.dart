@@ -186,6 +186,7 @@ class HealthService {
     String userId,
     int age,
     double weight,
+    double? height,
     List<String> injuries,
     List<String> medicalConditions,
     String activityLevel,
@@ -199,6 +200,7 @@ class HealthService {
         'user_id': userId,
         'age': age,
         'weight': weight,
+        if (height != null) 'height': height,
         'injuries': injuries,
         'medical_conditions': medicalConditions,
         'activity_level': activityLevel,
@@ -209,15 +211,15 @@ class HealthService {
         'updated_at': DateTime.now().toIso8601String(),
       };
 
-      final result = await supabase.from('health').upsert(data).select('*, profiles(height, gender)');
+      final result = await supabase.from('health').upsert(data).select('*, user_id(height, gender)');
 
       if (result.isEmpty) {
         return (healthData: null, error: 'Lỗi lưu hồ sơ sức khỏe');
       }
 
-      // Extract height and gender from joined profiles data
+      // Extract height and gender from joined profiles data via user_id
       final resultData = result.first;
-      final profilesData = resultData['profiles'] as Map<String, dynamic>?;
+      final profilesData = resultData['user_id'] as Map<String, dynamic>?;
       final profileData = (
         height: (profilesData?['height'] as num?)?.toDouble(),
         gender: profilesData?['gender'] as String?,

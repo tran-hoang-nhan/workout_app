@@ -139,7 +139,7 @@ class InputSection extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     final weight = double.tryParse(weightInput.text);
                     final height = double.tryParse(heightInput.text);
 
@@ -152,9 +152,20 @@ class InputSection extends ConsumerWidget {
                     }
 
                     if (weight != null || height != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Đã lưu cân nặng và chiều cao thành công!')),
-                      );
+                      try {
+                        await ref.read(saveHealthProfileProvider(HealthProfileSaveParams(
+                          height: height,
+                          gender: null,
+                        )).future);
+                        
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Đã lưu cân nặng và chiều cao thành công!')),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Lỗi: ${e.toString()}')),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -176,172 +187,8 @@ class InputSection extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
-
-          // Age & Gender
-          Row(
-            children: [
-              Expanded(
-                child: _buildInputField(
-                  label: 'Tuổi',
-                  initialValue: formState.age.toString(),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    final age = int.tryParse(value);
-                    if (age != null) {
-                      ref.read(healthFormProvider.notifier).setAge(age);
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Giới tính',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade500,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => ref.read(healthFormProvider.notifier).setGender('male'),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                              decoration: BoxDecoration(
-                                gradient: formState.gender == 'male'
-                                    ? LinearGradient(
-                                        colors: [Colors.orange.shade500, Colors.red.shade500],
-                                      )
-                                    : null,
-                                color: formState.gender != 'male' ? Colors.grey.shade900 : null,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Nam',
-                                  style: TextStyle(
-                                    color: formState.gender == 'male' ? Colors.white : Colors.grey.shade400,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => ref.read(healthFormProvider.notifier).setGender('female'),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                              decoration: BoxDecoration(
-                                gradient: formState.gender == 'female'
-                                    ? LinearGradient(
-                                        colors: [Colors.pink.shade500, Colors.purple.shade500],
-                                      )
-                                    : null,
-                                color: formState.gender != 'female' ? Colors.grey.shade900 : null,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Nữ',
-                                  style: TextStyle(
-                                    color: formState.gender == 'female' ? Colors.white : Colors.grey.shade400,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildInputField({
-    required String label,
-    TextEditingController? controller,
-    String? initialValue,
-    TextInputType keyboardType = TextInputType.text,
-    Function(String)? onChanged,
-    VoidCallback? onSave,
-    bool showButton = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade500,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        TextField(
-          controller: controller,
-          keyboardType: keyboardType,
-          onChanged: onChanged,
-          style: const TextStyle(color: AppColors.white),
-          decoration: InputDecoration(
-            hintText: initialValue,
-            hintStyle: TextStyle(color: Colors.grey.shade700),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.md,
-            ),
-            filled: true,
-            fillColor: Colors.grey.shade900,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade800),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade800),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.orange.shade500),
-            ),
-          ),
-        ),
-        if (showButton) ...[
-          const SizedBox(height: AppSpacing.sm),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange.shade500,
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: onSave,
-              child: const Text('Lưu',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-            ),
-          ),
-        ],
-      ],
     );
   }
 }

@@ -264,6 +264,7 @@ final saveHealthProfileProvider = FutureProvider.family<String?, HealthProfileSa
     userId,
     formState.age,
     formState.weight,
+    formState.height,
     injuries,
     medicalConditions,
     formState.activityLevel,

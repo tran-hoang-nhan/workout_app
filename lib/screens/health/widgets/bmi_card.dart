@@ -16,7 +16,7 @@ class BMICard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.blue.shade400, Colors.cyan.shade400],
+          colors: [Colors.teal.shade400, Colors.green.shade600],
         ),
         borderRadius: BorderRadius.circular(24),
       ),
@@ -31,7 +31,7 @@ class BMICard extends StatelessWidget {
                 'Chỉ số BMI',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.blue.shade100,
+                  color: Colors.teal.shade100,
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
