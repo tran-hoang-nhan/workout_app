@@ -52,6 +52,9 @@ class AuthService {
         }
       }
       
+      // Give Supabase time to broadcast the auth state change
+      await Future.delayed(const Duration(milliseconds: 500));
+      
       return response;
     } on AuthException catch (e) {
       _logger.e('Auth error during sign in: ${e.message}');
