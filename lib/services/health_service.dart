@@ -133,6 +133,8 @@ class HealthService {
             .eq('user_id', userId)
             .single();
 
+        debugPrint('[HealthService] Health data: weight=${healthResponse['weight']}, height=${healthResponse['height']}, age=${healthResponse['age']}');
+
         // Fetch profile data from profiles table separately
         final profileResponse = await supabase
             .from('profiles')
@@ -140,12 +142,15 @@ class HealthService {
             .eq('id', userId)
             .single();
 
+        debugPrint('[HealthService] Profile data: height=${profileResponse['height']}, gender=${profileResponse['gender']}');
+
         final profileData = (
           height: (profileResponse['height'] as num?)?.toDouble(),
           gender: profileResponse['gender'] as String?,
         );
         
         final healthData = _mapHealthData(healthResponse, userId, profileData);
+        debugPrint('[HealthService] Mapped health data: weight=${healthData.weight}, height=${healthData.height}, age=${healthData.age}');
         return (isLoggedIn: true, hasProfile: true, userId: userId, healthData: healthData);
       } on PostgrestException catch (e) {
         if (e.code == 'PGRST116') {
@@ -200,7 +205,6 @@ class HealthService {
         'user_id': userId,
         'age': age,
         'weight': weight,
-        if (height != null) 'height': height,
         'injuries': injuries,
         'medical_conditions': medicalConditions,
         'activity_level': activityLevel,
@@ -211,20 +215,61 @@ class HealthService {
         'updated_at': DateTime.now().toIso8601String(),
       };
 
-      final result = await supabase.from('health').upsert(data).select('*, user_id(height, gender)');
+      final result = await supabase.from('health').upsert(data, onConflict: 'user_id').select();
 
       if (result.isEmpty) {
         return (healthData: null, error: 'Lỗi lưu hồ sơ sức khỏe');
       }
 
-      // Extract height and gender from joined profiles data via user_id
+      // Update profiles table with height if provided
+      if (height != null) {
+        try {
+          await supabase.from('profiles').update({'height': height}).eq('id', userId);
+          debugPrint('Successfully updated height in profiles: $height cm');
+        } catch (e) {
+          debugPrint('Warning: Error updating height in profiles: $e');
+        }
+      }
+
+      // Lưu weight vào body_metrics
+      try {
+        final bmi = height != null ? weight / ((height / 100) * (height / 100)) : null;
+        
+        // Check xem user đã có record trong body_metrics chưa
+        final existing = await supabase
+            .from('body_metrics')
+            .select('id')
+            .eq('user_id', userId)
+            .limit(1);
+
+        if (existing.isNotEmpty) {
+          // Update existing record
+          await supabase.from('body_metrics').update({
+            'weight': weight,
+            'bmi': bmi,
+            'recorded_at': DateTime.now().toIso8601String(),
+          }).eq('user_id', userId);
+          debugPrint('Updated weight in body_metrics: $weight kg, BMI: ${bmi?.toStringAsFixed(1)}');
+        } else {
+          // Insert new record
+          await supabase.from('body_metrics').insert({
+            'user_id': userId,
+            'weight': weight,
+            'bmi': bmi,
+            'recorded_at': DateTime.now().toIso8601String(),
+          });
+          debugPrint('Inserted new weight to body_metrics: $weight kg, BMI: ${bmi?.toStringAsFixed(1)}');
+        }
+      } catch (e) {
+        debugPrint('Warning: Error saving to body_metrics: $e');
+        // Không return error, vì lưu health profile đã thành công
+      }
+
+      // Load height and gender from profiles
+      final profileData = await loadUserProfile(userId);
+      
       final resultData = result.first;
-      final profilesData = resultData['user_id'] as Map<String, dynamic>?;
-      final profileData = (
-        height: (profilesData?['height'] as num?)?.toDouble(),
-        gender: profilesData?['gender'] as String?,
-      );
-      final healthData = _mapHealthData(resultData, userId, profileData);
+      final healthData = _mapHealthData(resultData, userId, (height: profileData.height, gender: profileData.gender));
       return (healthData: healthData, error: null);
     } catch (e) {
       debugPrint('Error saving health profile: $e');
@@ -302,6 +347,52 @@ class HealthService {
       min: (maxHeartRate * 0.7).round(),
       max: (maxHeartRate * 0.85).round(),
     );
+  }
+
+  // Sync existing health data to body_metrics (one-time migration)
+  Future<void> syncHealthToBodyMetrics(String userId) async {
+    try {
+      // Check if already synced by checking if body_metrics has data for this user
+      final existingData = await supabase
+          .from('body_metrics')
+          .select('id')
+          .eq('user_id', userId)
+          .limit(1);
+
+      if (existingData.isNotEmpty) {
+        debugPrint('[HealthService] Body metrics already has data for user $userId, skipping sync');
+        return;
+      }
+
+      // Get current health data
+      final healthResponse = await supabase
+          .from('health')
+          .select()
+          .eq('user_id', userId)
+          .single();
+
+      final weight = (healthResponse['weight'] as num?)?.toDouble() ?? 65;
+      final profileResponse = await supabase
+          .from('profiles')
+          .select('height')
+          .eq('id', userId)
+          .single();
+
+      final height = (profileResponse['height'] as num?)?.toDouble();
+
+      if (height != null) {
+        final bmi = weight / ((height / 100) * (height / 100));
+        await supabase.from('body_metrics').insert({
+          'user_id': userId,
+          'weight': weight,
+          'bmi': bmi,
+          'recorded_at': healthResponse['updated_at'] ?? DateTime.now().toIso8601String(),
+        });
+        debugPrint('[HealthService] Synced weight $weight kg to body_metrics with BMI $bmi');
+      }
+    } catch (e) {
+      debugPrint('[HealthService] Error syncing health to body_metrics: $e');
+    }
   }
 
   // Helper to map Supabase data to HealthData

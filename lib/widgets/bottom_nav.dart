@@ -13,7 +13,6 @@ class BottomNav extends StatelessWidget {
   final List<_TabItem> tabs = const [
     _TabItem(id: 'home', label: 'Trang chủ', icon: Icons.home),
     _TabItem(id: 'workouts', label: 'Bài tập', icon: Icons.fitness_center),
-    _TabItem(id: 'progress', label: 'Tiến độ', icon: Icons.trending_up),
     _TabItem(id: 'health', label: 'Sức khỏe', icon: Icons.local_activity),
     _TabItem(id: 'profile', label: 'Cá nhân', icon: Icons.person),
   ];
@@ -26,33 +25,32 @@ class BottomNav extends StatelessWidget {
       right: 0,
       child: Container(
         padding: const EdgeInsets.only(left: 4, right: 4, bottom: 20, top: 12),
-        child: Center(
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: const Color(0xFF333333), width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.min,
-              children: tabs.map((tab) {
-                final isActive = activeTab == tab.id;
-                return _TabButton(
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: const Color(0xFF333333), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: tabs.map((tab) {
+              final isActive = activeTab == tab.id;
+              return Expanded(
+                child: _TabButton(
                   tab: tab,
                   isActive: isActive,
                   onTap: () => setActiveTab(tab.id),
-                );
-              }).toList(),
-            ),
+                ),
+              );
+            }).toList(),
           ),
         ),
       ),
@@ -151,9 +149,11 @@ class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMi
           color: widget.isActive ? null : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             AnimatedBuilder(
               animation: _controller,
@@ -164,14 +164,14 @@ class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMi
                     scale: _scaleAnimation.value,
                     child: Icon(
                       widget.tab.icon,
-                      size: 22,
+                      size: 20,
                       color: widget.isActive ? Colors.white : const Color(0xFF999999),
                     ),
                   ),
                 );
               },
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 2),
             AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
@@ -179,6 +179,9 @@ class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMi
                   scale: _labelScaleAnimation.value,
                   child: Text(
                     widget.tab.label,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w500,

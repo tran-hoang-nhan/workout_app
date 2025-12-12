@@ -56,62 +56,74 @@ class StatsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: AppSpacing.xl),
-        GridView.count(
-          crossAxisCount: 3,
-          mainAxisSpacing: 5.0,
-          crossAxisSpacing: 3.0,
-          childAspectRatio: 1.0,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          children: stats.map((stat) {
-            return Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF0A1A3F),
-                borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                border: Border.all(color: const Color(0xFF1A3A5F)),
-              ),
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      gradient: stat.gradient,
-                      borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                    ),
-                    child: Icon(
-                      stat.icon,
-                      color: AppColors.white,
-                      size: 22,
-                    ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            // Tính toán spacing responsive
+            final screenWidth = constraints.maxWidth;
+            final spacing = screenWidth > 400 ? 6.0 : 4.0;
+            final padding = screenWidth > 400 ? 10.0 : 8.0;
+            
+            return GridView.count(
+              crossAxisCount: 3,
+              mainAxisSpacing: spacing,
+              crossAxisSpacing: spacing,
+              childAspectRatio: 0.95,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: stats.map((stat) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0A1A3F),
+                    borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+                    border: Border.all(color: const Color(0xFF1A3A5F)),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    stat.value,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.white,
-                    ),
-                    textAlign: TextAlign.center,
+                  padding: EdgeInsets.all(padding),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          gradient: stat.gradient,
+                          borderRadius: BorderRadius.circular(AppBorderRadius.md),
+                        ),
+                        child: Icon(
+                          stat.icon,
+                          color: AppColors.white,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        stat.value,
+                        style: TextStyle(
+                          fontSize: screenWidth > 400 ? 15 : 13,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        stat.label,
+                        style: TextStyle(
+                          fontSize: screenWidth > 400 ? 10 : 9,
+                          color: AppColors.grey,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    stat.label,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.grey,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+                );
+              }).toList(),
             );
-          }).toList(),
+          },
         ),
       ],
     );

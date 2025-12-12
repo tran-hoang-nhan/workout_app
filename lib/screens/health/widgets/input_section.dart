@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../constants/app_constants.dart';
 import '../../../providers/health_provider.dart';
+import '../../../services/weight_service.dart';
 
 class InputSection extends ConsumerWidget {
   final HealthFormState formState;
@@ -80,7 +82,7 @@ class InputSection extends ConsumerWidget {
                       keyboardType: TextInputType.number,
                       style: const TextStyle(color: AppColors.white),
                       decoration: InputDecoration(
-                        hintText: '0',
+                        hintText: formState.weight.toStringAsFixed(0),
                         hintStyle: TextStyle(color: Colors.grey.shade700),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.md,
@@ -157,14 +159,40 @@ class InputSection extends ConsumerWidget {
                           height: height,
                           gender: null,
                         )).future);
+
+                        // Lưu weight vào body_metrics thêm
+                        if (weight != null) {
+                          try {
+                            final userId = Supabase.instance.client.auth.currentUser?.id;
+                            if (userId != null) {
+                              final heightValue = height ?? formState.height;
+                              final bmi = weight / ((heightValue / 100) * (heightValue / 100));
+                              final weightService = WeightService();
+                              await weightService.addWeight(
+                                userId: userId,
+                                weight: weight,
+                                bmi: bmi,
+                              );
+                              debugPrint('[InputSection] Weight saved to body_metrics: $weight kg, BMI: ${bmi.toStringAsFixed(1)}');
+                            }
+                          } catch (e) {
+                            debugPrint('[InputSection] Warning: Could not save to body_metrics: $e');
+                          }
+                        }
                         
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Đã lưu cân nặng và chiều cao thành công!')),
-                        );
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Đã lưu cân nặng và chiều cao thành công!')),
+                          );
+                          // Refresh formState by invalidating health provider
+                          ref.invalidate(healthFormProvider);
+                        }
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Lỗi: ${e.toString()}')),
-                        );
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Lỗi: ${e.toString()}')),
+                          );
+                        }
                       }
                     }
                   },

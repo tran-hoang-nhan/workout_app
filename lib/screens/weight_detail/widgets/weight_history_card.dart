@@ -1,0 +1,224 @@
+import 'package:flutter/material.dart';
+import '../../../constants/app_constants.dart';
+import '../../../services/weight_service.dart';
+
+class WeightHistoryCard extends StatelessWidget {
+  final List<WeightRecord> weightHistory;
+  final double height;
+  final Function(int) onDelete;
+
+  const WeightHistoryCard({
+    super.key,
+    required this.weightHistory,
+    required this.height,
+    required this.onDelete,
+  });
+
+  double _calculateBMI(double w) {
+    final heightInMeters = height / 100;
+    return w / (heightInMeters * heightInMeters);
+  }
+
+  Map<String, dynamic> _getBMICategory(double bmi) {
+    if (bmi < 18.5) {
+      return {
+        'label': 'Thiếu cân',
+        'color': const Color(0xFF60A5FA),
+        'range': '< 18.5'
+      };
+    } else if (bmi < 25) {
+      return {
+        'label': 'Bình thường',
+        'color': const Color(0xFF34D399),
+        'range': '18.5 - 24.9'
+      };
+    } else if (bmi < 30) {
+      return {
+        'label': 'Thừa cân',
+        'color': const Color(0xFFFBBF24),
+        'range': '25 - 29.9'
+      };
+    } else {
+      return {
+        'label': 'Béo phì',
+        'color': const Color(0xFFF87171),
+        'range': '≥ 30'
+      };
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: const Color(0xFF111827),
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: const Color(0xFF1F2937)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Lịch sử cân nặng',
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white)),
+          const SizedBox(height: AppSpacing.lg),
+          if (weightHistory.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.sm),
+                child: Column(
+                  children: [
+                    Icon(Icons.calendar_today,
+                        size: 36,
+                        color: Colors.grey.shade700),
+                    const SizedBox(height: AppSpacing.sm),
+                    const Text('Chưa có dữ liệu cân nặng',
+                        style: TextStyle(
+                            color: AppColors.grey)),
+                  ],
+                ),
+              ),
+            )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: weightHistory.length,
+              itemBuilder: (context, index) {
+                final record = weightHistory[index];
+                final recordBMI =
+                    _calculateBMI(record.weight);
+                final recordCategory = _getBMICategory(recordBMI);
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1F2937),
+                      borderRadius: BorderRadius.circular(AppBorderRadius.md),
+                    ),
+                    child: Row(
+                      children: [
+                        // Icon
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFFF97316),
+                                Color(0xFFDC2626),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Text(
+                              index == 0 ? '📍' : '📊',
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Weight, Badge, Date (Column: weight+badge trên, date dưới)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Wrap(
+                              spacing: 4,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  '${record.weight} kg',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                if (index == 0)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF97316),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: const Text(
+                                      'Mới nhất',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _formatDate(record.recordedAt),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: AppColors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'BMI: ${recordBMI.toStringAsFixed(1)}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 1),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                              decoration: BoxDecoration(
+                                color: (recordCategory['color'] as Color).withAlpha((255 * 0.2).toInt()),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                recordCategory['label'],
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: recordCategory['color'],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (weightHistory.length > 1)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 6),
+                            child: GestureDetector(
+                              onTap: () => onDelete(index),
+                              child: Icon(Icons.close, size: 16, color: Colors.grey.shade500),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+}

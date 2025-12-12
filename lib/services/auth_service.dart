@@ -79,6 +79,26 @@ class AuthService {
     try {
       _logger.i('Attempting sign up with email: $email');
 
+      // Kiểm tra xem user đã tồn tại chưa
+      try {
+        await _supabase.auth.signInWithPassword(
+          email: email,
+          password: 'dummy_password_for_check',
+        );
+        // Nếu đến đây tức là email tồn tại (mật khẩu không khớp)
+        throw Exception('Email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.');
+      } on AuthException catch (e) {
+        // Nếu lỗi là invalid_credentials, có nghĩa email tồn tại nhưng mật khẩu sai
+        if (e.statusCode == 'invalid_credentials') {
+          throw Exception('Email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.');
+        }
+        // Nếu lỗi là user_not_found, có nghĩa email chưa tồn tại - tiếp tục đăng ký
+        // Các lỗi khác thì rethrow
+        if (e.statusCode != 'user_not_found') {
+          rethrow;
+        }
+      }
+
       final response = await _supabase.auth.signUp(
         email: email,
         password: password,

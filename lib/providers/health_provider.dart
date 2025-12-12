@@ -283,6 +283,9 @@ final saveHealthProfileProvider = FutureProvider.family<String?, HealthProfileSa
     await healthService.updateUserProfile(userId, params.height, params.gender);
   }
 
+  // Reload data from Supabase after save
+  ref.invalidate(syncHealthProfileProvider);
+
   return null;
 });
 

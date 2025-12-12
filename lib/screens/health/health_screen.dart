@@ -7,7 +7,7 @@ import 'widgets/health_header.dart';
 import 'widgets/health_alerts.dart';
 import 'widgets/input_section.dart';
 import 'widgets/bmi_card.dart';
-import 'widgets/metric_card.dart';
+import 'widgets/steps_water_cards.dart';
 import 'widgets/water_intake_card.dart';
 import 'widgets/heart_rate_zones.dart';
 import 'widgets/calorie_goals.dart';
@@ -37,6 +37,20 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     super.dispose();
   }
 
+  void _updateControllers(HealthFormState formState) {
+    // Update controllers từ formState
+    // Selection position sẽ được giữ nếu text không thay đổi
+    final newWeight = formState.weight.toStringAsFixed(0);
+    final newHeight = formState.height.toStringAsFixed(0);
+    
+    if (_weightInput.text != newWeight) {
+      _weightInput.text = newWeight;
+    }
+    if (_heightInput.text != newHeight) {
+      _heightInput.text = newHeight;
+    }
+  }
+
   TextEditingController get weightInput => _weightInput;
   TextEditingController get heightInput => _heightInput;
 
@@ -46,13 +60,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     final calculations = ref.watch(healthCalculationsProvider);
     ref.watch(syncHealthProfileProvider);
 
-    // Initialize if needed (defensive programming)
-    if (!_weightInput.text.isNotEmpty) {
-      _weightInput.text = formState.weight.toStringAsFixed(0);
-    }
-    if (!_heightInput.text.isNotEmpty) {
-      _heightInput.text = formState.height.toStringAsFixed(0);
-    }
+    // Cập nhật controllers từ formState
+    _updateControllers(formState);
 
     return Scaffold(
       backgroundColor: const Color(0xFF000000),
@@ -85,8 +94,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               BMICard(calculations: calculations),
               const SizedBox(height: AppSpacing.md),
 
-              // BMR & TDEE 
-              BMRTDEESection(calculations: calculations),
+              // Steps & Water
+              const StepsWaterCards(),
               const SizedBox(height: AppSpacing.md),
 
               // Water Intake
@@ -181,7 +190,26 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                 ref.read(healthFormProvider.notifier).setWaterIntake(value.toDouble()),
             onDietTypeChanged: (value) => ref.read(healthFormProvider.notifier).setDietType(value),
             onSave: () async {
-              Navigator.pop(context);
+              try {
+                // Save health profile
+                await ref.read(saveHealthProfileProvider(HealthProfileSaveParams(
+                  height: formState.height,
+                  gender: null,
+                )).future);
+                
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã lưu thông tin sức khỏe thành công!')),
+                  );
+                  Navigator.pop(context);
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Lỗi: ${e.toString()}')),
+                  );
+                }
+              }
             },
           ),
         ),
