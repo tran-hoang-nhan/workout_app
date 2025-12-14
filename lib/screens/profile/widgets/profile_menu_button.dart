@@ -20,22 +20,22 @@ class ProfileMenuButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         decoration: BoxDecoration(
-          color: const Color(0xFF0A1A3F),
-          border: Border.all(color: const Color(0xFF1A3A5F)),
-          borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+          color: AppColors.bgLight,
+          border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
+          borderRadius: BorderRadius.circular(AppBorderRadius.md),
         ),
         child: Row(
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
-                borderRadius: BorderRadius.circular(AppBorderRadius.md),
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(AppBorderRadius.sm),
               ),
-              child: Icon(icon, color: AppColors.grey, size: 20),
+              child: Icon(icon, color: Colors.grey.shade600, size: 20),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -45,23 +45,23 @@ class ProfileMenuButton extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      color: AppColors.white,
+                      color: AppColors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: AppFontSize.md,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.xs),
+                  const SizedBox(height: 2),
                   Text(
                     description,
                     style: const TextStyle(
                       color: AppColors.grey,
-                      fontSize: AppFontSize.sm,
+                      fontSize: AppFontSize.xs,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.grey),
+            Icon(Icons.chevron_right, color: Colors.grey.shade400, size: 20),
           ],
         ),
       ),

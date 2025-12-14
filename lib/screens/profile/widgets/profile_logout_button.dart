@@ -37,20 +37,20 @@ class ProfileLogoutButton extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(AppSpacing.md),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         decoration: BoxDecoration(
-          color: const Color(0xFF0A1A3F),
-          border: Border.all(color: const Color(0xFF1A3A5F)),
-          borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+          color: AppColors.bgLight,
+          border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
+          borderRadius: BorderRadius.circular(AppBorderRadius.md),
         ),
         child: Row(
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: const Color(0xFFEF4444).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppBorderRadius.md),
+                borderRadius: BorderRadius.circular(AppBorderRadius.sm),
               ),
               child: const Icon(Icons.logout, color: Color(0xFFEF4444), size: 20),
             ),
@@ -65,7 +65,7 @@ class ProfileLogoutButton extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.grey),
+            Icon(Icons.chevron_right, color: Colors.grey.shade400, size: 20),
           ],
         ),
       ),

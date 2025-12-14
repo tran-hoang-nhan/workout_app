@@ -221,7 +221,6 @@ class HealthService {
         return (healthData: null, error: 'Lỗi lưu hồ sơ sức khỏe');
       }
 
-      // Update profiles table with height if provided
       if (height != null) {
         try {
           await supabase.from('profiles').update({'height': height}).eq('id', userId);
@@ -235,7 +234,6 @@ class HealthService {
       try {
         final bmi = height != null ? weight / ((height / 100) * (height / 100)) : null;
         
-        // Check xem user đã có record trong body_metrics chưa
         final existing = await supabase
             .from('body_metrics')
             .select('id')
@@ -243,7 +241,6 @@ class HealthService {
             .limit(1);
 
         if (existing.isNotEmpty) {
-          // Update existing record
           await supabase.from('body_metrics').update({
             'weight': weight,
             'bmi': bmi,
@@ -251,7 +248,6 @@ class HealthService {
           }).eq('user_id', userId);
           debugPrint('Updated weight in body_metrics: $weight kg, BMI: ${bmi?.toStringAsFixed(1)}');
         } else {
-          // Insert new record
           await supabase.from('body_metrics').insert({
             'user_id': userId,
             'weight': weight,
@@ -262,12 +258,9 @@ class HealthService {
         }
       } catch (e) {
         debugPrint('Warning: Error saving to body_metrics: $e');
-        // Không return error, vì lưu health profile đã thành công
       }
 
-      // Load height and gender from profiles
       final profileData = await loadUserProfile(userId);
-      
       final resultData = result.first;
       final healthData = _mapHealthData(resultData, userId, (height: profileData.height, gender: profileData.gender));
       return (healthData: healthData, error: null);
@@ -277,7 +270,6 @@ class HealthService {
     }
   }
 
-  // Update user profile with additional info
   Future<String?> updateUserProfile(
     String userId,
     double? height,
@@ -392,6 +384,89 @@ class HealthService {
       }
     } catch (e) {
       debugPrint('[HealthService] Error syncing health to body_metrics: $e');
+    }
+  }
+
+  // Save health data during onboarding
+  Future<void> saveHealthData({
+    required String userId,
+    required int age,
+    required double weight,
+    required double height,
+    required String gender,
+    required String activityLevel,
+    required String goal,
+    required String dietType,
+    required int sleepHours,
+    required int waterIntake,
+    required List<String> injuries,
+    required List<String> medicalConditions,
+    required List<String> allergies,
+  }) async {
+    try {
+      debugPrint('[HealthService] ========== SAVE START ==========');
+      debugPrint('[HealthService] userId: $userId');
+      debugPrint('[HealthService] Step 1-2: age=$age, weight=$weight, height=$height, gender=$gender, activityLevel=$activityLevel, goal=$goal');
+      debugPrint('[HealthService] Step 3: dietType=$dietType, sleepHours=$sleepHours, waterIntake=$waterIntake');
+      debugPrint('[HealthService] Step 4 RAW: injuries=$injuries, conditions=$medicalConditions, allergies=$allergies');
+      
+      // Clean and normalize health condition lists
+      // Remove empty strings and trim whitespace
+      final cleanedInjuries = injuries
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+      
+      final cleanedConditions = medicalConditions
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+      
+      final cleanedAllergies = allergies
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+
+      debugPrint('[HealthService] Step 4 CLEANED: injuries=$cleanedInjuries, conditions=$cleanedConditions, allergies=$cleanedAllergies');
+
+      // Save to health table (only health-related data)
+      // Lists are sent directly as arrays to Supabase
+      await supabase.from('health').upsert({
+        'user_id': userId,
+        'age': age,
+        'weight': weight,
+        'activity_level': activityLevel,
+        'diet_type': dietType,
+        'sleep_hours_avg': sleepHours,
+        'water_intake_goal': waterIntake,
+        'injuries': cleanedInjuries,
+        'medical_conditions': cleanedConditions,
+        'allergies': cleanedAllergies,
+        'updated_at': DateTime.now().toIso8601String(),
+      });
+      debugPrint('[HealthService] ✅ Health table upserted');
+
+      // Update height, goal and gender in profiles table
+      await supabase.from('profiles').update({
+        'height': height,
+        'gender': gender,
+        'goal': goal,
+      }).eq('id', userId);
+      debugPrint('[HealthService] ✅ Profiles table updated');
+
+      // Create initial body_metrics record
+      await supabase.from('body_metrics').insert({
+        'user_id': userId,
+        'weight': weight,
+        'bmi': weight / ((height / 100) * (height / 100)),
+        'recorded_at': DateTime.now().toIso8601String(),
+      });
+      debugPrint('[HealthService] ✅ Body metrics inserted');
+
+      debugPrint('[HealthService] ========== SAVE COMPLETE ==========');
+    } catch (e) {
+      debugPrint('[HealthService] Error saving health data: $e');
+      rethrow;
     }
   }
 

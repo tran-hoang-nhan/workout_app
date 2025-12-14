@@ -46,6 +46,8 @@ dependencies:
   # UI & Design
   google_fonts: ^6.0.0
   shimmer: ^3.0.0
+  responsive_framework: ^1.4.0
+  styled_widget: ^0.4.1
   
   # Utilities
   intl: ^0.19.0

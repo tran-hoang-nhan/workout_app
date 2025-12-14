@@ -14,9 +14,16 @@ class HeartRateZones extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
-        border: Border.all(color: Colors.grey.shade800),
+        color: AppColors.cardBg,
+        border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
@@ -31,7 +38,7 @@ class HeartRateZones extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.white,
+                  color: AppColors.black,
                 ),
               ),
             ],
@@ -47,7 +54,7 @@ class HeartRateZones extends StatelessWidget {
               Text(
                 '${calculations.maxHeartRate.toStringAsFixed(0)} bpm',
                 style: const TextStyle(
-                  color: AppColors.white,
+                  color: AppColors.black,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -75,7 +82,7 @@ class HeartRateZones extends StatelessWidget {
   Widget _buildHeartRateZoneRow(String label, String value, Color color, double progress) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade900,
+        color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -89,7 +96,7 @@ class HeartRateZones extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.white,
+                  color: AppColors.black,
                 ),
               ),
               Text(

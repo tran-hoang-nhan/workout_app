@@ -7,12 +7,14 @@ import 'dart:async';
 import 'config/supabase_config.dart';
 import 'constants/app_constants.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/health_onboard/health_onboarding_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/workouts/workouts_screen.dart';
 import 'screens/progress/progress_screen.dart';
 import 'screens/health/health_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'providers/auth_provider.dart';
+import 'providers/health_provider.dart';
 import 'widgets/bottom_nav.dart';
 
 final logger = Logger();
@@ -86,6 +88,8 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     // Watch auth state - this will rebuild when it changes
     final authStateAsync = ref.watch(authStateProvider);
+    // Watch health data status
+    final hasHealthDataAsync = ref.watch(hasHealthDataProvider);
 
     return MaterialApp(
       title: 'Workout App',
@@ -94,28 +98,62 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primary,
-          brightness: Brightness.dark,
+          brightness: Brightness.light,
         ),
-        scaffoldBackgroundColor: const Color(0xFF000000),
+        scaffoldBackgroundColor: AppColors.bgLight,
         appBarTheme: const AppBarTheme(
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Color(0xFF000000),
-          foregroundColor: AppColors.white,
+          backgroundColor: Colors.transparent,
+          foregroundColor: AppColors.black,
         ),
       ),
       home: authStateAsync.when(
         data: (isAuthenticated) {
-          return isAuthenticated 
-            ? const AppShell() 
-            : LoginScreen(
-                onLoginSuccess: () {
-                  // Invalidate auth state to trigger rebuild
-                  ref.invalidate(authStateProvider);
-                  ref.invalidate(currentUserIdProvider);
-                  ref.invalidate(currentUserProvider);
+          if (!isAuthenticated) {
+            return LoginScreen(
+              onLoginSuccess: () async {
+                // Invalidate all providers and wait for hasHealthData to re-fetch
+                ref.invalidate(currentUserIdProvider);
+                ref.invalidate(currentUserProvider);
+                ref.invalidate(hasHealthDataProvider);
+                await Future.delayed(const Duration(milliseconds: 100));
+                ref.invalidate(authStateProvider);
+              },
+            );
+          }
+
+          // User is authenticated - check if has health data
+          return hasHealthDataAsync.when(
+            data: (hasHealthData) {
+              if (!hasHealthData) {
+                // No health data - show onboarding (BẮTBUỘC)
+                return HealthOnboardingScreen(
+                  onComplete: () async {
+                    // After health onboarding, invalidate and rebuild
+                    ref.invalidate(hasHealthDataProvider);
+                  },
+                );
+              }
+              // Has health data - show app
+              return const AppShell();
+            },
+            loading: () => const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                ),
+              ),
+            ),
+            error: (error, stack) {
+              // Error checking health data - show onboarding to be safe
+              return HealthOnboardingScreen(
+                onComplete: () async {
+                  ref.invalidate(hasHealthDataProvider);
                 },
               );
+            },
+          );
         },
         loading: () => const Scaffold(
           body: Center(
@@ -125,8 +163,9 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           ),
         ),
         error: (error, stackTrace) => LoginScreen(
-          onLoginSuccess: () {
+          onLoginSuccess: () async {
             ref.invalidate(authStateProvider);
+            ref.invalidate(hasHealthDataProvider);
           },
         ),
       ),

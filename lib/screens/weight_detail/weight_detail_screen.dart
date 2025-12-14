@@ -17,7 +17,7 @@ class WeightDetailScreen extends ConsumerWidget {
     final userId = Supabase.instance.client.auth.currentUser?.id ?? '';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.bgLight,
       body: SafeArea(
         child: weightDataAsync.when(
           data: (weightData) => SingleChildScrollView(
@@ -44,7 +44,7 @@ class WeightDetailScreen extends ConsumerWidget {
                     style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.white)),
+                        color: AppColors.black)),
                 const SizedBox(height: AppSpacing.xs),
                 const Text('Theo dõi cân nặng và chỉ số BMI của bạn',
                     style: TextStyle(

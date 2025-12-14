@@ -50,9 +50,16 @@ class _StepsWaterCardsState extends ConsumerState<StepsWaterCards> {
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: const Color(0xFF0A1A3F),
+              color: AppColors.cardBg,
               borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-              border: Border.all(color: const Color(0xFF1A3A5F)),
+              border: Border.all(color: AppColors.cardBorder),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +87,7 @@ class _StepsWaterCardsState extends ConsumerState<StepsWaterCards> {
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.white,
+                    color: AppColors.black,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -170,9 +177,16 @@ class _StepsWaterCardsState extends ConsumerState<StepsWaterCards> {
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: const Color(0xFF0A1A3F),
+              color: AppColors.cardBg,
               borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-              border: Border.all(color: const Color(0xFF1A3A5F)),
+              border: Border.all(color: AppColors.cardBorder),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +214,7 @@ class _StepsWaterCardsState extends ConsumerState<StepsWaterCards> {
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.white,
+                    color: AppColors.black,
                   ),
                 ),
                 const SizedBox(height: 2),

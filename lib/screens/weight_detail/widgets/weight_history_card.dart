@@ -56,9 +56,16 @@ class WeightHistoryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: const Color(0xFF1F2937)),
+        border: Border.all(color: AppColors.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +74,7 @@ class WeightHistoryCard extends StatelessWidget {
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+                  color: AppColors.black)),
           const SizedBox(height: AppSpacing.lg),
           if (weightHistory.isEmpty)
             Center(
@@ -103,8 +110,9 @@ class WeightHistoryCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1F2937),
+                      color: Colors.grey.shade50,
                       borderRadius: BorderRadius.circular(AppBorderRadius.md),
+                      border: Border.all(color: Colors.grey.shade300, width: 1),
                     ),
                     child: Row(
                       children: [
@@ -143,7 +151,7 @@ class WeightHistoryCard extends StatelessWidget {
                                   style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: AppColors.black,
                                   ),
                                 ),
                                 if (index == 0)
@@ -183,7 +191,7 @@ class WeightHistoryCard extends StatelessWidget {
                               'BMI: ${recordBMI.toStringAsFixed(1)}',
                               style: const TextStyle(
                                 fontSize: 12,
-                                color: Colors.white,
+                                color: AppColors.black,
                               ),
                             ),
                             const SizedBox(height: 1),

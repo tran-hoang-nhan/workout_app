@@ -21,9 +21,16 @@ class ProfileStatsSection extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A1A3F),
-        border: Border.all(color: const Color(0xFF1A3A5F)),
+        color: AppColors.cardBg,
+        border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +40,7 @@ class ProfileStatsSection extends StatelessWidget {
             style: TextStyle(
               fontSize: AppFontSize.lg,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.black,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -62,7 +69,7 @@ class ProfileStatsSection extends StatelessWidget {
           style: TextStyle(
             fontSize: AppFontSize.lg,
             fontWeight: FontWeight.bold,
-            color: isHighlight ? const Color(0xFFFF7F00) : AppColors.white,
+            color: isHighlight ? AppColors.primary : AppColors.black,
           ),
         ),
       ],

@@ -14,8 +14,8 @@ class HealthAlerts extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.yellow.withValues(alpha: 0.1),
-        border: Border.all(color: Colors.yellow.withValues(alpha: 0.3)),
+        color: Colors.orange.withValues(alpha: 0.08),
+        border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -24,12 +24,12 @@ class HealthAlerts extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.warning_outlined, color: Colors.yellow, size: 18),
+              Icon(Icons.warning_outlined, color: Colors.orange.shade600, size: 18),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 'Lưu ý sức khỏe',
                 style: TextStyle(
-                  color: Colors.yellow.shade500,
+                  color: Colors.orange.shade700,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -44,12 +44,12 @@ class HealthAlerts extends StatelessWidget {
                 children: [
                   Text(
                     'Chấn thương: ',
-                    style: TextStyle(color: Colors.grey.shade300, fontSize: 13),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
                   ),
                   Expanded(
                     child: Text(
                       formState.injuries.join(', '),
-                      style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                      style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
                     ),
                   ),
                 ],
@@ -60,12 +60,12 @@ class HealthAlerts extends StatelessWidget {
               children: [
                 Text(
                   'Tình trạng: ',
-                  style: TextStyle(color: Colors.grey.shade300, fontSize: 13),
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
                 ),
                 Expanded(
                   child: Text(
                     formState.medicalConditions.join(', '),
-                    style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                    style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
                   ),
                 ),
               ],

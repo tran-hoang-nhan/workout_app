@@ -6,6 +6,49 @@ import '../services/health_service.dart';
 // Providers for health data
 final healthServiceProvider = Provider((ref) => HealthService());
 
+// Check if user has health data
+final hasHealthDataProvider = FutureProvider<bool>((ref) async {
+  try {
+    // Wait a bit for Supabase auth to initialize
+    await Future.delayed(const Duration(milliseconds: 200));
+    
+    final session = Supabase.instance.client.auth.currentSession;
+    final userId = session?.user.id;
+    
+    debugPrint('[hasHealthDataProvider] ========== CHECK START ==========');
+    debugPrint('[hasHealthDataProvider] Session exists: ${session != null}');
+    debugPrint('[hasHealthDataProvider] UserId: $userId');
+    
+    if (userId == null) {
+      debugPrint('[hasHealthDataProvider] No userId, returning false');
+      debugPrint('[hasHealthDataProvider] ========== CHECK END (no user) ==========');
+      return false;
+    }
+
+    // Query health table with user_id column
+    final response = await Supabase.instance.client
+        .from('health')
+        .select('user_id, age, weight')
+        .eq('user_id', userId);
+
+    debugPrint('[hasHealthDataProvider] Query executed');
+    debugPrint('[hasHealthDataProvider] Response type: ${response.runtimeType}');
+    debugPrint('[hasHealthDataProvider] Response: $response');
+    debugPrint('[hasHealthDataProvider] Response isEmpty: ${response.isEmpty}');
+    debugPrint('[hasHealthDataProvider] Response length: ${response.length}');
+    
+    final hasData = response.isNotEmpty;
+    debugPrint('[hasHealthDataProvider] Final result - Has health data: $hasData');
+    debugPrint('[hasHealthDataProvider] ========== CHECK END ==========');
+    return hasData;
+  } catch (e, stackTrace) {
+    debugPrint('[hasHealthDataProvider] ========== ERROR ==========');
+    debugPrint('[hasHealthDataProvider] Error: $e');
+    debugPrint('[hasHealthDataProvider] StackTrace: $stackTrace');
+    return false;
+  }
+});
+
 // State notifier for form state management
 class HealthFormNotifier extends StateNotifier<HealthFormState> {
   HealthFormNotifier()
@@ -84,6 +127,89 @@ class HealthFormNotifier extends StateNotifier<HealthFormState> {
       injuries: data.injuries,
       medicalConditions: data.medicalConditions,
       allergies: data.allergies,
+    );
+  }
+
+  Future<void> saveHealthData(String userId, String goal, HealthService healthService) async {
+    await healthService.saveHealthData(
+      userId: userId,
+      age: state.age,
+      weight: state.weight,
+      height: state.height,
+      gender: state.gender,
+      activityLevel: state.activityLevel,
+      goal: goal,
+      dietType: state.dietType,
+      sleepHours: state.sleepHours,
+      waterIntake: state.waterIntake,
+      injuries: state.injuries,
+      medicalConditions: state.medicalConditions,
+      allergies: state.allergies,
+    );
+  }
+
+  Future<void> saveHealthOnboarding({
+    required String userId,
+    required int age,
+    required double weight,
+    required double height,
+    required String gender,
+    required String activityLevel,
+    required String goal,
+    required String dietType,
+    required int sleepHours,
+    required int waterIntake,
+    required String injuries,
+    required String medicalConditions,
+    required String allergies,
+  }) async {
+    // Convert comma-separated strings to List
+    final injuriesList = injuries.trim().isEmpty 
+        ? <String>[] 
+        : injuries.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    
+    final conditionsList = medicalConditions.trim().isEmpty 
+        ? <String>[] 
+        : medicalConditions.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    
+    final allergiesList = allergies.trim().isEmpty 
+        ? <String>[] 
+        : allergies.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    
+    debugPrint('[HealthFormNotifier] Saving onboarding for user: $userId');
+    debugPrint('[HealthFormNotifier] Injuries: $injuriesList, Conditions: $conditionsList, Allergies: $allergiesList');
+    
+    // Update state
+    state = state.copyWith(
+      age: age,
+      weight: weight,
+      height: height,
+      gender: gender,
+      activityLevel: activityLevel,
+      dietType: dietType,
+      sleepHours: sleepHours,
+      waterIntake: waterIntake,
+      injuries: injuriesList,
+      medicalConditions: conditionsList,
+      allergies: allergiesList,
+    );
+    
+    // Save to database
+    final healthService = HealthService();
+    await healthService.saveHealthData(
+      userId: userId,
+      age: age,
+      weight: weight,
+      height: height,
+      gender: gender,
+      activityLevel: activityLevel,
+      goal: goal,
+      dietType: dietType,
+      sleepHours: sleepHours,
+      waterIntake: waterIntake,
+      injuries: injuriesList,
+      medicalConditions: conditionsList,
+      allergies: allergiesList,
     );
   }
 

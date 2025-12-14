@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/app_constants.dart';
 
 class BottomNav extends StatelessWidget {
   final String activeTab;
@@ -27,14 +28,14 @@ class BottomNav extends StatelessWidget {
         padding: const EdgeInsets.only(left: 4, right: 4, bottom: 20, top: 12),
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: const Color(0xFF333333), width: 1),
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.cardBorder, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 12,
-                offset: const Offset(0, 8),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -140,14 +141,14 @@ class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMi
       child: Container(
         decoration: BoxDecoration(
           gradient: widget.isActive
-              ? const LinearGradient(
-                  colors: [Color(0xFFFF7F00), Color(0xFFFF0000)],
+              ? LinearGradient(
+                  colors: [AppColors.primary, AppColors.primaryDark],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 )
               : null,
           color: widget.isActive ? null : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(15),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         child: Column(
@@ -165,7 +166,7 @@ class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMi
                     child: Icon(
                       widget.tab.icon,
                       size: 20,
-                      color: widget.isActive ? Colors.white : const Color(0xFF999999),
+                      color: widget.isActive ? Colors.white : AppColors.grey,
                     ),
                   ),
                 );
@@ -185,7 +186,7 @@ class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMi
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w500,
-                      color: widget.isActive ? Colors.white : const Color(0xFF808080),
+                      color: widget.isActive ? Colors.white : AppColors.grey,
                     ),
                   ),
                 );

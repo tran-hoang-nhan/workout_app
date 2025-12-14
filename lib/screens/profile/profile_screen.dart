@@ -17,6 +17,7 @@ class ProfileScreen extends ConsumerWidget {
     final userAsync = ref.watch(currentUserProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.bgLight,
       body: SafeArea(
         child: userAsync.when(
           loading: () => Center(
@@ -60,7 +61,7 @@ class ProfileScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: AppFontSize.xxxl,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.white,
+                      color: AppColors.black,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
@@ -75,28 +76,28 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   const ProfileStatsSection(),
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: AppSpacing.lg),
                   ProfileMenuButton(
                     title: 'Cài đặt',
                     description: 'Quản lý tài khoản',
                     icon: Icons.settings,
                     onTap: () {},
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.sm),
                   ProfileMenuButton(
                     title: 'Thông báo',
                     description: 'Nhắc nhở và cập nhật',
                     icon: Icons.notifications,
                     onTap: () {},
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.sm),
                   ProfileMenuButton(
                     title: 'Trợ giúp',
                     description: 'FAQ và hỗ trợ',
                     icon: Icons.help,
                     onTap: () {},
                   ),
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: AppSpacing.sm),
                   ProfileLogoutButton(
                     onLogoutConfirmed: () async {
                       try {

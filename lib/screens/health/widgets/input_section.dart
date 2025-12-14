@@ -21,9 +21,16 @@ class InputSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey.shade800),
+        border: Border.all(color: AppColors.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
@@ -31,14 +38,14 @@ class InputSection extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.calculate, size: 20, color: AppColors.white),
+              const Icon(Icons.calculate, size: 20, color: AppColors.primary),
               const SizedBox(width: AppSpacing.sm),
               const Text(
                 'Thông tin cơ bản',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.white,
+                  color: AppColors.black,
                 ),
               ),
             ],
@@ -80,27 +87,27 @@ class InputSection extends ConsumerWidget {
                     child: TextField(
                       controller: weightInput,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(color: AppColors.white),
+                      style: const TextStyle(color: AppColors.black),
                       decoration: InputDecoration(
                         hintText: formState.weight.toStringAsFixed(0),
-                        hintStyle: TextStyle(color: Colors.grey.shade700),
+                        hintStyle: const TextStyle(color: AppColors.grey),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.md,
                           vertical: AppSpacing.md,
                         ),
                         filled: true,
-                        fillColor: Colors.grey.shade900,
+                        fillColor: Colors.grey.shade50,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade800),
+                          borderSide: BorderSide(color: AppColors.cardBorder),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade800),
+                          borderSide: BorderSide(color: AppColors.cardBorder),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.orange.shade500),
+                          borderSide: const BorderSide(color: AppColors.primary),
                         ),
                       ),
                     ),
@@ -110,27 +117,27 @@ class InputSection extends ConsumerWidget {
                     child: TextField(
                       controller: heightInput,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(color: AppColors.white),
+                      style: const TextStyle(color: AppColors.black),
                       decoration: InputDecoration(
                         hintText: formState.height.toStringAsFixed(0),
-                        hintStyle: TextStyle(color: Colors.grey.shade700),
+                        hintStyle: const TextStyle(color: AppColors.grey),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.md,
                           vertical: AppSpacing.md,
                         ),
                         filled: true,
-                        fillColor: Colors.grey.shade900,
+                        fillColor: Colors.grey.shade50,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade800),
+                          borderSide: BorderSide(color: AppColors.cardBorder),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade800),
+                          borderSide: BorderSide(color: AppColors.cardBorder),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.orange.shade500),
+                          borderSide: const BorderSide(color: AppColors.primary),
                         ),
                       ),
                     ),

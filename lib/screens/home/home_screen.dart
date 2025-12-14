@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: AppFontSize.xxxl,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.black,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),

@@ -33,9 +33,16 @@ class _AddWeightFormState extends State<AddWeightForm> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: const Color(0xFF1F2937)),
+        border: Border.all(color: AppColors.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +51,7 @@ class _AddWeightFormState extends State<AddWeightForm> {
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+                  color: AppColors.black)),
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
@@ -55,27 +62,27 @@ class _AddWeightFormState extends State<AddWeightForm> {
                   decoration: InputDecoration(
                     hintText: 'Nhập cân nặng (kg)',
                     hintStyle: const TextStyle(
-                        color: Color(0xFF6B7280)),
+                        color: AppColors.grey),
                     filled: true,
-                    fillColor: const Color(0xFF1F2937),
+                    fillColor: Colors.grey.shade50,
                     border: OutlineInputBorder(
                       borderRadius:
                           BorderRadius.circular(AppBorderRadius.md),
-                      borderSide: const BorderSide(
-                          color: Color(0xFF374151)),
+                      borderSide: BorderSide(
+                          color: AppColors.cardBorder),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius:
                           BorderRadius.circular(20),
                       borderSide: const BorderSide(
-                          color: Color(0xFFF97316)),
+                          color: AppColors.primary),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
                         vertical: AppSpacing.md),
                   ),
                   style: const TextStyle(
-                      color: Colors.white, fontSize: 14),
+                      color: AppColors.black, fontSize: 14),
                 ),
               ),
               const SizedBox(width: AppSpacing.md),

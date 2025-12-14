@@ -5,7 +5,7 @@ import '../../services/auth_service.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
-  final VoidCallback onSignupSuccess;
+  final Future<void> Function() onSignupSuccess;
 
   const RegisterScreen({
     super.key,
@@ -21,8 +21,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   late TextEditingController emailController;
   late TextEditingController passwordController;
   late TextEditingController confirmPasswordController;
-  late TextEditingController heightController;
-  late TextEditingController goalController;
 
   bool showPassword = false;
   bool showConfirmPassword = false;
@@ -36,8 +34,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     emailController = TextEditingController();
     passwordController = TextEditingController();
     confirmPasswordController = TextEditingController();
-    heightController = TextEditingController();
-    goalController = TextEditingController();
   }
 
   @override
@@ -46,8 +42,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
-    heightController.dispose();
-    goalController.dispose();
     super.dispose();
   }
 
@@ -62,12 +56,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
         fullName: nameController.text.trim(),
-        height: double.tryParse(heightController.text.trim()),
-        goal: goalController.text.trim(),
       );
 
       if (mounted) {
-        widget.onSignupSuccess();
+        await widget.onSignupSuccess();
       }
     } catch (e) {
       if (mounted) {
@@ -339,21 +331,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           onToggle: () {
             setState(() => showConfirmPassword = !showConfirmPassword);
           },
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        _buildInputField(
-          label: 'Chiều cao (cm)',
-          icon: Icons.straighten,
-          controller: heightController,
-          placeholder: '175',
-          keyboardType: TextInputType.number,
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        _buildInputField(
-          label: 'Mục tiêu',
-          icon: Icons.flag,
-          controller: goalController,
-          placeholder: 'Ví dụ: Giảm cân, Tăng cơ bắp',
         ),
       ],
     );

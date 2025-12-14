@@ -15,11 +15,11 @@ class WorkoutsScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Bài Tập',
+                'Bài tập',
                 style: TextStyle(
                   fontSize: AppFontSize.xxxl,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.white,
+                  color: AppColors.black,
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -72,9 +72,16 @@ class WorkoutsScreen extends ConsumerWidget {
   Widget _buildSearchBar() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A1A3F),
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF1A3A5F)),
+        border: Border.all(color: AppColors.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: const Padding(
         padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),

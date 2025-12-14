@@ -17,7 +17,7 @@ class PlanSection extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppFontSize.lg,
                 fontWeight: FontWeight.bold,
-                color: AppColors.white,
+                color: AppColors.black,
               ),
             ),
             TextButton(

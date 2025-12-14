@@ -5,7 +5,7 @@ import '../../services/auth_service.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  final VoidCallback onLoginSuccess;
+  final Future<void> Function() onLoginSuccess;
 
   const LoginScreen({
     super.key,
@@ -51,7 +51,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
 
       if (mounted) {
-        widget.onLoginSuccess();
+        await widget.onLoginSuccess();
       }
     } catch (e) {
       if (mounted) {

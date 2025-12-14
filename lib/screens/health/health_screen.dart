@@ -64,7 +64,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     _updateControllers(formState);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF000000),
+      backgroundColor: AppColors.bgLight,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.lg).copyWith(bottom: 100),

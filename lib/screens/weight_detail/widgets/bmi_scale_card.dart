@@ -21,9 +21,16 @@ class BMIScaleCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: const Color(0xFF1F2937)),
+        border: Border.all(color: AppColors.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,7 +39,7 @@ class BMIScaleCard extends StatelessWidget {
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+                  color: AppColors.black)),
           const SizedBox(height: 8),
           
           // Gradient Bar with BMI Indicator
@@ -160,7 +167,7 @@ class BMIScaleCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: const Color(0xFF1F2937),
+        color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(AppBorderRadius.md),
       ),
       child: Row(
@@ -184,14 +191,14 @@ class BMIScaleCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.grey,
+                    color: AppColors.black,
                   ),
                 ),
                 Text(
                   range,
                   style: const TextStyle(
                     fontSize: 8,
-                    color: Color(0xFF6B7280),
+                    color: AppColors.grey,
                   ),
                 ),
               ],

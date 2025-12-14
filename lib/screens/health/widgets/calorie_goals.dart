@@ -14,9 +14,16 @@ class CalorieGoals extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
-        border: Border.all(color: Colors.grey.shade800),
+        color: AppColors.cardBg,
+        border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
@@ -27,7 +34,7 @@ class CalorieGoals extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: AppColors.white,
+              color: AppColors.black,
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -56,7 +63,7 @@ class CalorieGoals extends StatelessWidget {
   Widget _buildCalorieGoalRow(String title, String value, Color color) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade900,
+        color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -71,7 +78,7 @@ class CalorieGoals extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.white,
+                  color: AppColors.black,
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),

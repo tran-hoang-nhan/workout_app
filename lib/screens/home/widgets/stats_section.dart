@@ -73,9 +73,16 @@ class StatsSection extends StatelessWidget {
               children: stats.map((stat) {
                 return Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0A1A3F),
-                    borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                    border: Border.all(color: const Color(0xFF1A3A5F)),
+                    color: AppColors.cardBg,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.grey.shade300),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   padding: EdgeInsets.all(padding),
                   child: Column(
@@ -101,7 +108,7 @@ class StatsSection extends StatelessWidget {
                         style: TextStyle(
                           fontSize: screenWidth > 400 ? 15 : 13,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.white,
+                          color: AppColors.black,
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 1,

@@ -22,26 +22,26 @@ class HealthHeader extends StatelessWidget {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: AppColors.white,
+                color: AppColors.black,
               ),
             ),
             const SizedBox(height: AppSpacing.xs),
-            Text(
+            const Text(
               'Theo dõi các chỉ số sức khỏe của bạn',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade400,
+                color: AppColors.grey,
               ),
             ),
           ],
         ),
         GestureDetector(
           onTap: onEditTap,
-          child: Text(
+          child: const Text(
             'Sửa hồ sơ',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.orange.shade500,
+              color: AppColors.primary,
             ),
           ),
         ),

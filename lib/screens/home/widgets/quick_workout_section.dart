@@ -52,7 +52,7 @@ class QuickWorkoutSection extends StatelessWidget {
               style: TextStyle(
                 fontSize: AppFontSize.lg,
                 fontWeight: FontWeight.bold,
-                color: AppColors.white,
+                color: AppColors.black,
               ),
             ),
             GestureDetector(
@@ -77,9 +77,16 @@ class QuickWorkoutSection extends StatelessWidget {
             final workout = quickWorkouts[index];
             return Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF0A1A3F),
+                color: AppColors.cardBg,
                 borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                border: Border.all(color: const Color(0xFF1A3A5F)),
+                border: Border.all(color: Colors.grey.shade300),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               padding: const EdgeInsets.all(AppSpacing.md),
               child: Row(
@@ -88,15 +95,10 @@ class QuickWorkoutSection extends StatelessWidget {
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.blue.withValues(alpha: 0.3),
-                          Colors.purple.withValues(alpha: 0.3),
-                        ],
-                      ),
+                      color: Colors.orange.shade50,
                       borderRadius: BorderRadius.circular(AppBorderRadius.md),
                     ),
-                    child: Icon(workout.icon, color: Colors.blue, size: 28),
+                    child: Icon(Icons.local_fire_department, color: Colors.orange.shade600, size: 28),
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
@@ -108,7 +110,7 @@ class QuickWorkoutSection extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: AppFontSize.sm,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.white,
+                            color: AppColors.black,
                           ),
                         ),
                         const SizedBox(height: 4),
