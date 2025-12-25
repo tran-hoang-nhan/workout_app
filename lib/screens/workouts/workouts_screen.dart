@@ -117,9 +117,9 @@ class WorkoutsScreen extends ConsumerWidget {
                         end: Alignment.bottomRight,
                       )
                     : null,
-                color: index == 0 ? null : const Color(0xFF0A1A3F),
+                color: index == 0 ? null : const Color.fromARGB(255, 247, 248, 250),
                 border: Border.all(
-                  color: index == 0 ? Colors.transparent : const Color(0xFF1A3A5F),
+                  color: Color.fromARGB(255, 207, 209, 211),
                 ),
                 borderRadius: BorderRadius.circular(24),
               ),
@@ -154,9 +154,9 @@ class WorkoutsScreen extends ConsumerWidget {
         return Container(
           padding: EdgeInsets.all(isSmallScreen ? 10 : 12),
           decoration: BoxDecoration(
-            color: const Color(0xFF0A1A3F),
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-            border: Border.all(color: const Color(0xFF1A3A5F)),
+            border: Border.all(color: const Color.fromARGB(255, 241, 241, 241)),
           ),
           child: Column(
             children: [
@@ -172,7 +172,7 @@ class WorkoutsScreen extends ConsumerWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.white,
+                            color: AppColors.black,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -248,7 +248,7 @@ class WorkoutsScreen extends ConsumerWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1A1A1A),
+                    backgroundColor: const Color.fromARGB(255, 237, 81, 9),
                     padding: EdgeInsets.symmetric(
                       vertical: isSmallScreen ? 8 : 10,
                     ),

@@ -172,10 +172,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final userAsync = ref.watch(currentUserProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF000000),
+      backgroundColor: AppColors.bgLight,
       appBar: AppBar(
         title: const Text('Chỉnh sửa hồ sơ'),
-        backgroundColor: const Color(0xFF000000),
+        backgroundColor: AppColors.bgLight,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -343,7 +343,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   // Name Section
                   Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFF111827),
+                      color: const Color.fromARGB(255, 246, 207, 156),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(color: Colors.grey.shade800),
                     ),
@@ -464,7 +464,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           child: const Text(
                             'Hủy',
                             style: TextStyle(
-                              color: AppColors.white,
+                              color: AppColors.black,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
