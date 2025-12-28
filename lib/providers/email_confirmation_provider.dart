@@ -6,9 +6,7 @@ final emailConfirmationServiceProvider = Provider((ref) {
   return EmailConfirmationService();
 });
 
-// State cho verify OTP
-final verifyOTPProvider =
-    StateNotifierProvider.family<OTPNotifier, bool, String>((ref, email) {
+final verifyOTPProvider =StateNotifierProvider.family<OTPNotifier, bool, String>((ref, email) {
   final service = ref.watch(emailConfirmationServiceProvider);
   return OTPNotifier(service, email);
 });
@@ -16,7 +14,6 @@ final verifyOTPProvider =
 class OTPNotifier extends StateNotifier<bool> {
   final EmailConfirmationService _service;
   final String email;
-
   OTPNotifier(this._service, this.email) : super(false);
 
   Future<void> verifyOTP(String token) async {
@@ -33,9 +30,7 @@ class OTPNotifier extends StateNotifier<bool> {
   }
 }
 
-// State cho resend email
-final resendEmailProvider =
-    StateNotifierProvider.family<ResendNotifier, bool, String>((ref, email) {
+final resendEmailProvider = StateNotifierProvider.family<ResendNotifier, bool, String>((ref, email) {
   final service = ref.watch(emailConfirmationServiceProvider);
   return ResendNotifier(service, email);
 });
@@ -43,7 +38,6 @@ final resendEmailProvider =
 class ResendNotifier extends StateNotifier<bool> {
   final EmailConfirmationService _service;
   final String email;
-
   ResendNotifier(this._service, this.email) : super(false);
 
   Future<void> resendEmail() async {

@@ -59,8 +59,6 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     final formState = ref.watch(healthFormProvider);
     final calculations = ref.watch(healthCalculationsProvider);
     ref.watch(syncHealthProfileProvider);
-
-    // Cập nhật controllers từ formState
     _updateControllers(formState);
 
     return Scaffold(
@@ -78,7 +76,6 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               // Health Alerts
               if (formState.injuries.isNotEmpty || formState.medicalConditions.isNotEmpty)
                 HealthAlerts(formState: formState),
-              
               if (formState.injuries.isNotEmpty || formState.medicalConditions.isNotEmpty)
                 const SizedBox(height: AppSpacing.lg),
 
@@ -116,7 +113,6 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
   }
 
   void _showEditModal() {
-    final formState = ref.watch(healthFormProvider);
     late TextEditingController injuryController;
     late TextEditingController conditionController;
     late TextEditingController allergyController;
@@ -129,90 +125,93 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.9,
-        maxChildSize: 0.95,
-        minChildSize: 0.5,
-        builder: (context, scrollController) => Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF0A0E27),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
+      builder: (context) => Consumer(
+        builder: (context, ref, child) {
+          final formState = ref.watch(healthFormProvider);
+          
+          return DraggableScrollableSheet(
+            initialChildSize: 0.9,
+            maxChildSize: 0.95,
+            minChildSize: 0.5,
+            builder: (context, scrollController) => Container(
+              decoration: const BoxDecoration(
+                color: Color(0xFF0A0E27),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              child: HealthFormUI(
+                age: formState.age,
+                weight: formState.weight,
+                height: formState.height,
+                gender: formState.gender,
+                injuries: formState.injuries,
+                medicalConditions: formState.medicalConditions,
+                activityLevel: formState.activityLevel,
+                sleepHours: formState.sleepHours.toDouble(),
+                waterIntake: formState.waterIntake.toInt(),
+                dietType: formState.dietType,
+                allergies: formState.allergies,
+                injuryController: injuryController,
+                conditionController: conditionController,
+                allergyController: allergyController,
+                isSaving: false,
+                onAgeChanged: (value) => ref.read(healthFormProvider.notifier).setAge(value),
+                onWeightChanged: (value) => ref.read(healthFormProvider.notifier).setWeight(value),
+                onHeightChanged: (value) => ref.read(healthFormProvider.notifier).setHeight(value),
+                onGenderChanged: (value) => ref.read(healthFormProvider.notifier).setGender(value),
+                onAddInjury: () {
+                  if (injuryController.text.trim().isNotEmpty) {
+                    ref.read(healthFormProvider.notifier).addInjury(injuryController.text.trim());
+                    injuryController.clear();
+                  }
+                },
+                onRemoveInjury: (index) => ref.read(healthFormProvider.notifier).removeInjury(index),
+                onAddCondition: () {
+                  if (conditionController.text.trim().isNotEmpty) {
+                    ref.read(healthFormProvider.notifier).addCondition(conditionController.text.trim());
+                    conditionController.clear();
+                  }
+                },
+                onRemoveCondition: (index) => ref.read(healthFormProvider.notifier).removeCondition(index),
+                onAddAllergy: () {
+                  if (allergyController.text.trim().isNotEmpty) {
+                    ref.read(healthFormProvider.notifier).addAllergy(allergyController.text.trim());
+                    allergyController.clear();
+                  }
+                },
+                onRemoveAllergy: (index) => ref.read(healthFormProvider.notifier).removeAllergy(index),
+                onActivityLevelChanged: (value) =>ref.read(healthFormProvider.notifier).setActivityLevel(value),
+                onSleepHoursChanged: (value) =>ref.read(healthFormProvider.notifier).setSleepHours(value),
+                onWaterIntakeChanged: (value) =>ref.read(healthFormProvider.notifier).setWaterIntake(value.toDouble()),
+                onDietTypeChanged: (value) => ref.read(healthFormProvider.notifier).setDietType(value),
+                onSave: () async {
+                  try {
+                    // Save health profile
+                    await ref.read(saveHealthProfileProvider(HealthProfileSaveParams(
+                      height: formState.height,
+                      gender: null,
+                    )).future);
+                    
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Đã lưu thông tin sức khỏe thành công!')),
+                      );
+                      Navigator.pop(context);
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Lỗi: ${e.toString()}')),
+                      );
+                    }
+                  }
+                },
+              ),
             ),
-          ),
-          child: HealthFormUI(
-            age: formState.age,
-            weight: formState.weight,
-            height: formState.height,
-            gender: formState.gender,
-            injuries: formState.injuries,
-            medicalConditions: formState.medicalConditions,
-            activityLevel: formState.activityLevel,
-            sleepHours: formState.sleepHours.toDouble(),
-            waterIntake: formState.waterIntake,
-            dietType: formState.dietType,
-            allergies: formState.allergies,
-            injuryController: injuryController,
-            conditionController: conditionController,
-            allergyController: allergyController,
-            isSaving: false,
-            onAgeChanged: (value) => ref.read(healthFormProvider.notifier).setAge(value),
-            onWeightChanged: (value) => ref.read(healthFormProvider.notifier).setWeight(value),
-            onHeightChanged: (value) => ref.read(healthFormProvider.notifier).setHeight(value),
-            onGenderChanged: (value) => ref.read(healthFormProvider.notifier).setGender(value),
-            onAddInjury: () {
-              if (injuryController.text.trim().isNotEmpty) {
-                ref.read(healthFormProvider.notifier).addInjury(injuryController.text.trim());
-                injuryController.clear();
-              }
-            },
-            onRemoveInjury: (index) => ref.read(healthFormProvider.notifier).removeInjury(index),
-            onAddCondition: () {
-              if (conditionController.text.trim().isNotEmpty) {
-                ref.read(healthFormProvider.notifier).addCondition(conditionController.text.trim());
-                conditionController.clear();
-              }
-            },
-            onRemoveCondition: (index) => ref.read(healthFormProvider.notifier).removeCondition(index),
-            onAddAllergy: () {
-              if (allergyController.text.trim().isNotEmpty) {
-                ref.read(healthFormProvider.notifier).addAllergy(allergyController.text.trim());
-                allergyController.clear();
-              }
-            },
-            onRemoveAllergy: (index) => ref.read(healthFormProvider.notifier).removeAllergy(index),
-            onActivityLevelChanged: (value) =>
-                ref.read(healthFormProvider.notifier).setActivityLevel(value),
-            onSleepHoursChanged: (value) =>
-                ref.read(healthFormProvider.notifier).setSleepHours(value),
-            onWaterIntakeChanged: (value) =>
-                ref.read(healthFormProvider.notifier).setWaterIntake(value.toDouble()),
-            onDietTypeChanged: (value) => ref.read(healthFormProvider.notifier).setDietType(value),
-            onSave: () async {
-              try {
-                // Save health profile
-                await ref.read(saveHealthProfileProvider(HealthProfileSaveParams(
-                  height: formState.height,
-                  gender: null,
-                )).future);
-                
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Đã lưu thông tin sức khỏe thành công!')),
-                  );
-                  Navigator.pop(context);
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Lỗi: ${e.toString()}')),
-                  );
-                }
-              }
-            },
-          ),
-        ),
+          );
+        },
       ),
     ).whenComplete(() {
       injuryController.dispose();

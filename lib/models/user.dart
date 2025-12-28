@@ -23,9 +23,7 @@ class AppUser {
     this.updatedAt,
   }) : assert(id.isNotEmpty), assert(email.isNotEmpty);
 
-  // Tạo AppUser từ JSON (từ Supabase profiles table)
   factory AppUser.fromJson(Map<String, dynamic> json) {
-    // Handle height: Supabase may store as int or double
     double? height;
     final heightValue = json['height'];
     if (heightValue != null) {
@@ -50,7 +48,6 @@ class AppUser {
     );
   }
 
-  // Chuyển AppUser thành JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -66,7 +63,6 @@ class AppUser {
     };
   }
 
-  // Copy with - để cập nhật một số field
   AppUser copyWith({
     String? id,
     String? email,
@@ -93,3 +89,33 @@ class AppUser {
     );
   }
 }
+
+class UserStats {
+  final int totalWorkouts;
+  final double totalHours;
+  final int totalCalories;
+  final int streak;
+  double? weight;
+  double? height;
+  int? age;
+
+  UserStats({
+    required this.totalWorkouts,
+    required this.totalHours,
+    required this.totalCalories,
+    required this.streak,
+    this.weight,
+    this.height,
+    this.age,
+  });
+
+  factory UserStats.empty() {
+    return UserStats(
+      totalWorkouts: 0,
+      totalHours: 0,
+      totalCalories: 0,
+      streak: 0,
+    );
+  }
+}
+

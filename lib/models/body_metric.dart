@@ -4,7 +4,6 @@ class BodyMetric {
   final double weight;
   final double? bmi;
   final DateTime recordedAt;
-
   BodyMetric({
     required this.id,
     required this.userId,
@@ -12,7 +11,6 @@ class BodyMetric {
     this.bmi,
     required this.recordedAt,
   });
-
   factory BodyMetric.fromJson(Map<String, dynamic> json) {
     return BodyMetric(
       id: json['id'] ?? 0,
@@ -24,7 +22,6 @@ class BodyMetric {
           : DateTime.now(),
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -34,7 +31,6 @@ class BodyMetric {
       'recorded_at': recordedAt.toIso8601String(),
     };
   }
-
   BodyMetric copyWith({
     int? id,
     String? userId,
@@ -51,3 +47,40 @@ class BodyMetric {
     );
   }
 }
+
+class WeightData {
+  final double weight;
+  final double height;
+  final List<BodyMetric> weightHistory;
+  WeightData({
+    required this.weight,
+    required this.height,
+    required this.weightHistory,
+  });
+}
+
+class SaveWeightParams {
+  final String userId;
+  final double weight;
+  final double height;
+  SaveWeightParams({
+    required this.userId,
+    required this.weight,
+    required this.height,
+  });
+}
+
+class ProgressStats {
+  final double totalCalories;
+  final int totalDuration;
+  final int totalWorkouts;
+  final double avgCaloriesPerSession;
+
+  ProgressStats({
+    required this.totalCalories,
+    required this.totalDuration,
+    required this.totalWorkouts,
+    required this.avgCaloriesPerSession,
+  });
+}
+

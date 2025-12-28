@@ -4,7 +4,6 @@ import '../../../providers/health_provider.dart';
 
 class HeartRateZones extends StatelessWidget {
   final HealthCalculations calculations;
-
   const HeartRateZones({
     super.key,
     required this.calculations,

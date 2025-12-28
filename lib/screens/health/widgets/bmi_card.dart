@@ -108,7 +108,7 @@ class _BMICardState extends State<BMICard> with SingleTickerProviderStateMixin {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: Colors.white.withAlpha((255 * 0.2).toInt()),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(

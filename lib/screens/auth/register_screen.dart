@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
-import '../../services/auth_service.dart';
+import '../../providers/auth_provider.dart';
+import '../../models/auth.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -48,15 +49,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> handleSignup() async {
     if (!_validateInputs()) return;
 
-    setState(() => isLoading = true);
+    setState(() => authError = '');
 
     try {
-      final authService = AuthService();
-      await authService.signUp(
+      final params = SignUpParams(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
         fullName: nameController.text.trim(),
       );
+
+      await ref.read(authControllerProvider.notifier).signUp(params);
+      
+      final authState = ref.read(authControllerProvider);
+      if (authState.hasError) {
+        setState(() => authError = authState.error.toString());
+        return;
+      }
 
       if (mounted) {
         await widget.onSignupSuccess();
@@ -64,10 +72,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => authError = e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
       }
     }
   }
@@ -462,8 +466,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Widget _buildSubmitButton() {
+    final authState = ref.watch(authControllerProvider);
+    final isControllerLoading = authState.isLoading;
+
     return GestureDetector(
-      onTap: isLoading ? null : handleSignup,
+      onTap: isControllerLoading ? null : handleSignup,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
@@ -472,7 +479,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: isLoading
+            colors: isControllerLoading
                 ? [Colors.grey.shade600, Colors.grey.shade700]
                 : [Colors.orange.shade500, Colors.red.shade500],
           ),
@@ -485,7 +492,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ],
         ),
         child: Center(
-          child: isLoading
+          child: isControllerLoading
               ? SizedBox(
                   height: 20,
                   width: 20,

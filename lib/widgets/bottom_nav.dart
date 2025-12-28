@@ -11,11 +11,11 @@ class BottomNav extends StatelessWidget {
     required this.setActiveTab,
   });
 
-  final List<_TabItem> tabs = const [
-    _TabItem(id: 'home', label: 'Trang chủ', icon: Icons.home),
-    _TabItem(id: 'workouts', label: 'Bài tập', icon: Icons.fitness_center),
-    _TabItem(id: 'health', label: 'Sức khỏe', icon: Icons.local_activity),
-    _TabItem(id: 'profile', label: 'Cá nhân', icon: Icons.person),
+  final List<TabItem> tabs = const [
+    TabItem(id: 'home', label: 'Trang chủ', icon: Icons.home),
+    TabItem(id: 'workouts', label: 'Bài tập', icon: Icons.fitness_center),
+    TabItem(id: 'health', label: 'Sức khỏe', icon: Icons.local_activity),
+    TabItem(id: 'profile', label: 'Cá nhân', icon: Icons.person),
   ];
 
   @override
@@ -59,12 +59,13 @@ class BottomNav extends StatelessWidget {
   }
 }
 
-class _TabItem {
+// Đã loại bỏ _TabItem dư thừa, chỉ giữ lại TabItem
+class TabItem {
   final String id;
   final String label;
   final IconData icon;
 
-  const _TabItem({
+  const TabItem({
     required this.id,
     required this.label,
     required this.icon,
@@ -72,16 +73,15 @@ class _TabItem {
 }
 
 class _TabButton extends StatefulWidget {
-  final _TabItem tab;
+  final TabItem tab;
   final bool isActive;
   final VoidCallback onTap;
 
   const _TabButton({
-    Key? key,
     required this.tab,
     required this.isActive,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   State<_TabButton> createState() => _TabButtonState();

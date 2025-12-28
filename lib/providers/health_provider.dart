@@ -1,150 +1,161 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../repositories/health_repository.dart';
 import '../services/health_service.dart';
+import '../models/health_data.dart';
+import '../models/health_params.dart';
+import '../utils/app_error.dart';
+import './auth_provider.dart';
 
-// Providers for health data
-final healthServiceProvider = Provider((ref) => HealthService());
-
-// Check if user has health data
-final hasHealthDataProvider = FutureProvider<bool>((ref) async {
-  try {
-    // Wait a bit for Supabase auth to initialize
-    await Future.delayed(const Duration(milliseconds: 200));
-    
-    final session = Supabase.instance.client.auth.currentSession;
-    final userId = session?.user.id;
-    
-    debugPrint('[hasHealthDataProvider] ========== CHECK START ==========');
-    debugPrint('[hasHealthDataProvider] Session exists: ${session != null}');
-    debugPrint('[hasHealthDataProvider] UserId: $userId');
-    
-    if (userId == null) {
-      debugPrint('[hasHealthDataProvider] No userId, returning false');
-      debugPrint('[hasHealthDataProvider] ========== CHECK END (no user) ==========');
-      return false;
-    }
-
-    // Query health table with user_id column
-    final response = await Supabase.instance.client
-        .from('health')
-        .select('user_id, age, weight')
-        .eq('user_id', userId);
-
-    debugPrint('[hasHealthDataProvider] Query executed');
-    debugPrint('[hasHealthDataProvider] Response type: ${response.runtimeType}');
-    debugPrint('[hasHealthDataProvider] Response: $response');
-    debugPrint('[hasHealthDataProvider] Response isEmpty: ${response.isEmpty}');
-    debugPrint('[hasHealthDataProvider] Response length: ${response.length}');
-    
-    final hasData = response.isNotEmpty;
-    debugPrint('[hasHealthDataProvider] Final result - Has health data: $hasData');
-    debugPrint('[hasHealthDataProvider] ========== CHECK END ==========');
-    return hasData;
-  } catch (e, stackTrace) {
-    debugPrint('[hasHealthDataProvider] ========== ERROR ==========');
-    debugPrint('[hasHealthDataProvider] Error: $e');
-    debugPrint('[hasHealthDataProvider] StackTrace: $stackTrace');
-    return false;
-  }
+final healthRepositoryProvider = Provider<HealthRepository>((ref) {
+  return HealthRepository();
 });
 
-// State notifier for form state management
+final healthServiceProvider = Provider<HealthService>((ref) {
+  final repo = ref.watch(healthRepositoryProvider);
+  return HealthService(repository: repo);
+});
+
+final healthDataProvider = FutureProvider<HealthData?>((ref) async {
+  final userId = await ref.watch(currentUserIdProvider.future);
+  if (userId == null) return null;
+  final service = ref.watch(healthServiceProvider);
+  return service.checkHealthProfile(userId);
+});
+
+// 1. HealthFormState
+class HealthFormState {
+  final int age;
+  final double weight;
+  final double height;
+  final String gender;
+  final List<String> injuries;
+  final List<String> medicalConditions;
+  final String activityLevel;
+  final double sleepHours;
+  final double waterIntake;
+  final String dietType;
+  final List<String> allergies;
+
+  HealthFormState({
+    required this.age,
+    required this.weight,
+    required this.height,
+    required this.gender,
+    required this.injuries,
+    required this.medicalConditions,
+    required this.activityLevel,
+    required this.sleepHours,
+    required this.waterIntake,
+    required this.dietType,
+    required this.allergies,
+  });
+
+  factory HealthFormState.initial() {
+    return HealthFormState(
+      age: 25,
+      weight: 70,
+      height: 170,
+      gender: 'male',
+      injuries: [],
+      medicalConditions: [],
+      activityLevel: 'moderately_active',
+      sleepHours: 7,
+      waterIntake: 2000,
+      dietType: 'normal',
+      allergies: [],
+    );
+  }
+
+  HealthFormState copyWith({
+    int? age,
+    double? weight,
+    double? height,
+    String? gender,
+    List<String>? injuries,
+    List<String>? medicalConditions,
+    String? activityLevel,
+    double? sleepHours,
+    double? waterIntake,
+    String? dietType,
+    List<String>? allergies,
+  }) {
+    return HealthFormState(
+      age: age ?? this.age,
+      weight: weight ?? this.weight,
+      height: height ?? this.height,
+      gender: gender ?? this.gender,
+      injuries: injuries ?? List.from(this.injuries),
+      medicalConditions: medicalConditions ?? List.from(this.medicalConditions),
+      activityLevel: activityLevel ?? this.activityLevel,
+      sleepHours: sleepHours ?? this.sleepHours,
+      waterIntake: waterIntake ?? this.waterIntake,
+      dietType: dietType ?? this.dietType,
+      allergies: allergies ?? List.from(this.allergies),
+    );
+  }
+}
+
+// 2. HealthFormNotifier
 class HealthFormNotifier extends StateNotifier<HealthFormState> {
-  HealthFormNotifier()
-      : super(
-          HealthFormState(
-            age: 28,
-            weight: 68,
-            height: 175,
-            gender: 'male',
-            activityLevel: 'moderately_active',
-            sleepHours: 7,
-            waterIntake: 2000,
-            dietType: 'normal',
-            injuries: [],
-            medicalConditions: [],
-            allergies: [],
-          ),
-        );
+  final Ref ref;
+  HealthFormNotifier(this.ref) : super(HealthFormState.initial());
 
   void setAge(int age) => state = state.copyWith(age: age);
   void setWeight(double weight) => state = state.copyWith(weight: weight);
   void setHeight(double height) => state = state.copyWith(height: height);
   void setGender(String gender) => state = state.copyWith(gender: gender);
-  void setActivityLevel(String level) => state = state.copyWith(activityLevel: level);
-  void setSleepHours(double hours) => state = state.copyWith(sleepHours: hours.toInt());
-  void setWaterIntake(double intake) => state = state.copyWith(waterIntake: intake.toInt());
-  void setDietType(String type) => state = state.copyWith(dietType: type);
-
+  
   void addInjury(String injury) {
-    if (injury.isNotEmpty && !state.injuries.contains(injury)) {
+    if (!state.injuries.contains(injury)) {
       state = state.copyWith(injuries: [...state.injuries, injury]);
     }
   }
-
   void removeInjury(int index) {
-    final updated = [...state.injuries];
-    updated.removeAt(index);
-    state = state.copyWith(injuries: updated);
+    final list = List<String>.from(state.injuries);
+    list.removeAt(index);
+    state = state.copyWith(injuries: list);
   }
 
   void addCondition(String condition) {
-    if (condition.isNotEmpty && !state.medicalConditions.contains(condition)) {
+    if (!state.medicalConditions.contains(condition)) {
       state = state.copyWith(medicalConditions: [...state.medicalConditions, condition]);
     }
   }
-
   void removeCondition(int index) {
-    final updated = [...state.medicalConditions];
-    updated.removeAt(index);
-    state = state.copyWith(medicalConditions: updated);
+    final list = List<String>.from(state.medicalConditions);
+    list.removeAt(index);
+    state = state.copyWith(medicalConditions: list);
   }
 
+  void setActivityLevel(String level) => state = state.copyWith(activityLevel: level);
+  void setSleepHours(double hours) => state = state.copyWith(sleepHours: hours);
+  void setWaterIntake(double ml) => state = state.copyWith(waterIntake: ml);
+  void setDietType(String type) => state = state.copyWith(dietType: type);
+
   void addAllergy(String allergy) {
-    if (allergy.isNotEmpty && !state.allergies.contains(allergy)) {
+    if (!state.allergies.contains(allergy)) {
       state = state.copyWith(allergies: [...state.allergies, allergy]);
     }
   }
-
   void removeAllergy(int index) {
-    final updated = [...state.allergies];
-    updated.removeAt(index);
-    state = state.copyWith(allergies: updated);
+    final list = List<String>.from(state.allergies);
+    list.removeAt(index);
+    state = state.copyWith(allergies: list);
   }
 
-  void loadFromHealthData(HealthData data) {
-    debugPrint('DEBUG loadFromHealthData - age: ${data.age}, weight: ${data.weight}, height: ${data.height}, gender: ${data.gender}');
+  void updateFromHealthData(HealthData data) {
     state = HealthFormState(
       age: data.age,
       weight: data.weight,
-      height: data.height ?? 175,
-      gender: data.gender ?? 'male',
-      activityLevel: data.activityLevel,
-      sleepHours: data.sleepHours,
-      waterIntake: data.waterIntake,
-      dietType: data.dietType,
+      height: data.height ?? state.height,
+      gender: data.gender ?? state.gender,
       injuries: data.injuries,
       medicalConditions: data.medicalConditions,
+      activityLevel: data.activityLevel,
+      sleepHours: data.sleepHours.toDouble(),
+      waterIntake: data.waterIntake.toDouble(),
+      dietType: data.dietType,
       allergies: data.allergies,
-    );
-  }
-
-  Future<void> saveHealthData(String userId, String goal, HealthService healthService) async {
-    await healthService.saveHealthData(
-      userId: userId,
-      age: state.age,
-      weight: state.weight,
-      height: state.height,
-      gender: state.gender,
-      activityLevel: state.activityLevel,
-      goal: goal,
-      dietType: state.dietType,
-      sleepHours: state.sleepHours,
-      waterIntake: state.waterIntake,
-      injuries: state.injuries,
-      medicalConditions: state.medicalConditions,
-      allergies: state.allergies,
     );
   }
 
@@ -163,47 +174,21 @@ class HealthFormNotifier extends StateNotifier<HealthFormState> {
     required String medicalConditions,
     required String allergies,
   }) async {
-    // Convert comma-separated strings to List
-    final injuriesList = injuries.trim().isEmpty 
-        ? <String>[] 
-        : injuries.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    final activityKey = _mapActivityLevel(activityLevel);
+    final goalKey = _mapGoal(goal);
     
-    final conditionsList = medicalConditions.trim().isEmpty 
-        ? <String>[] 
-        : medicalConditions.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-    
-    final allergiesList = allergies.trim().isEmpty 
-        ? <String>[] 
-        : allergies.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-    
-    debugPrint('[HealthFormNotifier] Saving onboarding for user: $userId');
-    debugPrint('[HealthFormNotifier] Injuries: $injuriesList, Conditions: $conditionsList, Allergies: $allergiesList');
-    
-    // Update state
-    state = state.copyWith(
-      age: age,
-      weight: weight,
-      height: height,
-      gender: gender,
-      activityLevel: activityLevel,
-      dietType: dietType,
-      sleepHours: sleepHours,
-      waterIntake: waterIntake,
-      injuries: injuriesList,
-      medicalConditions: conditionsList,
-      allergies: allergiesList,
-    );
-    
-    // Save to database
-    final healthService = HealthService();
-    await healthService.saveHealthData(
+    final injuriesList = injuries.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    final conditionsList = medicalConditions.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    final allergiesList = allergies.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+
+    final params = HealthUpdateParams(
       userId: userId,
       age: age,
       weight: weight,
       height: height,
       gender: gender,
-      activityLevel: activityLevel,
-      goal: goal,
+      activityLevel: activityKey,
+      goal: goalKey,
       dietType: dietType,
       sleepHours: sleepHours,
       waterIntake: waterIntake,
@@ -211,146 +196,75 @@ class HealthFormNotifier extends StateNotifier<HealthFormState> {
       medicalConditions: conditionsList,
       allergies: allergiesList,
     );
+
+    await ref.read(healthControllerProvider.notifier).saveHealthData(params);
+    
+    // Update local form state too
+    state = state.copyWith(
+      age: age,
+      weight: weight,
+      height: height,
+      gender: gender,
+      activityLevel: activityKey,
+      dietType: dietType,
+      sleepHours: sleepHours.toDouble(),
+      waterIntake: waterIntake.toDouble(),
+      injuries: injuriesList,
+      medicalConditions: conditionsList,
+      allergies: allergiesList,
+    );
   }
 
-  void reset() {
-    state = HealthFormState(
-      age: 28,
-      weight: 68,
-      height: 175,
-      gender: 'male',
-      activityLevel: 'moderately_active',
-      sleepHours: 7,
-      waterIntake: 2000,
-      dietType: 'normal',
-      injuries: [],
-      medicalConditions: [],
-      allergies: [],
-    );
+  String _mapActivityLevel(String label) {
+    if (label.contains('Ít')) return 'sedentary';
+    if (label.contains('Nhẹ')) return 'lightly_active';
+    if (label.contains('Trung')) return 'moderately_active';
+    if (label.contains('Rất')) return 'very_active';
+    return 'sedentary';
+  }
+
+  String _mapGoal(String label) {
+    if (label.contains('Giảm')) return 'lose';
+    if (label.contains('Duy')) return 'maintain';
+    if (label.contains('Tăng')) return 'gain';
+    return 'maintain';
   }
 }
 
-class HealthFormState {
-  final int age;
-  final double weight;
-  final double height;
-  final String gender;
-  final String activityLevel;
-  final int sleepHours;
-  final int waterIntake;
-  final String dietType;
-  final List<String> injuries;
-  final List<String> medicalConditions;
-  final List<String> allergies;
-
-  HealthFormState({
-    required this.age,
-    required this.weight,
-    required this.height,
-    required this.gender,
-    required this.activityLevel,
-    required this.sleepHours,
-    required this.waterIntake,
-    required this.dietType,
-    required this.injuries,
-    required this.medicalConditions,
-    required this.allergies,
-  });
-
-  HealthFormState copyWith({
-    int? age,
-    double? weight,
-    double? height,
-    String? gender,
-    String? activityLevel,
-    int? sleepHours,
-    int? waterIntake,
-    String? dietType,
-    List<String>? injuries,
-    List<String>? medicalConditions,
-    List<String>? allergies,
-  }) {
-    return HealthFormState(
-      age: age ?? this.age,
-      weight: weight ?? this.weight,
-      height: height ?? this.height,
-      gender: gender ?? this.gender,
-      activityLevel: activityLevel ?? this.activityLevel,
-      sleepHours: sleepHours ?? this.sleepHours,
-      waterIntake: waterIntake ?? this.waterIntake,
-      dietType: dietType ?? this.dietType,
-      injuries: injuries ?? this.injuries,
-      medicalConditions: medicalConditions ?? this.medicalConditions,
-      allergies: allergies ?? this.allergies,
-    );
-  }
-}
-
-// Provider for health form state
 final healthFormProvider = StateNotifierProvider<HealthFormNotifier, HealthFormState>((ref) {
-  return HealthFormNotifier();
+  return HealthFormNotifier(ref);
 });
 
-// Provider for loading health profile from Supabase and syncing to form
+final healthControllerProvider = AsyncNotifierProvider<HealthController, void>(() {
+  return HealthController();
+});
+
+class HealthController extends AsyncNotifier<void> {
+  @override
+  Future<void> build() async {}
+
+  Future<void> saveHealthData(HealthUpdateParams params) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      try {
+        final service = ref.read(healthServiceProvider);
+        await service.saveHealthData(params);
+        ref.invalidate(healthDataProvider);
+      } catch (e, st) {
+        throw handleException(e, st);
+      }
+    });
+  }
+}
+
 final syncHealthProfileProvider = FutureProvider<void>((ref) async {
-  final healthService = ref.watch(healthServiceProvider);
-
-  final session = Supabase.instance.client.auth.currentSession;
-  if (session == null) {
-    return;
-  }
-
-  final result = await healthService.checkHealthProfile();
-  if (result.hasProfile && result.healthData != null) {
-    // Debug: check height value
-    debugPrint('DEBUG syncHealthProfileProvider - height: ${result.healthData!.height}');
-    // Sync health data to form provider
-    ref.read(healthFormProvider.notifier).loadFromHealthData(result.healthData!);
+  final healthData = await ref.watch(healthDataProvider.future);
+  if (healthData != null) {
+    ref.read(healthFormProvider.notifier).updateFromHealthData(healthData);
   }
 });
 
-// Provider for loading health profile from Supabase
-final healthProfileProvider = FutureProvider<(bool, HealthData?)>((ref) async {
-  final healthService = ref.watch(healthServiceProvider);
-
-  final session = Supabase.instance.client.auth.currentSession;
-  if (session == null) {
-    return (false, null);
-  }
-
-  final result = await healthService.checkHealthProfile();
-  if (result.hasProfile && result.healthData != null) {
-    return (true, result.healthData);
-  }
-
-  return (false, null);
-});
-
-// Provider for health calculations
-final healthCalculationsProvider = Provider<HealthCalculations>((ref) {
-  final healthService = ref.watch(healthServiceProvider);
-  final formState = ref.watch(healthFormProvider);
-
-  final bmi = healthService.calculateBMI(formState.weight, formState.height);
-  final bmiCategory = healthService.getBMICategory(bmi);
-  final bmr =
-      healthService.calculateBMR(formState.weight, formState.height, formState.age, formState.gender);
-  final tdee = healthService.calculateTDEE(bmr, formState.activityLevel);
-  final maxHR = healthService.calculateMaxHeartRate(formState.age);
-  final fatBurnZone = healthService.calculateFatBurnZone(maxHR);
-  final cardioZone = healthService.calculateCardioZone(maxHR);
-
-  return HealthCalculations(
-    bmi: bmi,
-    bmiCategory: bmiCategory,
-    bmr: bmr,
-    tdee: tdee,
-    maxHeartRate: maxHR,
-    fatBurnZone: fatBurnZone,
-    cardioZone: cardioZone,
-  );
-});
-
+// Health calculations output
 class HealthCalculations {
   final double bmi;
   final String bmiCategory;
@@ -369,55 +283,86 @@ class HealthCalculations {
     required this.fatBurnZone,
     required this.cardioZone,
   });
+
+  factory HealthCalculations.empty() {
+    return HealthCalculations(
+      bmi: 0,
+      bmiCategory: 'N/A',
+      bmr: 0,
+      tdee: 0,
+      maxHeartRate: 0,
+      fatBurnZone: (min: 0, max: 0),
+      cardioZone: (min: 0, max: 0),
+    );
+  }
 }
 
-// Provider for saving health profile
-final saveHealthProfileProvider = FutureProvider.family<String?, HealthProfileSaveParams>((ref, params) async {
-  final healthService = ref.watch(healthServiceProvider);
+final healthCalculationsProvider = Provider<HealthCalculations>((ref) {
+  final form = ref.watch(healthFormProvider);
+  final service = ref.watch(healthServiceProvider);
 
-  final session = Supabase.instance.client.auth.currentSession;
-  if (session == null) return 'Chưa đăng nhập';
+  final bmi = service.calculateBMI(form.weight, form.height);
+  final bmiCategory = service.getBMICategory(bmi);
+  final bmr = service.calculateBMR(form.weight, form.height, form.age, form.gender);
+  final tdee = service.calculateTDEE(bmr, form.activityLevel);
+  final maxHR = service.calculateMaxHeartRate(form.age);
+  final fatBurn = service.calculateFatBurnZone(maxHR);
+  final cardio = service.calculateCardioZone(maxHR);
 
-  final userId = session.user.id;
-  final formState = ref.watch(healthFormProvider);
-
-  // Convert empty lists to ["Không"] for display purposes
-  final injuries = formState.injuries.isEmpty ? ['Không'] : formState.injuries;
-  final medicalConditions = formState.medicalConditions.isEmpty ? ['Không'] : formState.medicalConditions;
-  final allergies = formState.allergies.isEmpty ? ['Không'] : formState.allergies;
-
-  final result = await healthService.saveHealthProfile(
-    userId,
-    formState.age,
-    formState.weight,
-    formState.height,
-    injuries,
-    medicalConditions,
-    formState.activityLevel,
-    formState.sleepHours,
-    formState.waterIntake,
-    formState.dietType,
-    allergies,
+  return HealthCalculations(
+    bmi: bmi,
+    bmiCategory: bmiCategory,
+    bmr: bmr,
+    tdee: tdee,
+    maxHeartRate: maxHR,
+    fatBurnZone: fatBurn,
+    cardioZone: cardio,
   );
-
-  if (result.error != null) {
-    return result.error;
-  }
-
-  // Update user profile with height and gender if needed
-  if (params.height != null || params.gender != null) {
-    await healthService.updateUserProfile(userId, params.height, params.gender);
-  }
-
-  // Reload data from Supabase after save
-  ref.invalidate(syncHealthProfileProvider);
-
-  return null;
 });
 
-class HealthProfileSaveParams {
-  final double? height;
-  final String? gender;
+// Provider check has health data
+final hasHealthDataProvider = FutureProvider<bool>((ref) async {
+  final data = await ref.watch(healthDataProvider.future);
+  return data != null;
+});
 
-  HealthProfileSaveParams({this.height, this.gender});
+// Save params for editing
+class HealthProfileSaveParams {
+  final double height;
+  final String? gender;
+  HealthProfileSaveParams({required this.height, this.gender});
 }
+
+final saveHealthProfileProvider = FutureProvider.family<void, HealthProfileSaveParams>((ref, params) async {
+  try {
+    final userId = await ref.read(currentUserIdProvider.future);
+    if (userId == null) throw UnauthorizedException('Chưa đăng nhập');
+    
+    final form = ref.read(healthFormProvider);
+    
+    final updateParams = HealthUpdateParams(
+      userId: userId,
+      age: form.age,
+      weight: form.weight,
+      height: params.height,
+      gender: params.gender ?? form.gender,
+      activityLevel: form.activityLevel,
+      goal: 'maintain', // Default or could be in form
+      dietType: form.dietType,
+      sleepHours: form.sleepHours.toInt(),
+      waterIntake: form.waterIntake.toInt(),
+      injuries: form.injuries,
+      medicalConditions: form.medicalConditions,
+      allergies: form.allergies,
+    );
+
+    await ref.read(healthControllerProvider.notifier).saveHealthData(updateParams);
+  } catch (e, st) {
+    throw handleException(e, st);
+  }
+});
+
+final bmiProvider = Provider<double>((ref) {
+  final calculations = ref.watch(healthCalculationsProvider);
+  return calculations.bmi;
+});

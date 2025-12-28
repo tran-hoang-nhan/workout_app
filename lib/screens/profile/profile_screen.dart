@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/profile_provider.dart';
 import 'edit_profile_screen.dart';
 import 'widgets/profile_header_card.dart';
 import 'widgets/profile_stats_section.dart';
@@ -75,7 +75,16 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
-                  const ProfileStatsSection(),
+                  ref.watch(profileStatsProvider).when(
+                    data: (stats) => ProfileStatsSection(
+                      totalWorkouts: stats?.totalWorkouts.toString() ?? '0',
+                      totalTime: '${stats?.totalHours.toStringAsFixed(1) ?? '0'}h',
+                      caloriesBurned: '${((stats?.totalCalories ?? 0) / 1000).toStringAsFixed(1)}k',
+                      streakDays: '${stats?.streak ?? 0} ngày',
+                    ),
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (err, _) => Center(child: Text('Lỗi tải stats: $err')),
+                  ),
                   const SizedBox(height: AppSpacing.lg),
                   ProfileMenuButton(
                     title: 'Cài đặt',
@@ -101,9 +110,10 @@ class ProfileScreen extends ConsumerWidget {
                   ProfileLogoutButton(
                     onLogoutConfirmed: () async {
                       try {
-                        await ref.read(authServiceProvider).signOut();
+                        await ref.read(authControllerProvider.notifier).signOut();
                         if (context.mounted) {
-                          ref.invalidate(authStateProvider);
+                          ref.invalidate(currentUserIdProvider);
+                          ref.invalidate(currentUserProvider);
                           Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
                         }
                       } catch (e) {

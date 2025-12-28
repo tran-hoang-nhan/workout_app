@@ -1,51 +1,34 @@
-import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:io';
+import 'package:path/path.dart' as p; 
+import '../repositories/avatar_repository.dart';
+import '../utils/app_error.dart';
 
 class AvatarService {
-  final SupabaseClient _supabase = Supabase.instance.client;
+  final AvatarRepository _repository;
+  AvatarService({AvatarRepository? repository}): _repository = repository ?? AvatarRepository();
 
-  /// Upload avatar to Supabase Storage
-  /// Note: Due to platform limitations, this currently shows a placeholder message
-  /// Implement using native file picker for production
-  Future<({String? publicUrl, String? error})> uploadAvatar({
-    required String userId,
-    required dynamic imageFile, // File or XFile
-  }) async {
+  Future<String> uploadAvatar({required String userId, required File imageFile,}) async {
     try {
-      debugPrint('Starting avatar upload for user: $userId');
-      
-      // Note: This is a placeholder implementation
-      // In production, use image_picker or file_picker package
-      // and convert to File before uploading
-      
-      throw UnimplementedError(
-        'Avatar upload requires image_picker package. '
-        'Add image_picker to pubspec.yaml and implement file selection.',
+      final fileExt = p.extension(imageFile.path);
+      final fileName = 'avatar_${DateTime.now().millisecondsSinceEpoch}$fileExt';
+      final storagePath = await _repository.uploadImageToStorage(
+        userId: userId,
+        imageFile: imageFile,
+        fileName: fileName,
       );
-    } catch (e) {
-      debugPrint('Error uploading avatar: $e');
-      return (publicUrl: null, error: e.toString());
+      final publicUrl = _repository.getPublicUrl(storagePath);
+      await _repository.updateProfileAvatar(userId, publicUrl);
+      return publicUrl;
+    } catch (e, st) {
+      throw handleException(e, st);
     }
   }
 
-  /// Remove avatar from Supabase Storage and profiles table
-  Future<({String? error})> removeAvatar({required String userId}) async {
+  Future<void> removeAvatar(String userId) async {
     try {
-      debugPrint('Starting avatar removal for user: $userId');
-
-      // Update profiles table to remove avatar URL
-      await _supabase.from('profiles').upsert({
-        'id': userId,
-        'avatar_url': null,
-        'updated_at': DateTime.now().toIso8601String(),
-      });
-
-      debugPrint('Avatar URL removed from profiles table');
-
-      return (error: null);
-    } catch (e) {
-      debugPrint('Error removing avatar: $e');
-      return (error: e.toString());
+      await _repository.updateProfileAvatar(userId, null);
+    } catch (e, st) {
+      throw handleException(e, st);
     }
   }
 }

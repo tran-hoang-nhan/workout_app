@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
-import '../../services/auth_service.dart';
+import '../../providers/auth_provider.dart';
+import '../../models/auth.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -41,14 +42,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> handleLogin() async {
     if (!_validateInputs()) return;
 
-    setState(() => isLoading = true);
+    setState(() => authError = '');
 
     try {
-      final authService = AuthService();
-      await authService.signIn(
+      final params = SignInParams(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
+
+      await ref.read(authControllerProvider.notifier).signIn(params);
+      
+      final authState = ref.read(authControllerProvider);
+      if (authState.hasError) {
+        setState(() => authError = authState.error.toString());
+        return;
+      }
 
       if (mounted) {
         await widget.onLoginSuccess();
@@ -56,10 +64,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => authError = e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
       }
     }
   }
@@ -225,7 +229,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 20,
             spreadRadius: 0,
           ),
@@ -405,8 +409,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildSubmitButton() {
+    final authState = ref.watch(authControllerProvider);
+    final isControllerLoading = authState.isLoading;
+
     return GestureDetector(
-      onTap: isLoading ? null : handleLogin,
+      onTap: isControllerLoading ? null : handleLogin,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
@@ -415,7 +422,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: isLoading
+            colors: isControllerLoading
                 ? [Colors.grey.shade600, Colors.grey.shade700]
                 : [Colors.orange.shade500, Colors.red.shade500],
           ),
@@ -428,7 +435,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ],
         ),
         child: Center(
-          child: isLoading
+          child: isControllerLoading
               ? SizedBox(
                   height: 20,
                   width: 20,

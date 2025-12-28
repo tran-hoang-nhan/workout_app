@@ -1,24 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-import '../../../services/weight_service.dart';
+import '../../../models/body_metric.dart';
+import '../../../utils/health_utils.dart';
 
 class WeightHistoryCard extends StatelessWidget {
-  final List<WeightRecord> weightHistory;
+  final List<BodyMetric> weightHistory;
   final double height;
   final Function(int) onDelete;
-
   const WeightHistoryCard({
     super.key,
     required this.weightHistory,
     required this.height,
     required this.onDelete,
   });
-
-  double _calculateBMI(double w) {
-    final heightInMeters = height / 100;
-    return w / (heightInMeters * heightInMeters);
-  }
-
   Map<String, dynamic> _getBMICategory(double bmi) {
     if (bmi < 18.5) {
       return {
@@ -101,10 +95,8 @@ class WeightHistoryCard extends StatelessWidget {
               itemCount: weightHistory.length,
               itemBuilder: (context, index) {
                 final record = weightHistory[index];
-                final recordBMI =
-                    _calculateBMI(record.weight);
+                final recordBMI = calculateBMI(record.weight, height);
                 final recordCategory = _getBMICategory(recordBMI);
-
                 return Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.md),
                   child: Container(
@@ -198,7 +190,7 @@ class WeightHistoryCard extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
                               decoration: BoxDecoration(
-                                color: (recordCategory['color'] as Color).withAlpha((255 * 0.2).toInt()),
+                                color: (recordCategory['color'] as Color).withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(

@@ -174,7 +174,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 }
 
 class AppShell extends StatefulWidget {
-  const AppShell({Key? key}) : super(key: key);
+  const AppShell({super.key});
 
   @override
   State<AppShell> createState() => _AppShellState();

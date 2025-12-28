@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/avatar_provider.dart';
+import '../../models/auth.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -90,18 +91,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       if (userId == null) {
         throw Exception('Chưa đăng nhập');
       }
-
       final avatarService = ref.read(avatarServiceProvider);
-      final result = await avatarService.removeAvatar(userId: userId);
+      await avatarService.removeAvatar(userId);
 
       if (!mounted) return;
-
-      if (result.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: ${result.error}')),
-        );
-        return;
-      }
 
       setState(() {
         _avatarUrl = '';
@@ -131,24 +124,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     setState(() => _isSaving = true);
 
     try {
-      final userId = Supabase.instance.client.auth.currentUser?.id;
-      if (userId == null) {
+      final user = ref.read(currentUserProvider).value;
+      if (user == null) {
         throw Exception('Chưa đăng nhập');
       }
 
-      // Update user metadata
-      await Supabase.instance.client.auth.updateUser(
-        UserAttributes(
-          data: {'name': _nameController.text},
-        ),
+      final params = UpdateProfileParams(
+        userId: user.id,
+        fullName: _nameController.text,
       );
 
-      // Update profiles table
-      await Supabase.instance.client.from('profiles').upsert({
-        'id': userId,
-        'full_name': _nameController.text,
-        'updated_at': DateTime.now().toIso8601String(),
-      });
+      await ref.read(authControllerProvider.notifier).updateProfile(params);
+      
+      final authState = ref.read(authControllerProvider);
+      if (authState.hasError) {
+        throw Exception(authState.error.toString());
+      }
 
       if (!mounted) return;
 
@@ -158,12 +149,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
       Navigator.pop(context);
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: ${e.toString()}')),
+        );
+      }
     } finally {
-      setState(() => _isSaving = false);
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
   }
 

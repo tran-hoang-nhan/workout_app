@@ -41,6 +41,7 @@ class HealthFormUI extends StatelessWidget {
   final bool isSaving;
 
   const HealthFormUI({
+    super.key,
     required this.age,
     required this.weight,
     required this.height,
@@ -563,7 +564,7 @@ class HealthFormUI extends StatelessWidget {
                 ),
               ),
             );
-          })).toList(),
+          })),
         ],
       ),
     );

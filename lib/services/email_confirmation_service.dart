@@ -1,56 +1,32 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../repositories/auth_repository.dart';
+import '../utils/app_error.dart';
 
 class EmailConfirmationService {
-  final SupabaseClient _supabaseClient;
+  final AuthRepository _repository;
+  EmailConfirmationService({AuthRepository? repository}): _repository = repository ?? AuthRepository();
 
-  EmailConfirmationService({SupabaseClient? supabaseClient})
-      : _supabaseClient = supabaseClient ?? Supabase.instance.client;
-
-  /// Xác nhận OTP từ email
-  Future<void> verifyOTP({
-    required String email,
-    required String token,
-    required OtpType type,
-  }) async {
+  Future<void> verifyOTP({required String email, required String token, required OtpType type,}) async {
     try {
-      await _supabaseClient.auth.verifyOTP(
-        email: email,
-        token: token,
-        type: type,
-      );
-    } catch (e) {
-      throw Exception('Lỗi xác nhận OTP: ${e.toString()}');
+      await _repository.verifyOTP(email: email, token: token, type: type,);
+    } catch (e, st) {
+      throw handleException(e, st);
     }
   }
 
-  /// Gửi lại email xác nhận
   Future<void> resendSignupEmail(String email) async {
     try {
-      await _supabaseClient.auth.resend(
-        type: OtpType.signup,
-        email: email,
-      );
-    } catch (e) {
-      throw Exception('Lỗi gửi lại email: ${e.toString()}');
+      await _repository.resendOTP( type: OtpType.signup,  email: email,);
+    } catch (e, st) {
+      throw handleException(e, st);
     }
   }
 
-  /// Kiểm tra xem email đã được xác nhận chưa
-  Future<bool> isEmailVerified() async {
-    try {
-      final user = _supabaseClient.auth.currentUser;
-      return user?.emailConfirmedAt != null;
-    } catch (e) {
-      throw Exception('Lỗi kiểm tra xác nhận email: ${e.toString()}');
-    }
+  bool isEmailVerified() {
+    return _repository.isEmailVerified;
   }
 
-  /// Lấy email của user hiện tại
   String? getCurrentUserEmail() {
-    try {
-      return _supabaseClient.auth.currentUser?.email;
-    } catch (e) {
-      throw Exception('Lỗi lấy email: ${e.toString()}');
-    }
+    return _repository.currentUser?.email;
   }
 }

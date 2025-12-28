@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_constants.dart';
 
 class ProgressScreen extends StatelessWidget {
-  const ProgressScreen({Key? key}) : super(key: key);
+  const ProgressScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

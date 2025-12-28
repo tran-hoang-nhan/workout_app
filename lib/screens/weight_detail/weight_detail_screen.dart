@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/weight_provider.dart';
 import 'widgets/current_weight_card.dart';
@@ -14,7 +13,6 @@ class WeightDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final weightDataAsync = ref.watch(loadWeightDataProvider);
-    final userId = Supabase.instance.client.auth.currentUser?.id ?? '';
 
     return Scaffold(
       backgroundColor: AppColors.bgLight,
@@ -70,7 +68,7 @@ class WeightDetailScreen extends ConsumerWidget {
                 // Add Weight Form
                 AddWeightForm(
                   onAddWeight: (weightValue) {
-                    _saveWeight(context, ref, userId, weightValue, weightData.height);
+                    _saveWeight(context, ref, weightValue);
                   },
                 ),
                 const SizedBox(height: AppSpacing.lg),
@@ -90,7 +88,7 @@ class WeightDetailScreen extends ConsumerWidget {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stack) => Center(
             child: Text('Lỗi: $error',
-                style: const TextStyle(color: AppColors.white)),
+                style: const TextStyle(color: AppColors.black)),
           ),
         ),
       ),
@@ -100,21 +98,13 @@ class WeightDetailScreen extends ConsumerWidget {
   void _saveWeight(
     BuildContext context,
     WidgetRef ref,
-    String userId,
     String weightValue,
-    double height,
   ) async {
     try {
       final weight = double.tryParse(weightValue);
       if (weight == null) return;
 
-      await ref.read(
-        saveWeightProvider(SaveWeightParams(
-          userId: userId,
-          weight: weight,
-          height: height,
-        )).future,
-      );
+      await ref.read(weightControllerProvider.notifier).addWeight(weight);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -136,7 +126,7 @@ class WeightDetailScreen extends ConsumerWidget {
     int recordId,
   ) async {
     try {
-      await ref.read(deleteWeightProvider(recordId).future);
+      await ref.read(weightControllerProvider.notifier).deleteWeight(recordId);
       
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import '../../../constants/app_constants.dart';
 
 class HealthInputWidget extends StatelessWidget {
@@ -84,43 +83,41 @@ class HealthInputWidget extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: items
-                .asMap()
-                .entries
-                .map(
-                  (entry) => Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1F2937),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          entry.value,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
+            children: [
+              ...items.asMap().entries.map(
+                    (entry) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1F2937),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            entry.value,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        GestureDetector(
-                          onTap: () => onRemove(entry.key),
-                          child: Icon(
-                            Icons.close,
-                            size: 16,
-                            color: Colors.grey.shade500,
+                          const SizedBox(width: 6),
+                          GestureDetector(
+                            onTap: () => onRemove(entry.key),
+                            child: Icon(
+                              Icons.close,
+                              size: 16,
+                              color: Colors.grey.shade500,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                )
-                .toList(),
+            ],
           ),
         ],
       ],

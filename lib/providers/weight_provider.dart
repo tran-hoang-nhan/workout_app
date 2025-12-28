@@ -1,98 +1,83 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../repositories/weight_repository.dart';
 import '../services/weight_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/body_metric.dart';
+import '../utils/app_error.dart';
+import './auth_provider.dart'; 
 
-final weightServiceProvider = Provider((ref) => WeightService());
-
-final weightHistoryProvider =
-    FutureProvider.family<List<WeightRecord>, String>((ref, userId) async {
-  final weightService = ref.watch(weightServiceProvider);
-  return weightService.loadWeightHistory(userId);
+final weightRepositoryProvider = Provider<WeightRepository>((ref) {
+  return WeightRepository();
 });
 
-final heightFromProfileProvider =
-    FutureProvider.family<double?, String>((ref, userId) async {
-  final weightService = ref.watch(weightServiceProvider);
-  return weightService.loadHeightFromProfile(userId);
+final weightServiceProvider = Provider<WeightService>((ref) {
+  final repo = ref.watch(weightRepositoryProvider);
+  return WeightService(repository: repo);
 });
 
-// Load weight data (height + weight history + current weight)
-class WeightData {
-  final double weight;
-  final double height;
-  final List<WeightRecord> weightHistory;
 
-  WeightData({
-    required this.weight,
-    required this.height,
-    required this.weightHistory,
-  });
-}
+final weightHistoryProvider = FutureProvider.autoDispose<List<BodyMetric>>((ref) async {
+  final userId = await ref.watch(currentUserIdProvider.future);
+  if (userId == null) return [];
+  final service = ref.watch(weightServiceProvider);
+  return service.loadHistory(userId);
+});
 
-final loadWeightDataProvider = FutureProvider<WeightData>((ref) async {
-  final weightService = ref.watch(weightServiceProvider);
-  final userId = Supabase.instance.client.auth.currentUser?.id;
+final userHeightProvider = FutureProvider.autoDispose<double>((ref) async {
+  final userId = await ref.watch(currentUserIdProvider.future);
+  if (userId == null) return 0.0;
+  final repo = ref.watch(weightRepositoryProvider);
+  return (await repo.getUserHeight(userId)) ?? 0.0;
+});
 
-  if (userId == null) {
-    return WeightData(weight: 68, height: 175, weightHistory: []);
-  }
-
-  final heightData = await weightService.loadHeightFromProfile(userId);
-  final historyData = await weightService.loadWeightHistory(userId);
-
-  double finalWeight = 68;
-  if (historyData.isNotEmpty) {
-    finalWeight = historyData.first.weight;
-  } else {
-    try {
-      final supabase = Supabase.instance.client;
-      final healthData = await supabase
-          .from('health')
-          .select('weight')
-          .eq('user_id', userId)
-          .single();
-      finalWeight = (healthData['weight'] as num?)?.toDouble() ?? 68;
-    } catch (e) {
-      // Fallback to default
-    }
+final loadWeightDataProvider = FutureProvider.autoDispose<WeightData>((ref) async {
+  final history = await ref.watch(weightHistoryProvider.future);
+  final height = await ref.watch(userHeightProvider.future);
+  
+  double currentWeight = 0;
+  if (history.isNotEmpty) {
+    currentWeight = history.first.weight;
   }
 
   return WeightData(
-    weight: finalWeight,
-    height: heightData ?? 175,
-    weightHistory: historyData,
+    weight: currentWeight,
+    height: height,
+    weightHistory: history,
   );
 });
 
-// Save weight action
-class SaveWeightParams {
-  final String userId;
-  final double weight;
-  final double height;
+final weightControllerProvider = AsyncNotifierProvider<WeightController, void>(() {
+  return WeightController();
+});
 
-  SaveWeightParams({
-    required this.userId,
-    required this.weight,
-    required this.height,
-  });
+class WeightController extends AsyncNotifier<void> {
+  @override
+  Future<void> build() async {}
+
+  Future<void> addWeight(double weight, {DateTime? date}) async {
+    state = const AsyncValue.loading();
+    final userId = await ref.read(currentUserIdProvider.future);
+    if (userId == null) return;
+    state = await AsyncValue.guard(() async {
+      try {
+        final service = ref.read(weightServiceProvider);
+        await service.logNewWeight(userId: userId, weight: weight, date: date);
+        ref.invalidate(weightHistoryProvider);
+        ref.invalidate(loadWeightDataProvider);
+      } catch (e, st) {
+        throw handleException(e, st);
+      }
+    });
+  }
+
+  Future<void> deleteWeight(int id) async {
+    state = await AsyncValue.guard(() async {
+      try {
+        await ref.read(weightServiceProvider).deleteEntry(id);
+        ref.invalidate(weightHistoryProvider);
+        ref.invalidate(loadWeightDataProvider);
+      } catch (e, st) {
+        throw handleException(e, st);
+      }
+    });
+  }
 }
-
-final saveWeightProvider =
-    FutureProvider.family<void, SaveWeightParams>((ref, params) async {
-  final weightService = ref.watch(weightServiceProvider);
-  await weightService.saveWeight(
-    userId: params.userId,
-    weight: params.weight,
-    height: params.height,
-  );
-  // Refresh weight data sau khi save
-  ref.invalidate(loadWeightDataProvider);
-});
-
-// Delete weight action
-final deleteWeightProvider = FutureProvider.family<void, int>((ref, recordId) async {
-  final weightService = ref.watch(weightServiceProvider);
-  await weightService.deleteWeight(recordId);
-  ref.invalidate(loadWeightDataProvider);
-});
-

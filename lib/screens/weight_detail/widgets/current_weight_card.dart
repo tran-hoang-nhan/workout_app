@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../services/weight_service.dart';
+import '../../../models/body_metric.dart';
 
 class CurrentWeightCard extends StatelessWidget {
   final double weight;
   final double height;
-  final List<WeightRecord> weightHistory;
+  final List<BodyMetric> weightHistory;
 
   const CurrentWeightCard({
     super.key,

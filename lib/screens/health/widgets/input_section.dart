@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../constants/app_constants.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../providers/health_provider.dart';
-import '../../../services/weight_service.dart';
+import '../../../providers/weight_provider.dart';
 
 class InputSection extends ConsumerWidget {
   final HealthFormState formState;
@@ -95,16 +95,19 @@ class InputSection extends ConsumerWidget {
                           horizontal: AppSpacing.md,
                           vertical: AppSpacing.md,
                         ),
+
                         filled: true,
                         fillColor: Colors.grey.shade50,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: AppColors.cardBorder),
                         ),
+
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: AppColors.cardBorder),
                         ),
+
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(color: AppColors.primary),
@@ -125,16 +128,19 @@ class InputSection extends ConsumerWidget {
                           horizontal: AppSpacing.md,
                           vertical: AppSpacing.md,
                         ),
+
                         filled: true,
                         fillColor: Colors.grey.shade50,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: AppColors.cardBorder),
                         ),
+
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: AppColors.cardBorder),
                         ),
+
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(color: AppColors.primary),
@@ -151,36 +157,28 @@ class InputSection extends ConsumerWidget {
                   onPressed: () async {
                     final weight = double.tryParse(weightInput.text);
                     final height = double.tryParse(heightInput.text);
-
                     if (weight != null) {
                       ref.read(healthFormProvider.notifier).setWeight(weight);
                     }
-
                     if (height != null) {
                       ref.read(healthFormProvider.notifier).setHeight(height);
                     }
-
                     if (weight != null || height != null) {
                       try {
                         await ref.read(saveHealthProfileProvider(HealthProfileSaveParams(
-                          height: height,
+                          height: height ?? formState.height,
                           gender: null,
                         )).future);
-
-                        // Lưu weight vào body_metrics thêm
                         if (weight != null) {
                           try {
-                            final userId = Supabase.instance.client.auth.currentUser?.id;
+                            final userId = ref.read(currentUserIdProvider).value;
                             if (userId != null) {
-                              final heightValue = height ?? formState.height;
-                              final bmi = weight / ((heightValue / 100) * (heightValue / 100));
-                              final weightService = WeightService();
-                              await weightService.addWeight(
+                              final weightService = ref.read(weightServiceProvider);
+                              await weightService.logNewWeight(
                                 userId: userId,
                                 weight: weight,
-                                bmi: bmi,
                               );
-                              debugPrint('[InputSection] Weight saved to body_metrics: $weight kg, BMI: ${bmi.toStringAsFixed(1)}');
+                              debugPrint('[InputSection] Weight saved to body_metrics');
                             }
                           } catch (e) {
                             debugPrint('[InputSection] Warning: Could not save to body_metrics: $e');
