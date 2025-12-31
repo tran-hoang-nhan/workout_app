@@ -12,102 +12,121 @@ class CalorieGoals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        border: Border.all(color: AppColors.cardBorder),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Mục tiêu calo',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.black,
+            letterSpacing: -0.5,
           ),
-        ],
-      ),
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Mục tiêu calo',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppColors.black,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _buildCalorieGoalRow(
-            'Thâm hụt',
-            '${(calculations.tdee * 0.85).toStringAsFixed(0)} kcal',
-            Colors.blue.shade400,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _buildCalorieGoalRow(
-            'Duy trì',
-            '${calculations.tdee.toStringAsFixed(0)} kcal',
-            Colors.green.shade400,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _buildCalorieGoalRow(
-            'Dư thừa',
-            '${(calculations.tdee * 1.15).toStringAsFixed(0)} kcal',
-            Colors.orange.shade400,
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _buildCalorieGoalCard(
+          'Thâm hụt Calo',
+          'Giảm cân an toàn & hiệu quả',
+          '${(calculations.tdee * 0.85).toStringAsFixed(0)}',
+          const Color(0xFF00C6FF),
+          Icons.trending_down_rounded,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _buildCalorieGoalCard(
+          'Duy trì Cân nặng',
+          'Giữ vững phong độ hiện tại',
+          '${calculations.tdee.toStringAsFixed(0)}',
+          const Color(0xFF10B981),
+          Icons.rebase_edit,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _buildCalorieGoalCard(
+          'Dư thừa Calo',
+          'Tăng cơ & Phát triển sức mạnh',
+          '${(calculations.tdee * 1.15).toStringAsFixed(0)}',
+          const Color(0xFFF97316),
+          Icons.trending_up_rounded,
+        ),
+      ],
     );
   }
 
-  Widget _buildCalorieGoalRow(String title, String value, Color color) {
+  Widget _buildCalorieGoalCard(
+    String title,
+    String subtitle,
+    String value,
+    Color color,
+    IconData icon,
+  ) {
     return Container(
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.all(AppSpacing.md),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.black,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.grey.withValues(alpha: 0.6),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.black,
+                value,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                  color: color,
                 ),
               ),
-              const SizedBox(height: AppSpacing.xs),
               Text(
-                'Mục tiêu calo',
+                'KCAL',
                 style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade500,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  color: color.withValues(alpha: 0.5),
+                  letterSpacing: 1,
                 ),
               ),
             ],
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: color,
-              ),
-            ),
           ),
         ],
       ),

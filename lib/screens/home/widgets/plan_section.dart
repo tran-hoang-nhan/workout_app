@@ -47,117 +47,135 @@ class PlanSection extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFFF7F00), Color(0xFFFF0000)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            borderRadius: BorderRadius.circular(AppBorderRadius.xxl),
+            image: const DecorationImage(
+              image: NetworkImage('https://images.unsplash.com/photo-1541534741688-6078c64b52de?q=80&w=800&auto=format&fit=crop'),
+              fit: BoxFit.cover,
             ),
-            borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-          ),
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Buổi tập tiếp theo',
-                          style: TextStyle(
-                            fontSize: AppFontSize.sm,
-                            color: Color(0xFFFFE4B5),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        const Text(
-                          'Full Body Workout',
-                          style: TextStyle(
-                            fontSize: AppFontSize.xxl,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.white,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.schedule,
-                              size: 16,
-                              color: Color(0xFFFFE4B5),
-                            ),
-                            const SizedBox(width: AppSpacing.xs),
-                            const Text(
-                              '45 phút',
-                              style: TextStyle(
-                                fontSize: AppFontSize.sm,
-                                color: Color(0xFFFFE4B5),
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.lg),
-                            const Icon(
-                              Icons.flag_outlined,
-                              size: 16,
-                              color: Color(0xFFFFE4B5),
-                            ),
-                            const SizedBox(width: AppSpacing.xs),
-                            const Text(
-                              'Trung bình',
-                              style: TextStyle(
-                                fontSize: AppFontSize.sm,
-                                color: Color(0xFFFFE4B5),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(AppBorderRadius.full),
-                    ),
-                    child: const Icon(
-                      Icons.local_fire_department,
-                      color: AppColors.white,
-                      size: 28,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.white,
-                    foregroundColor: const Color(0xFFFF7F00),
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                    ),
-                  ),
-                  onPressed: () {},
-                  child: const Text(
-                    'Bắt đầu ngay',
-                    style: TextStyle(
-                      fontSize: AppFontSize.md,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFF7F00).withValues(alpha: 0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppBorderRadius.xxl),
+              gradient: LinearGradient(
+                begin: Alignment.bottomRight,
+                colors: [
+                  Colors.black.withValues(alpha: 0.9),
+                  Colors.black.withValues(alpha: 0.2),
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'BUỔI TẬP HÔM NAY',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.5,
+                            color: Color.fromARGB(255, 251, 251, 251), // Brighter, high-contrast orange
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Full Body\nPower Workout',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.bolt, color: Colors.white, size: 28),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                Row(
+                  children: [
+                    _buildInfoTag(Icons.schedule, '45 Min'),
+                    const SizedBox(width: AppSpacing.md),
+                    _buildInfoTag(Icons.local_fire_department, '350 kcal'),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF7F00),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: () {},
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Bắt đầu ngay',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(width: 8),
+                        Icon(Icons.play_circle_fill, size: 20),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildInfoTag(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.white),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

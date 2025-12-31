@@ -16,6 +16,9 @@ class HealthFormUI extends StatelessWidget {
   final int waterIntake;
   final String dietType;
   final List<String> allergies;
+  final bool waterReminderEnabled;
+  final int waterReminderInterval;
+
 
   // Controllers
   final TextEditingController injuryController;
@@ -37,7 +40,12 @@ class HealthFormUI extends StatelessWidget {
   final ValueChanged<double> onSleepHoursChanged;
   final ValueChanged<int> onWaterIntakeChanged;
   final ValueChanged<String> onDietTypeChanged;
+  final ValueChanged<bool> onWaterReminderEnabledChanged;
+  final ValueChanged<int> onWaterReminderIntervalChanged;
   final VoidCallback onSave;
+  final VoidCallback? onClose;
+
+
   final bool isSaving;
 
   const HealthFormUI({
@@ -53,6 +61,8 @@ class HealthFormUI extends StatelessWidget {
     required this.waterIntake,
     required this.dietType,
     required this.allergies,
+    required this.waterReminderEnabled,
+    required this.waterReminderInterval,
     required this.injuryController,
     required this.conditionController,
     required this.allergyController,
@@ -70,7 +80,10 @@ class HealthFormUI extends StatelessWidget {
     required this.onSleepHoursChanged,
     required this.onWaterIntakeChanged,
     required this.onDietTypeChanged,
+    required this.onWaterReminderEnabledChanged,
+    required this.onWaterReminderIntervalChanged,
     required this.onSave,
+    this.onClose,
     this.isSaving = false,
   });
 
@@ -81,14 +94,27 @@ class HealthFormUI extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: AppSpacing.lg),
-          const Text(
-            'Hồ sơ sức khỏe',
-            style: TextStyle(
-              fontSize: AppFontSize.xxxl,
-              fontWeight: FontWeight.bold,
-              color: AppColors.white,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Hồ sơ sức khỏe',
+                style: TextStyle(
+                  fontSize: AppFontSize.xxxl,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.white,
+                ),
+              ),
+              if (onClose != null)
+                IconButton(
+                  onPressed: onClose,
+                  icon: const Icon(Icons.close, color: AppColors.white),
+                  style: IconButton.styleFrom(
+                    backgroundColor: AppColors.white.withValues(alpha: 0.1),
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: AppSpacing.xs),
           const Text(
@@ -240,6 +266,10 @@ class HealthFormUI extends StatelessWidget {
 
           // Water Intake
           _buildWaterIntakeField(),
+          const SizedBox(height: AppSpacing.lg),
+
+          // Water Reminder
+          _buildWaterReminderField(),
           const SizedBox(height: AppSpacing.lg),
 
           // Diet Type
@@ -630,7 +660,74 @@ class HealthFormUI extends StatelessWidget {
     );
   }
 
+  Widget _buildWaterReminderField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A1A3F),
+        border: Border.all(color: const Color(0xFF1A3A5F)),
+        borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+      ),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Nhắc nhở uống nước',
+                style: TextStyle(
+                  fontSize: AppFontSize.lg,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.white,
+                ),
+              ),
+              Switch(
+                value: waterReminderEnabled,
+                onChanged: onWaterReminderEnabledChanged,
+                activeThumbColor: const Color(0xFFFF7F00),
+              ),
+            ],
+          ),
+          if (waterReminderEnabled) ...[
+            const SizedBox(height: AppSpacing.md),
+            const Text(
+              'Khoảng cách nhắc nhở (giờ)',
+              style: TextStyle(
+                color: AppColors.grey,
+                fontSize: AppFontSize.sm,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [1, 2, 3, 4].map((hours) {
+                final isSelected = waterReminderInterval == hours;
+                return Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.sm),
+                  child: ChoiceChip(
+                    label: Text('$hours giờ'),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      if (selected) onWaterReminderIntervalChanged(hours);
+                    },
+                    selectedColor: const Color(0xFFFF7F00),
+                    labelStyle: TextStyle(
+                      color: isSelected ? Colors.white : AppColors.grey,
+                      fontSize: 12,
+                    ),
+                    backgroundColor: const Color(0xFF0F1A3A),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildDietTypeField() {
+
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF0A1A3F),

@@ -5,14 +5,36 @@ import '../models/health_data.dart';
 import '../models/health_params.dart';
 import '../utils/app_error.dart';
 import './auth_provider.dart';
+import '../services/health_integration_service.dart';
+import '../services/notification_service.dart';
+
 
 final healthRepositoryProvider = Provider<HealthRepository>((ref) {
   return HealthRepository();
 });
 
+final healthIntegrationServiceProvider = Provider<HealthIntegrationService>((ref) {
+  return HealthIntegrationService();
+});
+
+final notificationServiceProvider = Provider<NotificationService>((ref) {
+  return NotificationService();
+});
+
+final initializeNotificationProvider = FutureProvider<void>((ref) async {
+  final service = ref.watch(notificationServiceProvider);
+  await service.init();
+});
+
 final healthServiceProvider = Provider<HealthService>((ref) {
   final repo = ref.watch(healthRepositoryProvider);
-  return HealthService(repository: repo);
+  final healthIntegration = ref.watch(healthIntegrationServiceProvider);
+  final notifications = ref.watch(notificationServiceProvider);
+  return HealthService(
+    repository: repo,
+    healthIntegration: healthIntegration,
+    notifications: notifications,
+  );
 });
 
 final healthDataProvider = FutureProvider<HealthData?>((ref) async {
@@ -35,6 +57,9 @@ class HealthFormState {
   final double waterIntake;
   final String dietType;
   final List<String> allergies;
+  final bool waterReminderEnabled;
+  final int waterReminderInterval;
+
 
   HealthFormState({
     required this.age,
@@ -48,6 +73,8 @@ class HealthFormState {
     required this.waterIntake,
     required this.dietType,
     required this.allergies,
+    required this.waterReminderEnabled,
+    required this.waterReminderInterval,
   });
 
   factory HealthFormState.initial() {
@@ -63,6 +90,8 @@ class HealthFormState {
       waterIntake: 2000,
       dietType: 'normal',
       allergies: [],
+      waterReminderEnabled: false,
+      waterReminderInterval: 2,
     );
   }
 
@@ -78,6 +107,8 @@ class HealthFormState {
     double? waterIntake,
     String? dietType,
     List<String>? allergies,
+    bool? waterReminderEnabled,
+    int? waterReminderInterval,
   }) {
     return HealthFormState(
       age: age ?? this.age,
@@ -91,6 +122,8 @@ class HealthFormState {
       waterIntake: waterIntake ?? this.waterIntake,
       dietType: dietType ?? this.dietType,
       allergies: allergies ?? List.from(this.allergies),
+      waterReminderEnabled: waterReminderEnabled ?? this.waterReminderEnabled,
+      waterReminderInterval: waterReminderInterval ?? this.waterReminderInterval,
     );
   }
 }
@@ -104,6 +137,9 @@ class HealthFormNotifier extends StateNotifier<HealthFormState> {
   void setWeight(double weight) => state = state.copyWith(weight: weight);
   void setHeight(double height) => state = state.copyWith(height: height);
   void setGender(String gender) => state = state.copyWith(gender: gender);
+  
+  void setWaterReminderEnabled(bool enabled) => state = state.copyWith(waterReminderEnabled: enabled);
+  void setWaterReminderInterval(int interval) => state = state.copyWith(waterReminderInterval: interval);
   
   void addInjury(String injury) {
     if (!state.injuries.contains(injury)) {
@@ -156,6 +192,8 @@ class HealthFormNotifier extends StateNotifier<HealthFormState> {
       waterIntake: data.waterIntake.toDouble(),
       dietType: data.dietType,
       allergies: data.allergies,
+      waterReminderEnabled: data.waterReminderEnabled,
+      waterReminderInterval: data.waterReminderInterval,
     );
   }
 
@@ -173,6 +211,8 @@ class HealthFormNotifier extends StateNotifier<HealthFormState> {
     required String injuries,
     required String medicalConditions,
     required String allergies,
+    bool waterReminderEnabled = false,
+    int waterReminderInterval = 2,
   }) async {
     final activityKey = _mapActivityLevel(activityLevel);
     final goalKey = _mapGoal(goal);
@@ -195,6 +235,8 @@ class HealthFormNotifier extends StateNotifier<HealthFormState> {
       injuries: injuriesList,
       medicalConditions: conditionsList,
       allergies: allergiesList,
+      waterReminderEnabled: waterReminderEnabled,
+      waterReminderInterval: waterReminderInterval,
     );
 
     await ref.read(healthControllerProvider.notifier).saveHealthData(params);
@@ -212,6 +254,8 @@ class HealthFormNotifier extends StateNotifier<HealthFormState> {
       injuries: injuriesList,
       medicalConditions: conditionsList,
       allergies: allergiesList,
+      waterReminderEnabled: waterReminderEnabled,
+      waterReminderInterval: waterReminderInterval,
     );
   }
 
@@ -249,6 +293,12 @@ class HealthController extends AsyncNotifier<void> {
       try {
         final service = ref.read(healthServiceProvider);
         await service.saveHealthData(params);
+
+        // Sync reminders if values are provided
+        if (params.waterReminderEnabled != null && params.waterReminderInterval != null) {
+          await service.syncWaterReminders(params.waterReminderEnabled!, params.waterReminderInterval!);
+        }
+
         ref.invalidate(healthDataProvider);
       } catch (e, st) {
         throw handleException(e, st);
@@ -354,6 +404,8 @@ final saveHealthProfileProvider = FutureProvider.family<void, HealthProfileSaveP
       injuries: form.injuries,
       medicalConditions: form.medicalConditions,
       allergies: form.allergies,
+      waterReminderEnabled: form.waterReminderEnabled,
+      waterReminderInterval: form.waterReminderInterval,
     );
 
     await ref.read(healthControllerProvider.notifier).saveHealthData(updateParams);

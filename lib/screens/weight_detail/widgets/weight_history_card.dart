@@ -129,7 +129,6 @@ class WeightHistoryCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        // Weight, Badge, Date (Column: weight+badge trên, date dưới)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,

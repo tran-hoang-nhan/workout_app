@@ -90,6 +90,8 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     final authStateAsync = ref.watch(authStateProvider);
     // Watch health data status
     final hasHealthDataAsync = ref.watch(hasHealthDataProvider);
+    // Initialize notification service
+    ref.watch(initializeNotificationProvider);
 
     return MaterialApp(
       title: 'Workout App',

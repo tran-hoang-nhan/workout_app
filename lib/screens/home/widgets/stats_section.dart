@@ -1,136 +1,194 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
 
-class StatCard {
-  final IconData icon;
-  final String label;
-  final String value;
-  final LinearGradient gradient;
-
-  StatCard({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.gradient,
-  });
-}
-
 class StatsSection extends StatelessWidget {
   const StatsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final List<StatCard> stats = [
-      StatCard(
-        icon: Icons.local_fire_department,
-        label: 'Calories',
-        value: '324',
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFF7F00), Color(0xFFFF0000)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      StatCard(
-        icon: Icons.flag_outlined,
-        label: 'Mục tiêu',
-        value: '75%',
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0066FF), Color(0xFF00CCFF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      StatCard(
-        icon: Icons.schedule,
-        label: 'Thời gian',
-        value: '45m',
-        gradient: const LinearGradient(
-          colors: [Color(0xFF8B00FF), Color(0xFFFF1493)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            // Tính toán spacing responsive
-            final screenWidth = constraints.maxWidth;
-            final spacing = screenWidth > 400 ? 6.0 : 4.0;
-            final padding = screenWidth > 400 ? 10.0 : 8.0;
-            
-            return GridView.count(
-              crossAxisCount: 3,
-              mainAxisSpacing: spacing,
-              crossAxisSpacing: spacing,
-              childAspectRatio: 0.95,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: stats.map((stat) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.cardBg,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.grey.shade300),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+        SizedBox(
+          height: 180,
+          child: Row(
+            children: [
+              // Main Large Card - Calories
+              Expanded(
+                flex: 3,
+                child: _buildMainStatCard(
+                  context,
+                  icon: Icons.local_fire_department,
+                  label: 'Calories',
+                  value: '324',
+                  unit: 'kcal',
+                  color: const Color(0xFFFF7F00),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              // Secondary Small Cards Column
+              Expanded(
+                flex: 2,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: _buildSmallStatCard(
+                        context,
+                        icon: Icons.flag,
+                        label: 'Mục tiêu',
+                        value: '75%',
+                        color: const Color(0xFF0066FF),
                       ),
-                    ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Expanded(
+                      child: _buildSmallStatCard(
+                        context,
+                        icon: Icons.timer,
+                        label: 'Thời gian',
+                        value: '45m',
+                        color: const Color(0xFF8B00FF),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMainStatCard(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+    required String unit,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: _cardDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                      height: 1,
+                    ),
                   ),
-                  padding: EdgeInsets.all(padding),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          gradient: stat.gradient,
-                          borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                        ),
-                        child: Icon(
-                          stat.icon,
-                          color: AppColors.white,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        stat.value,
-                        style: TextStyle(
-                          fontSize: screenWidth > 400 ? 15 : 13,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.black,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        stat.label,
-                        style: TextStyle(
-                          fontSize: screenWidth > 400 ? 10 : 9,
-                          color: AppColors.grey,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                  const SizedBox(width: 4),
+                  Text(
+                    unit,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.grey.withValues(alpha: 0.6),
+                    ),
                   ),
-                );
-              }).toList(),
-            );
-          },
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.grey,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSmallStatCard(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 12),
+      decoration: _cardDecoration(),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
+                ),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.grey,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: AppColors.white,
+      borderRadius: BorderRadius.circular(24),
+      border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5)),
+      boxShadow: [
+        BoxShadow(
+          color: AppColors.black.withValues(alpha: 0.03),
+          blurRadius: 15,
+          offset: const Offset(0, 8),
         ),
       ],
     );

@@ -189,8 +189,6 @@ class InputSection extends ConsumerWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Đã lưu cân nặng và chiều cao thành công!')),
                           );
-                          // Refresh formState by invalidating health provider
-                          ref.invalidate(healthFormProvider);
                         }
                       } catch (e) {
                         if (context.mounted) {

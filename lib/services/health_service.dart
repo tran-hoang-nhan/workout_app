@@ -2,13 +2,54 @@ import '../repositories/health_repository.dart';
 import '../models/health_data.dart';
 import '../models/health_params.dart';
 import '../utils/health_utils.dart' as health_utils;
+import './health_integration_service.dart';
+import './notification_service.dart';
 
 class HealthService {
   final HealthRepository _repository;
-  HealthService({HealthRepository? repository}): _repository = repository ?? HealthRepository();
+  final HealthIntegrationService _healthIntegration;
+  final NotificationService _notifications;
+
+  HealthService({
+    HealthRepository? repository,
+    HealthIntegrationService? healthIntegration,
+    NotificationService? notifications,
+  })  : _repository = repository ?? HealthRepository(),
+        _healthIntegration = healthIntegration ?? HealthIntegrationService(),
+        _notifications = notifications ?? NotificationService();
 
   Future<HealthData?> checkHealthProfile(String userId) async {
-    return await _repository.getHealthData(userId);
+    final profile = await _repository.getHealthData(userId);
+    if (profile == null) return null;
+
+    // Fetch real-time steps
+    final steps = await _healthIntegration.getTodaySteps();
+    
+    return HealthData(
+      userId: profile.userId,
+      age: profile.age,
+      weight: profile.weight,
+      height: profile.height,
+      injuries: profile.injuries,
+      medicalConditions: profile.medicalConditions,
+      activityLevel: profile.activityLevel,
+      sleepHours: profile.sleepHours,
+      waterIntake: profile.waterIntake,
+      dietType: profile.dietType,
+      allergies: profile.allergies,
+      gender: profile.gender,
+      steps: steps,
+      waterReminderEnabled: profile.waterReminderEnabled,
+      waterReminderInterval: profile.waterReminderInterval,
+    );
+  }
+
+  Future<void> syncWaterReminders(bool enabled, int intervalHours) async {
+    if (enabled) {
+      await _notifications.scheduleWaterReminder(intervalHours: intervalHours);
+    } else {
+      await _notifications.cancelAllReminders();
+    }
   }
 
   Future<void> saveHealthData(HealthUpdateParams params) async {

@@ -21,7 +21,7 @@ class AppColors {
   static const Color greyDark = Color(0xFF374151);
   
   // Background colors
-  static const Color bgLight = Color(0xFFFFF7ED); // Orange-50
+  static const Color bgLight = Color(0xFFF8F9FD); // Premium light neutral background
   static const Color bgWhite = Color(0xFFFFFFFF);
   static const Color cardBg = Color(0xFFFFFFFF);
   static const Color cardBorder = Color(0xFFE5E7EB); // Gray-200
@@ -41,6 +41,7 @@ class AppBorderRadius {
   static const double md = 8.0;
   static const double lg = 12.0;
   static const double xl = 16.0;
+  static const double xxl = 24.0;
   static const double full = 999.0;
 }
 

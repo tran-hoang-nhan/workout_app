@@ -3,6 +3,7 @@ class Workout {
   final String title;
   final String? description;
   final String? level;
+  final String? category;
   final int? estimatedDuration;
   final String? thumbnailUrl;
   final bool isPremium;
@@ -12,6 +13,7 @@ class Workout {
     required this.title,
     this.description,
     this.level,
+    this.category,
     this.estimatedDuration,
     this.thumbnailUrl,
     this.isPremium = false,
@@ -23,6 +25,7 @@ class Workout {
       title: json['title'] ?? '',
       description: json['description'],
       level: json['level'],
+      category: json['category'],
       estimatedDuration: json['estimated_duration'],
       thumbnailUrl: json['thumbnail_url'],
       isPremium: json['is_premium'] ?? false,
@@ -35,6 +38,7 @@ class Workout {
       'title': title,
       'description': description,
       'level': level,
+      'category': category,
       'estimated_duration': estimatedDuration,
       'thumbnail_url': thumbnailUrl,
       'is_premium': isPremium,
@@ -46,6 +50,7 @@ class Workout {
     String? title,
     String? description,
     String? level,
+    String? category,
     int? estimatedDuration,
     String? thumbnailUrl,
     bool? isPremium,
@@ -55,6 +60,7 @@ class Workout {
       title: title ?? this.title,
       description: description ?? this.description,
       level: level ?? this.level,
+      category: category ?? this.category,
       estimatedDuration: estimatedDuration ?? this.estimatedDuration,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       isPremium: isPremium ?? this.isPremium,

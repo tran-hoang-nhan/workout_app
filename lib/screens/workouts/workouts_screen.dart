@@ -35,51 +35,146 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
     }
 
     return Scaffold(
+      backgroundColor: AppColors.bgLight,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Bài tập',
-                    style: TextStyle(
-                      fontSize: AppFontSize.xxxl,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.black,
+        child: CustomScrollView(
+          slivers: [
+            // Premium Header & Discovery
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Thư viện bài tập',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.black,
+                        letterSpacing: -0.5,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  _buildSearchBar(),
-                  const SizedBox(height: AppSpacing.lg),
-                  _buildCategoryChips(),
-                  const SizedBox(height: AppSpacing.lg),
-                ],
+                    const SizedBox(height: AppSpacing.lg),
+                    _buildSearchBar(),
+                    const SizedBox(height: AppSpacing.lg),
+                    if (_searchQuery.isEmpty && _selectedCategory == 'Tất cả') ...[
+                      _buildFeaturedHero(),
+                      const SizedBox(height: AppSpacing.xl),
+                    ],
+                    _buildCategoryChips(),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+                ),
               ),
             ),
-            Expanded(
-              child: workoutsAsync.when(
-                data: (workouts) {
-                  if (workouts.isEmpty) {
-                    return const Center(
+            
+            // Workouts List
+            workoutsAsync.when(
+              data: (workouts) {
+                if (workouts.isEmpty) {
+                  return const SliverFillRemaining(
+                    child: Center(
                       child: Text('Không tìm thấy bài tập nào'),
-                    );
-                  }
-                  return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 120),
-                    itemCount: workouts.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.lg),
-                    itemBuilder: (context, index) {
-                      final workout = workouts[index];
-                      return _buildWorkoutCard(workout);
-                    },
+                    ),
                   );
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) => Center(child: Text('Lỗi: $err')),
+                }
+                return SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 120),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                          child: _buildWorkoutCard(workouts[index]),
+                        );
+                      },
+                      childCount: workouts.length,
+                    ),
+                  ),
+                );
+              },
+              loading: () => const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (err, stack) => SliverFillRemaining(
+                child: Center(child: Text('Lỗi: $err')),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeaturedHero() {
+    return Container(
+      width: double.infinity,
+      height: 220,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        image: const DecorationImage(
+          image: NetworkImage('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800&auto=format&fit=crop'),
+          fit: BoxFit.cover,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          gradient: LinearGradient(
+            begin: Alignment.bottomRight,
+            colors: [
+              Colors.black.withValues(alpha: 0.8),
+              Colors.black.withValues(alpha: 0.2),
+            ],
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text(
+                'NỔI BẬT',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'HIIT Sức Mạnh Toàn Thân',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Đốt cháy 400 kcal • 30 phút • Nâng cao',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.white.withValues(alpha: 0.7),
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -90,34 +185,25 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
 
   Widget _buildSearchBar() {
     return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.cardBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: const Color(0xFFF5F7FA),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.transparent),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-        child: TextField(
-          controller: _searchController,
-          onChanged: (value) {
-            setState(() {
-              _searchQuery = value;
-            });
-          },
-          decoration: const InputDecoration(
-            hintText: 'Tìm kiếm bài tập...',
-            hintStyle: TextStyle(color: Color(0xFF999999)),
-            prefixIcon: Icon(Icons.search, color: Color(0xFF999999)),
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-          ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value;
+          });
+        },
+        decoration: InputDecoration(
+          hintText: 'Tìm kiếm bài tập...',
+          hintStyle: TextStyle(color: AppColors.grey.withValues(alpha: 0.5), fontSize: 15),
+          prefixIcon: Icon(Icons.search, color: AppColors.grey.withValues(alpha: 0.5)),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 16),
         ),
       ),
     );
@@ -125,214 +211,207 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
 
   Widget _buildCategoryChips() {
     final categories = ['Tất cả', 'Cardio', 'Sức mạnh', 'Yoga', 'HIIT'];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: List.generate(
-          categories.length,
-          (index) {
-            final category = categories[index];
-            final isSelected = _selectedCategory == category;
-            return Padding(
-              padding: EdgeInsets.only(right: index < categories.length - 1 ? AppSpacing.md : 0),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedCategory = category;
-                    _searchQuery = '';
-                    _searchController.clear();
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-                  decoration: BoxDecoration(
-                    gradient: isSelected
-                        ? const LinearGradient(
-                            colors: [Color(0xFFFF7F00), Color(0xFFFF0000)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          )
-                        : null,
-                    color: isSelected ? null : const Color.fromARGB(255, 247, 248, 250),
-                    border: Border.all(
-                      color: isSelected ? Colors.transparent : const Color.fromARGB(255, 207, 209, 211),
-                    ),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Text(
-                    category,
-                    style: TextStyle(
-                      fontSize: AppFontSize.sm,
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? AppColors.white : AppColors.grey,
-                    ),
-                  ),
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        separatorBuilder: (context, index) => const SizedBox(width: AppSpacing.sm),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          final isSelected = _selectedCategory == category;
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedCategory = category;
+                _searchQuery = '';
+                _searchController.clear();
+              });
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.black : AppColors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isSelected ? AppColors.black : AppColors.cardBorder.withValues(alpha: 0.5),
+                ),
+                boxShadow: isSelected ? [
+                  BoxShadow(
+                    color: AppColors.black.withValues(alpha: 0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ] : null,
+              ),
+              child: Text(
+                category,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected ? AppColors.white : AppColors.grey,
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildWorkoutCard(Workout workout) {
-    // Map level to Vietnamese and UI colors
-    String levelText = 'Dễ';
-    List<Color> gradientColors = [const Color(0xFFA855F7), const Color(0xFFEC4899)];
-    IconData icon = Icons.fitness_center;
-
-    switch (workout.level?.toLowerCase()) {
-      case 'beginner':
-      case 'dễ':
-        levelText = 'Dễ';
-        gradientColors = [const Color(0xFFA855F7), const Color(0xFFEC4899)];
-        icon = Icons.self_improvement;
-        break;
-      case 'intermediate':
-      case 'trung bình':
-        levelText = 'Trung bình';
-        gradientColors = [const Color(0xFF3B82F6), const Color(0xFF06B6D4)];
-        icon = Icons.favorite;
-        break;
-      case 'advanced':
-      case 'nâng cao':
-        levelText = 'Nâng cao';
-        gradientColors = [const Color(0xFFEF4444), const Color(0xFFEC4899)];
-        icon = Icons.flash_on;
-        break;
+    // Map colors for mesh effect based on category
+    Color accentColor = AppColors.primary;
+    String bgImage = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=400&auto=format&fit=crop';
+    
+    if (workout.category?.toLowerCase() == 'cardio') {
+      accentColor = const Color(0xFF00C6FF);
+      bgImage = 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?q=80&w=400&auto=format&fit=crop';
+    } else if (workout.category?.toLowerCase() == 'sức mạnh') {
+      accentColor = const Color(0xFF8B00FF);
+      bgImage = 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=400&auto=format&fit=crop';
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenWidth = constraints.maxWidth;
-        final isSmallScreen = screenWidth < 350;
-        
-        return Container(
-          padding: EdgeInsets.all(isSmallScreen ? 10 : 12),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-            border: Border.all(color: const Color.fromARGB(255, 241, 241, 241)),
+    return Container(
+      height: 140,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: Stack(
+          children: [
+            // Background Image with Dark Overlay
+            Positioned.fill(
+              child: Image.network(bgImage, fit: BoxFit.cover),
+            ),
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.8),
+                      Colors.black.withValues(alpha: 0.2),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           workout.title,
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.black,
+                            color: Colors.white,
                           ),
-                          maxLines: 2,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 6),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              Text(
-                                '${workout.estimatedDuration ?? 0} phút',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF999999),
-                                ),
-                              ),
-                              const Text(
-                                ' • ',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF999999),
-                                ),
-                              ),
-                              Text(
-                                levelText,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF999999),
-                                ),
-                              ),
-                              if (workout.isPremium) ...[
-                                const Text(
-                                  ' • ',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFF999999),
-                                  ),
-                                ),
-                                const Text(
-                                  'Premium',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFFFF7F00),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            _buildGlassTag(Icons.schedule, '${workout.estimatedDuration}m'),
+                            const SizedBox(width: 8),
+                            _buildGlassTag(Icons.bolt, workout.level ?? 'Dễ'),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
                   Container(
-                    width: isSmallScreen ? 56 : 64,
-                    height: isSmallScreen ? 56 : 64,
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: gradientColors,
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                    ),
-                    child: Icon(
-                      icon,
                       color: AppColors.white,
-                      size: isSmallScreen ? 26 : 30,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                        ),
+                      ],
                     ),
+                    child: Icon(Icons.play_arrow_rounded, color: accentColor, size: 28),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 237, 81, 9),
-                    padding: EdgeInsets.symmetric(
-                      vertical: isSmallScreen ? 8 : 10,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                    ),
+            ),
+            
+            // Premium Badge
+            if (workout.isPremium)
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFD700),
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                  onPressed: () {
-                    // Navigate to detail
-                  },
-                  child: Text(
-                    'Bắt đầu',
-                    style: TextStyle(
-                      fontSize: isSmallScreen ? 12 : 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.white,
-                    ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.star, size: 10, color: Colors.black),
+                      SizedBox(width: 4),
+                      Text(
+                        'PRO',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGlassTag(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 12, color: Colors.white),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

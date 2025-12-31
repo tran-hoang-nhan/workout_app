@@ -45,5 +45,14 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Chúng tôi cần quyền truy cập dữ liệu sức khỏe để theo dõi bước chân của bạn.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Chúng tôi cần quyền cập nhật dữ liệu sức khỏe để đồng bộ thông tin luyện tập.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 </dict>
 </plist>

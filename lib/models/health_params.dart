@@ -12,6 +12,9 @@ class HealthUpdateParams {
   final List<String> injuries;
   final List<String> medicalConditions;
   final List<String> allergies;
+  final bool? waterReminderEnabled;
+  final int? waterReminderInterval;
+
 
   HealthUpdateParams({
     required this.userId,
@@ -27,10 +30,12 @@ class HealthUpdateParams {
     required this.injuries,
     required this.medicalConditions,
     required this.allergies,
+    this.waterReminderEnabled,
+    this.waterReminderInterval,
   });
 
   Map<String, dynamic> toHealthMap() {
-    return {
+    final map = {
       'user_id': userId,
       'age': age,
       'weight': weight,
@@ -43,6 +48,15 @@ class HealthUpdateParams {
       'allergies': allergies,
       'updated_at': DateTime.now().toIso8601String(),
     };
+
+    if (waterReminderEnabled != null) {
+      map['water_reminder_enabled'] = waterReminderEnabled!;
+    }
+    if (waterReminderInterval != null) {
+      map['water_reminder_interval'] = waterReminderInterval!;
+    }
+
+    return map;
   }
 
   Map<String, dynamic> toProfileMap() {

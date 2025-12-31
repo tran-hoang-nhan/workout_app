@@ -11,6 +11,10 @@ class HealthData {
   final String dietType;
   final List<String> allergies;
   final String? gender;
+  final int steps;
+  final bool waterReminderEnabled;
+  final int waterReminderInterval;
+
 
   HealthData({
     required this.userId,
@@ -25,6 +29,9 @@ class HealthData {
     required this.dietType,
     required this.allergies,
     this.gender,
+    this.steps = 0,
+    this.waterReminderEnabled = false,
+    this.waterReminderInterval = 2,
   });
 
   factory HealthData.fromJson(Map<String, dynamic> json, String userId, {double? height, String? gender}) {
@@ -41,6 +48,9 @@ class HealthData {
       dietType: json['diet_type'] as String? ?? 'normal',
       allergies: List<String>.from(json['allergies'] ?? []),
       gender: gender,
+      steps: json['steps'] as int? ?? 0,
+      waterReminderEnabled: json['water_reminder_enabled'] as bool? ?? false,
+      waterReminderInterval: json['water_reminder_interval'] as int? ?? 2,
     );
   }
 }

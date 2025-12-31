@@ -20,48 +20,29 @@ class ProfileScreen extends ConsumerWidget {
       backgroundColor: AppColors.bgLight,
       body: SafeArea(
         child: userAsync.when(
-          loading: () => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                CircularProgressIndicator(color: AppColors.primary),
-                SizedBox(height: AppSpacing.lg),
-                Text(
-                  'Đang tải...',
-                  style: TextStyle(color: AppColors.grey, fontSize: AppFontSize.md),
-                ),
-              ],
-            ),
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
           ),
           error: (err, stack) => Center(
             child: Text('Lỗi: $err', style: const TextStyle(color: AppColors.danger)),
           ),
           data: (user) {
             if (user == null) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.person_off_outlined, size: 80, color: AppColors.grey),
-                    SizedBox(height: AppSpacing.lg),
-                    Text('Vui lòng đăng nhập', style: TextStyle(fontSize: AppFontSize.lg, color: AppColors.grey)),
-                  ],
-                ),
-              );
+              return const Center(child: Text('Vui lòng đăng nhập'));
             }
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.lg).copyWith(bottom: 100),
+              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.xl, AppSpacing.lg, 120),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: AppSpacing.lg),
                   const Text(
                     'Cá nhân',
                     style: TextStyle(
-                      fontSize: AppFontSize.xxxl,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
                       color: AppColors.black,
+                      letterSpacing: -1,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
@@ -85,28 +66,37 @@ class ProfileScreen extends ConsumerWidget {
                     loading: () => const Center(child: CircularProgressIndicator()),
                     error: (err, _) => Center(child: Text('Lỗi tải stats: $err')),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: 32),
+                  const Text(
+                    'Cài đặt & Hỗ trợ',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
                   ProfileMenuButton(
-                    title: 'Cài đặt',
-                    description: 'Quản lý tài khoản',
-                    icon: Icons.settings,
+                    title: 'Cài đặt tài khoản',
+                    description: 'Email, bảo mật và riêng tư',
+                    icon: Icons.settings_rounded,
                     onTap: () {},
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.md),
                   ProfileMenuButton(
                     title: 'Thông báo',
-                    description: 'Nhắc nhở và cập nhật',
-                    icon: Icons.notifications,
+                    description: 'Nhắc nhở luyện tập hàng ngày',
+                    icon: Icons.notifications_rounded,
                     onTap: () {},
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.md),
                   ProfileMenuButton(
                     title: 'Trợ giúp',
-                    description: 'FAQ và hỗ trợ',
-                    icon: Icons.help,
+                    description: 'Trung tâm hỗ trợ và FAQ',
+                    icon: Icons.help_outline_rounded,
                     onTap: () {},
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: 32),
                   ProfileLogoutButton(
                     onLogoutConfirmed: () async {
                       try {
@@ -118,15 +108,9 @@ class ProfileScreen extends ConsumerWidget {
                         }
                       } catch (e) {
                         debugPrint('Logout error: $e');
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Lỗi đăng xuất: $e')),
-                          );
-                        }
                       }
                     },
                   ),
-                  const SizedBox(height: AppSpacing.lg),
                 ],
               ),
             );

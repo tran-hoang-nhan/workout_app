@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
 
-class BottomNav extends StatelessWidget {
+class BottomNav extends StatefulWidget {
   final String activeTab;
   final void Function(String) setActiveTab;
 
@@ -11,6 +11,14 @@ class BottomNav extends StatelessWidget {
     required this.setActiveTab,
   });
 
+  @override
+  State<BottomNav> createState() => _BottomNavState();
+}
+
+class _BottomNavState extends State<BottomNav> with SingleTickerProviderStateMixin {
+  late AnimationController _entryController;
+  late Animation<Offset> _offsetAnimation;
+
   final List<TabItem> tabs = const [
     TabItem(id: 'home', label: 'Trang chủ', icon: Icons.home),
     TabItem(id: 'workouts', label: 'Bài tập', icon: Icons.fitness_center),
@@ -19,39 +27,67 @@ class BottomNav extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _entryController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _offsetAnimation = Tween<Offset>(
+      begin: const Offset(0, 1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _entryController,
+      curve: Curves.easeOutBack,
+    ));
+
+    _entryController.forward();
+  }
+
+  @override
+  void dispose() {
+    _entryController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Positioned(
       bottom: 0,
       left: 0,
       right: 0,
-      child: Container(
-        padding: const EdgeInsets.only(left: 4, right: 4, bottom: 20, top: 12),
+      child: SlideTransition(
+        position: _offsetAnimation,
         child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.cardBorder, width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: tabs.map((tab) {
-              final isActive = activeTab == tab.id;
-              return Expanded(
-                child: _TabButton(
-                  tab: tab,
-                  isActive: isActive,
-                  onTap: () => setActiveTab(tab.id),
+          padding: const EdgeInsets.only(left: 4, right: 4, bottom: 20, top: 12),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.cardBorder, width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
                 ),
-              );
-            }).toList(),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: tabs.map((tab) {
+                final isActive = widget.activeTab == tab.id;
+                return Expanded(
+                  child: _TabButton(
+                    tab: tab,
+                    isActive: isActive,
+                    onTap: () => widget.setActiveTab(tab.id),
+                  ),
+                );
+              }).toList(),
+            ),
           ),
         ),
       ),
