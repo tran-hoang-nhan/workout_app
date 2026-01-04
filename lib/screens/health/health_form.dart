@@ -102,15 +102,15 @@ class HealthFormUI extends StatelessWidget {
                 style: TextStyle(
                   fontSize: AppFontSize.xxxl,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.white,
+                  color: AppColors.black,
                 ),
               ),
               if (onClose != null)
                 IconButton(
                   onPressed: onClose,
-                  icon: const Icon(Icons.close, color: AppColors.white),
+                  icon: const Icon(Icons.close, color: AppColors.black),
                   style: IconButton.styleFrom(
-                    backgroundColor: AppColors.white.withValues(alpha: 0.1),
+                    backgroundColor: AppColors.greyLight,
                     padding: const EdgeInsets.all(AppSpacing.sm),
                   ),
                 ),
@@ -130,14 +130,14 @@ class HealthFormUI extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: const Color(0xFFFF7F00).withValues(alpha: 0.1),
-              border: Border.all(color: const Color(0xFFFF7F00).withValues(alpha: 0.3)),
+              color: AppColors.primary.withValues(alpha: 0.05),
+              border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
               borderRadius: BorderRadius.circular(AppBorderRadius.lg),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.info_outline, color: Color(0xFFFF7F00), size: 20),
+                 Icon(Icons.info_outline, color: AppColors.primary, size: 20),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
@@ -146,7 +146,7 @@ class HealthFormUI extends StatelessWidget {
                       Text(
                         'Thông tin quan trọng',
                         style: TextStyle(
-                          color: Color(0xFFFF7F00),
+                          color: AppColors.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: AppFontSize.sm,
                         ),
@@ -155,7 +155,7 @@ class HealthFormUI extends StatelessWidget {
                       Text(
                         'Thông tin này giúp chúng tôi gợi ý bài tập phù hợp và an toàn cho bạn',
                         style: TextStyle(
-                          color: AppColors.grey,
+                          color: AppColors.greyDark,
                           fontSize: AppFontSize.sm,
                         ),
                       ),
@@ -200,28 +200,36 @@ class HealthFormUI extends StatelessWidget {
             children: [
               Text(
                 'Giới tính',
-                style: Theme.of(context).textTheme.titleSmall,
+                style: const TextStyle(
+                  fontSize: AppFontSize.lg,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.white,
+                  border: Border.all(color: AppColors.cardBorder),
+                  borderRadius: BorderRadius.circular(AppBorderRadius.lg),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  child: DropdownButton<String>(
-                    value: gender,
-                    isExpanded: true,
-                    underline: const SizedBox(),
-                    items: const [
-                      DropdownMenuItem(value: 'male', child: Text('Nam')),
-                      DropdownMenuItem(value: 'female', child: Text('Nữ')),
-                      DropdownMenuItem(value: 'other', child: Text('Khác')),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) onGenderChanged(value);
-                    },
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: gender,
+                      isExpanded: true,
+                      icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.grey),
+                      items: const [
+                        DropdownMenuItem(value: 'male', child: Text('Nam', style: TextStyle(color: AppColors.black))),
+                        DropdownMenuItem(value: 'female', child: Text('Nữ', style: TextStyle(color: AppColors.black))),
+                        DropdownMenuItem(value: 'other', child: Text('Khác', style: TextStyle(color: AppColors.black))),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) onGenderChanged(value);
+                      },
+                      dropdownColor: AppColors.white,
+                    ),
                   ),
                 ),
               ),
@@ -252,7 +260,7 @@ class HealthFormUI extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
 
           // Activity Level
-          _buildActivityLevelField(),
+          _buildActivityLevelField(context),
           const SizedBox(height: AppSpacing.lg),
 
           // Sleep Hours
@@ -293,15 +301,17 @@ class HealthFormUI extends StatelessWidget {
             child: ElevatedButton(
               onPressed: isSaving ? null : onSave,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF7F00),
-                disabledBackgroundColor: AppColors.grey,
+                backgroundColor: AppColors.primary,
+                disabledBackgroundColor: AppColors.greyLight,
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+                  borderRadius: BorderRadius.circular(AppBorderRadius.xl),
                 ),
+                elevation: 4,
+                shadowColor: AppColors.primary.withValues(alpha: 0.4),
               ),
               child: Text(
-                isSaving ? 'Đang lưu...' : 'Lưu thông tin',
+                isSaving ? 'Đang lưu...' : 'Lưu Hồ Sơ',
                 style: const TextStyle(
                   fontSize: AppFontSize.lg,
                   fontWeight: FontWeight.bold,
@@ -323,8 +333,8 @@ class HealthFormUI extends StatelessWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A1A3F),
-        border: Border.all(color: const Color(0xFF1A3A5F)),
+        color: AppColors.white,
+        border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(AppBorderRadius.lg),
       ),
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -336,7 +346,7 @@ class HealthFormUI extends StatelessWidget {
             style: const TextStyle(
               fontSize: AppFontSize.lg,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.black,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -345,22 +355,22 @@ class HealthFormUI extends StatelessWidget {
             initialValue: value,
             onChanged: onChanged,
             keyboardType: keyboardType,
-            style: const TextStyle(color: AppColors.white),
+            style: const TextStyle(color: AppColors.black),
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                borderSide: const BorderSide(color: Color(0xFF1A3A5F)),
+                borderSide: const BorderSide(color: AppColors.cardBorder),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                borderSide: const BorderSide(color: Color(0xFF1A3A5F)),
+                borderSide: const BorderSide(color: AppColors.cardBorder),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                borderSide: const BorderSide(color: Color(0xFFFF7F00)),
+                borderSide: const BorderSide(color: AppColors.primary),
               ),
               filled: true,
-              fillColor: const Color(0xFF0F1A3A),
+              fillColor: AppColors.greyLight.withValues(alpha: 0.3),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.md,
                 vertical: AppSpacing.md,
@@ -382,8 +392,8 @@ class HealthFormUI extends StatelessWidget {
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A1A3F),
-        border: Border.all(color: const Color(0xFF1A3A5F)),
+        color: AppColors.white,
+        border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(AppBorderRadius.lg),
       ),
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -395,7 +405,7 @@ class HealthFormUI extends StatelessWidget {
             style: const TextStyle(
               fontSize: AppFontSize.lg,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.black,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -405,24 +415,24 @@ class HealthFormUI extends StatelessWidget {
                 child: TextField(
                   controller: controller,
                   onSubmitted: (_) => onAdd(),
-                  style: const TextStyle(color: AppColors.white),
+                  style: const TextStyle(color: AppColors.black),
                   decoration: InputDecoration(
                     hintText: placeholder,
                     hintStyle: const TextStyle(color: AppColors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                      borderSide: const BorderSide(color: Color(0xFF1A3A5F)),
+                      borderSide: const BorderSide(color: AppColors.cardBorder),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                      borderSide: const BorderSide(color: Color(0xFF1A3A5F)),
+                      borderSide: const BorderSide(color: AppColors.cardBorder),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                      borderSide: const BorderSide(color: Color(0xFFFF7F00)),
+                      borderSide: const BorderSide(color: AppColors.primary),
                     ),
                     filled: true,
-                    fillColor: const Color(0xFF0F1A3A),
+                    fillColor: AppColors.greyLight.withValues(alpha: 0.3),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.md,
                       vertical: AppSpacing.md,
@@ -434,7 +444,7 @@ class HealthFormUI extends StatelessWidget {
               ElevatedButton(
                 onPressed: onAdd,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF7F00),
+                  backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.lg,
                     vertical: AppSpacing.md,
@@ -463,42 +473,44 @@ class HealthFormUI extends StatelessWidget {
                   final index = entry.key;
                   final item = entry.value;
                   return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
-                    borderRadius: BorderRadius.circular(AppBorderRadius.xl),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        item,
-                        style: const TextStyle(
-                          color: AppColors.white,
-                          fontSize: AppFontSize.sm,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.greyLight,
+                      borderRadius: BorderRadius.circular(AppBorderRadius.xl),
+                      border: Border.all(color: AppColors.cardBorder),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          item,
+                          style: const TextStyle(
+                            color: AppColors.black,
+                            fontSize: AppFontSize.sm,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      GestureDetector(
-                        onTap: () => onRemove(index),
-                        child: const Icon(
-                          Icons.close,
-                          color: AppColors.grey,
-                          size: 16,
+                        const SizedBox(width: AppSpacing.sm),
+                        GestureDetector(
+                          onTap: () => onRemove(index),
+                          child: const Icon(
+                            Icons.close,
+                            color: AppColors.grey,
+                            size: 16,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
+                      ],
+                    ),
+                  );
+                }),
               ],
             ),
           ] else ...[
             const SizedBox(height: AppSpacing.md),
-            Text(
+            const Text(
               'Chưa có gì được thêm',
               style: TextStyle(
                 color: AppColors.grey,
@@ -511,7 +523,7 @@ class HealthFormUI extends StatelessWidget {
     );
   }
 
-  Widget _buildActivityLevelField() {
+  Widget _buildActivityLevelField(BuildContext context) {
     final levels = [
       ('sedentary', 'Ít vận động', 'Ít hoặc không tập luyện'),
       ('lightly_active', 'Nhẹ nhàng', '1-3 ngày/tuần'),
@@ -521,8 +533,8 @@ class HealthFormUI extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A1A3F),
-        border: Border.all(color: const Color(0xFF1A3A5F)),
+        color: AppColors.white,
+        border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(AppBorderRadius.lg),
       ),
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -534,7 +546,7 @@ class HealthFormUI extends StatelessWidget {
             style: TextStyle(
               fontSize: AppFontSize.lg,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.black,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -550,12 +562,19 @@ class HealthFormUI extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFFFF7F00).withValues(alpha: 0.1) : const Color(0xFF1A1A1A),
+                    color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : AppColors.white,
                     border: Border.all(
-                      color: isSelected ? const Color(0xFFFF7F00) : const Color(0xFF1A3A5F),
-                      width: 2,
+                      color: isSelected ? AppColors.primary : AppColors.cardBorder,
+                      width: isSelected ? 1.5 : 1,
                     ),
                     borderRadius: BorderRadius.circular(AppBorderRadius.md),
+                    boxShadow: isSelected ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      )
+                    ] : null,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -566,8 +585,8 @@ class HealthFormUI extends StatelessWidget {
                           children: [
                             Text(
                               label,
-                              style: const TextStyle(
-                                color: AppColors.white,
+                              style: TextStyle(
+                                color: isSelected ? AppColors.primary : AppColors.black,
                                 fontWeight: FontWeight.bold,
                                 fontSize: AppFontSize.md,
                               ),
@@ -575,18 +594,25 @@ class HealthFormUI extends StatelessWidget {
                             const SizedBox(height: AppSpacing.xs),
                             Text(
                               desc,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.grey,
                                 fontSize: AppFontSize.sm,
+                                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
                               ),
                             ),
                           ],
                         ),
                       ),
                       if (isSelected)
-                        const Icon(
+                         Icon(
                           Icons.check_circle,
-                          color: Color(0xFFFF7F00),
+                          color: AppColors.primary,
+                          size: 24,
+                        )
+                      else
+                        const Icon(
+                          Icons.circle_outlined,
+                          color: AppColors.cardBorder,
                           size: 24,
                         ),
                     ],
@@ -603,8 +629,8 @@ class HealthFormUI extends StatelessWidget {
   Widget _buildWaterIntakeField() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A1A3F),
-        border: Border.all(color: const Color(0xFF1A3A5F)),
+        color: AppColors.white,
+        border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(AppBorderRadius.lg),
       ),
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -616,7 +642,7 @@ class HealthFormUI extends StatelessWidget {
             style: TextStyle(
               fontSize: AppFontSize.lg,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.black,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -625,22 +651,22 @@ class HealthFormUI extends StatelessWidget {
             initialValue: waterIntake.toString(),
             onChanged: (value) => onWaterIntakeChanged(int.tryParse(value) ?? waterIntake),
             keyboardType: TextInputType.number,
-            style: const TextStyle(color: AppColors.white),
+            style: const TextStyle(color: AppColors.black),
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                borderSide: const BorderSide(color: Color(0xFF1A3A5F)),
+                borderSide: const BorderSide(color: AppColors.cardBorder),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                borderSide: const BorderSide(color: Color(0xFF1A3A5F)),
+                borderSide: const BorderSide(color: AppColors.cardBorder),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                borderSide: const BorderSide(color: Color(0xFFFF7F00)),
+                borderSide: const BorderSide(color: AppColors.primary),
               ),
               filled: true,
-              fillColor: const Color(0xFF0F1A3A),
+              fillColor: AppColors.greyLight.withValues(alpha: 0.3),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.md,
                 vertical: AppSpacing.md,
@@ -663,8 +689,8 @@ class HealthFormUI extends StatelessWidget {
   Widget _buildWaterReminderField() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A1A3F),
-        border: Border.all(color: const Color(0xFF1A3A5F)),
+        color: AppColors.white,
+        border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(AppBorderRadius.lg),
       ),
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -679,13 +705,16 @@ class HealthFormUI extends StatelessWidget {
                 style: TextStyle(
                   fontSize: AppFontSize.lg,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.white,
+                  color: AppColors.black,
                 ),
               ),
               Switch(
                 value: waterReminderEnabled,
                 onChanged: onWaterReminderEnabledChanged,
-                activeThumbColor: const Color(0xFFFF7F00),
+                activeThumbColor: AppColors.white,
+                activeTrackColor: AppColors.primary,
+                inactiveThumbColor: AppColors.grey,
+                inactiveTrackColor: AppColors.greyLight,
               ),
             ],
           ),
@@ -710,12 +739,16 @@ class HealthFormUI extends StatelessWidget {
                     onSelected: (selected) {
                       if (selected) onWaterReminderIntervalChanged(hours);
                     },
-                    selectedColor: const Color(0xFFFF7F00),
+                    selectedColor: AppColors.primary,
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : AppColors.grey,
+                      color: isSelected ? Colors.white : AppColors.black,
                       fontSize: 12,
                     ),
-                    backgroundColor: const Color(0xFF0F1A3A),
+                    backgroundColor: AppColors.white,
+                    side: BorderSide(
+                      color: isSelected ? AppColors.primary : AppColors.cardBorder,
+                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   ),
                 );
               }).toList(),
@@ -730,8 +763,8 @@ class HealthFormUI extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A1A3F),
-        border: Border.all(color: const Color(0xFF1A3A5F)),
+        color: AppColors.white,
+        border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(AppBorderRadius.lg),
       ),
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -743,38 +776,39 @@ class HealthFormUI extends StatelessWidget {
             style: TextStyle(
               fontSize: AppFontSize.lg,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: AppColors.black,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF0F1A3A),
-              border: Border.all(color: const Color(0xFF1A3A5F)),
+              color: AppColors.white,
+              border: Border.all(color: AppColors.cardBorder),
               borderRadius: BorderRadius.circular(AppBorderRadius.md),
             ),
-            child: DropdownButton<String>(
-              value: dietType,
-              onChanged: (value) => onDietTypeChanged(value ?? 'normal'),
-              items: [
-                ('normal', 'Bình thường'),
-                ('vegan', 'Thuần chay (Vegan)'),
-                ('vegetarian', 'Chay (Vegetarian)'),
-                ('keto', 'Keto'),
-                ('paleo', 'Paleo'),
-                ('low_carb', 'Low Carb'),
-                ('halal', 'Halal'),
-              ]
-                  .map((item) => DropdownMenuItem(
-                        value: item.$1,
-                        child: Text(item.$2, style: const TextStyle(color: AppColors.white)),
-                      ))
-                  .toList(),
-              style: const TextStyle(color: AppColors.white),
-              underline: const SizedBox(),
-              isExpanded: true,
-              icon: const Icon(Icons.arrow_drop_down, color: Color(0xFFFF7F00)),
-              dropdownColor: const Color(0xFF0F1A3A),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: dietType,
+                onChanged: (value) => onDietTypeChanged(value ?? 'normal'),
+                items: [
+                  ('normal', 'Bình thường'),
+                  ('vegan', 'Thuần chay (Vegan)'),
+                  ('vegetarian', 'Chay (Vegetarian)'),
+                  ('keto', 'Keto'),
+                  ('paleo', 'Paleo'),
+                  ('low_carb', 'Low Carb'),
+                  ('halal', 'Halal'),
+                ]
+                    .map((item) => DropdownMenuItem(
+                          value: item.$1,
+                          child: Text(item.$2, style: const TextStyle(color: AppColors.black)),
+                        ))
+                    .toList(),
+                style: const TextStyle(color: AppColors.black),
+                icon: const Icon(Icons.arrow_drop_down, color: AppColors.grey),
+                dropdownColor: AppColors.white,
+              ),
             ),
           ),
         ],

@@ -74,39 +74,43 @@ class _BMICardState extends State<BMICard> with SingleTickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Chỉ số BMI',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.blue.shade100,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Chỉ số BMI',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue.shade100,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        widget.calculations.bmi.toStringAsFixed(1),
-                        style: const TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.white,
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          widget.calculations.bmi.toStringAsFixed(1),
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.white,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        bmiCategory,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.white,
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          bmiCategory,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.white,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Container(
-                    width: 60,
-                    height: 60,
+                    width: 50,
+                    height: 50,
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
@@ -148,12 +152,16 @@ class _BMICardState extends State<BMICard> with SingleTickerProviderStateMixin {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
-                  Text(
-                    'Xem chi tiết →',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue.shade100,
-                      fontWeight: FontWeight.w500,
+                  Flexible(
+                    child: Text(
+                      'Xem chi tiết →',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.blue.shade100,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],

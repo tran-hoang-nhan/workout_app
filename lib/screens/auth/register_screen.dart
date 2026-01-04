@@ -4,6 +4,7 @@ import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/auth.dart';
 import 'login_screen.dart';
+import 'email_confirmation_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   final Future<void> Function() onSignupSuccess;
@@ -22,6 +23,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   late TextEditingController emailController;
   late TextEditingController passwordController;
   late TextEditingController confirmPasswordController;
+  DateTime? _selectedDate;
 
   bool showPassword = false;
   bool showConfirmPassword = false;
@@ -56,6 +58,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
         fullName: nameController.text.trim(),
+        dateOfBirth: _selectedDate,
       );
 
       await ref.read(authControllerProvider.notifier).signUp(params);
@@ -66,8 +69,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         return;
       }
 
-      if (mounted) {
+      final authService = ref.read(authServiceProvider);
+      if (authService.isAuthenticated) {
+        // Nếu đã được xác thực (auto login sau khi đăng ký thành công)
         await widget.onSignupSuccess();
+        // Pop màn hình đăng ký để quay lại main shell/onboarding
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      } else {
+        // Nếu chưa được xác thực (cần xác nhận email)
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => EmailConfirmationScreen(email: params.email),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -97,7 +115,43 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return false;
     }
 
+    if (_selectedDate == null) {
+      setState(() => authError = 'Vui lòng chọn ngày sinh');
+      return false;
+    }
+
     return true;
+  }
+
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColors.primary,
+              onPrimary: AppColors.white,
+              onSurface: AppColors.black,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primary,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
   }
 
   @override
@@ -112,7 +166,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             left: -MediaQuery.of(context).size.width * 0.1,
             child: Container(
               width: 300,
-              height: 300,
+              height: 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
@@ -128,10 +182,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     maxWidth: 450,
+                    minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom - 40,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -183,7 +239,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         const Text(
           'Workout App',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
             color: AppColors.black,
             letterSpacing: -0.5,
@@ -268,6 +324,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           icon: Icons.person,
           controller: nameController,
           placeholder: 'Nguyễn Văn A',
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _buildDatePickerField(
+          label: 'Ngày sinh',
+          icon: Icons.calendar_today,
+          value: _selectedDate == null
+              ? ''
+              : '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}',
+          placeholder: 'DD/MM/YYYY',
+          onTap: _selectDate,
         ),
         const SizedBox(height: AppSpacing.lg),
         _buildInputField(
@@ -487,37 +553,94 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Widget _buildLoginLink() {
     return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'Đã có tài khoản? ',
-            style: TextStyle(
-              color: AppColors.grey,
-              fontSize: 14,
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (_) => LoginScreen(
-                    onLoginSuccess: widget.onSignupSuccess,
-                  ),
-                ),
-              );
-            },
-            child: const Text(
-              'Đăng nhập ngay',
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Đã có tài khoản? ',
               style: TextStyle(
-                color: AppColors.primary,
+                color: AppColors.grey,
                 fontSize: 14,
-                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (_) => LoginScreen(
+                      onLoginSuccess: widget.onSignupSuccess,
+                    ),
+                  ),
+                );
+              },
+              child: const Text(
+                'Đăng nhập ngay',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildDatePickerField({
+    required String label,
+    required IconData icon,
+    required String value,
+    required String placeholder,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            color: AppColors.black,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.greyLight.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.cardBorder),
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 16,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: AppColors.grey,
+                  size: 20,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Text(
+                  value.isEmpty ? placeholder : value,
+                  style: TextStyle(
+                    color: value.isEmpty ? AppColors.grey : AppColors.black,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

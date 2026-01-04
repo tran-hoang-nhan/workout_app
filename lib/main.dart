@@ -17,6 +17,8 @@ import 'providers/auth_provider.dart';
 import 'providers/health_provider.dart';
 import 'widgets/bottom_nav.dart';
 
+import 'package:device_preview/device_preview.dart';
+
 final logger = Logger();
 
 void main() async {
@@ -58,8 +60,11 @@ void main() async {
   }
   
   runApp(
-    const ProviderScope(
-      child: MyApp(),
+    DevicePreview(
+      enabled: true,
+      builder: (context) => const ProviderScope(
+        child: MyApp(),
+      ),
     ),
   );
 }
@@ -96,6 +101,8 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     return MaterialApp(
       title: 'Workout App',
       debugShowCheckedModeBanner: false,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
@@ -115,12 +122,9 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           if (!isAuthenticated) {
             return LoginScreen(
               onLoginSuccess: () async {
-                // Invalidate all providers and wait for hasHealthData to re-fetch
-                ref.invalidate(currentUserIdProvider);
-                ref.invalidate(currentUserProvider);
+                // Invalidate both to ensure fresh data after login
+                ref.invalidate(healthDataProvider);
                 ref.invalidate(hasHealthDataProvider);
-                await Future.delayed(const Duration(milliseconds: 100));
-                ref.invalidate(authStateProvider);
               },
             );
           }
@@ -128,16 +132,16 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           // User is authenticated - check if has health data
           return hasHealthDataAsync.when(
             data: (hasHealthData) {
+              logger.i('Current Health Data Status: $hasHealthData');
               if (!hasHealthData) {
-                // No health data - show onboarding (BẮTBUỘC)
                 return HealthOnboardingScreen(
                   onComplete: () async {
-                    // After health onboarding, invalidate and rebuild
+                    logger.i('Onboarding completed, invalidating health providers...');
+                    ref.invalidate(healthDataProvider);
                     ref.invalidate(hasHealthDataProvider);
                   },
                 );
               }
-              // Has health data - show app
               return const AppShell();
             },
             loading: () => const Scaffold(
@@ -148,9 +152,12 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
               ),
             ),
             error: (error, stack) {
-              // Error checking health data - show onboarding to be safe
+              logger.e('Error checking health data: $error');
+              // Avoid loop: if there's an error, try to show the app but log it
+              // Or show a dedicated error screen
               return HealthOnboardingScreen(
                 onComplete: () async {
+                  ref.invalidate(healthDataProvider);
                   ref.invalidate(hasHealthDataProvider);
                 },
               );

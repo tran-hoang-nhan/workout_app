@@ -285,39 +285,54 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               ),
                               const SizedBox(height: AppSpacing.lg),
                               // Avatar Actions
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ElevatedButton.icon(
-                                    onPressed: _isUploadingAvatar
-                                        ? null
-                                        : _pickAndUploadAvatar,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.orange,
-                                      disabledBackgroundColor:
-                                          Colors.orange.withAlpha(128),
-                                    ),
-                                    icon: const Icon(Icons.upload),
-                                    label: Text(_avatarUrl.isNotEmpty
-                                        ? 'Đổi ảnh'
-                                        : 'Tải ảnh lên'),
-                                  ),
-                                  const SizedBox(width: AppSpacing.md),
-                                  if (_avatarUrl.isNotEmpty)
-                                    ElevatedButton.icon(
-                                      onPressed: _isUploadingAvatar
-                                          ? null
-                                          : _removeAvatar,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                        disabledBackgroundColor:
-                                            Colors.red.withAlpha(128),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: ElevatedButton.icon(
+                                        onPressed: _isUploadingAvatar
+                                            ? null
+                                            : _pickAndUploadAvatar,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.orange,
+                                          disabledBackgroundColor:
+                                              Colors.orange.withAlpha(128),
+                                        ),
+                                        icon: const Icon(Icons.upload, size: 16),
+                                        label: Text(
+                                          _avatarUrl.isNotEmpty
+                                              ? 'Đổi ảnh'
+                                              : 'Tải ảnh lên',
+                                          style: const TextStyle(fontSize: 12),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
-                                      icon: const Icon(Icons.delete),
-                                      label: const Text('Xóa'),
                                     ),
-                                ],
-                              ),
+                                    if (_avatarUrl.isNotEmpty) ...[
+                                      const SizedBox(width: AppSpacing.sm),
+                                      Flexible(
+                                        child: ElevatedButton.icon(
+                                          onPressed: _isUploadingAvatar
+                                              ? null
+                                              : _removeAvatar,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                            disabledBackgroundColor:
+                                                Colors.red.withAlpha(128),
+                                          ),
+                                          icon: const Icon(Icons.delete, size: 16),
+                                          label: const Text(
+                                            'Xóa',
+                                            style: TextStyle(fontSize: 12),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               const SizedBox(height: AppSpacing.sm),
                               Text(
                                 'Kích thước tối đa: 5MB',

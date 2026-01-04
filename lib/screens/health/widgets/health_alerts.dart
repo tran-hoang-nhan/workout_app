@@ -26,12 +26,14 @@ class HealthAlerts extends StatelessWidget {
             children: [
               Icon(Icons.warning_outlined, color: Colors.orange.shade600, size: 18),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                'Lưu ý sức khỏe',
-                style: TextStyle(
-                  color: Colors.orange.shade700,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  'Lưu ý sức khỏe',
+                  style: TextStyle(
+                    color: Colors.orange.shade700,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],

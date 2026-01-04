@@ -40,12 +40,14 @@ class InputSection extends ConsumerWidget {
             children: [
               const Icon(Icons.calculate, size: 20, color: AppColors.primary),
               const SizedBox(width: AppSpacing.sm),
-              const Text(
-                'Thông tin cơ bản',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.black,
+              const Expanded(
+                child: Text(
+                  'Thông tin cơ bản',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                  ),
                 ),
               ),
             ],

@@ -36,8 +36,8 @@ class ProfileHeaderCard extends StatelessWidget {
               top: -100,
               right: -100,
               child: Container(
-                width: 300,
-                height: 300,
+                width: 250,
+                height: 250,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
@@ -76,7 +76,7 @@ class ProfileHeaderCard extends StatelessWidget {
                             Text(
                               user.fullName ?? 'User',
                               style: const TextStyle(
-                                fontSize: 22,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w900,
                                 color: AppColors.black,
                                 letterSpacing: -0.5,
@@ -86,7 +86,7 @@ class ProfileHeaderCard extends StatelessWidget {
                             Text(
                               user.email,
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 10,
                                 color: AppColors.grey.withValues(alpha: 0.6),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -113,9 +113,9 @@ class ProfileHeaderCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildInfoTag('${user.height?.toStringAsFixed(0) ?? '0'} cm', 'Chiều cao'),
-                      _buildInfoTag(user.goal ?? 'Duy trì', 'Mục tiêu'),
-                      _buildInfoTag(user.gender ?? 'Nam', 'Giới tính'),
+                      Expanded(child: _buildInfoTag('${user.height?.toStringAsFixed(0) ?? '0'} cm', 'Chiều cao')),
+                      Expanded(child: _buildInfoTag(user.goal ?? 'Duy trì', 'Mục tiêu')),
+                      Expanded(child: _buildInfoTag(user.gender ?? 'Nam', 'Giới tính')),
                     ],
                   ),
                 ],
@@ -133,10 +133,13 @@ class ProfileHeaderCard extends StatelessWidget {
         Text(
           value,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 12,
             fontWeight: FontWeight.w800,
             color: AppColors.black,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 4),
         Text(
@@ -147,6 +150,9 @@ class ProfileHeaderCard extends StatelessWidget {
             fontWeight: FontWeight.w700,
             letterSpacing: 0.5,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
         ),
       ],
     );

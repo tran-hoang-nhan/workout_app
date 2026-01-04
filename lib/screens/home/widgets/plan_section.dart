@@ -9,47 +9,51 @@ class PlanSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Kế hoạch hôm nay',
-              style: TextStyle(
-                fontSize: AppFontSize.lg,
-                fontWeight: FontWeight.bold,
-                color: AppColors.black,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Expanded(
+                child: Text(
+                  'Kế hoạch hôm nay',
+                  style: TextStyle(
+                    fontSize: AppFontSize.lg,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Row(
-                children: [
-                  Text(
-                    'Xem tất cả',
-                    style: TextStyle(
-                      fontSize: AppFontSize.sm,
-                      color: Color(0xFFFF7F00),
-                      fontWeight: FontWeight.w600,
+              TextButton(
+                onPressed: () {},
+                child: const Row(
+                  children: [
+                    Text(
+                      'Xem tất cả',
+                      style: TextStyle(
+                        fontSize: AppFontSize.sm,
+                        color: Color(0xFFFF7F00),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  SizedBox(width: AppSpacing.xs),
-                  Icon(
-                    Icons.chevron_right,
-                    color: Color(0xFFFF7F00),
-                    size: 18,
-                  ),
-                ],
+                    SizedBox(width: AppSpacing.xs),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Color(0xFFFF7F00),
+                      size: 18,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
         const SizedBox(height: AppSpacing.md),
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppBorderRadius.xxl),
             image: const DecorationImage(
-              image: NetworkImage('https://images.unsplash.com/photo-1541534741688-6078c64b52de?q=80&w=800&auto=format&fit=crop'),
+              image: NetworkImage('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop'),
               fit: BoxFit.cover,
             ),
             boxShadow: [
@@ -78,30 +82,35 @@ class PlanSection extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'BUỔI TẬP HÔM NAY',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.5,
-                            color: Color.fromARGB(255, 251, 251, 251), // Brighter, high-contrast orange
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'BUỔI TẬP HÔM NAY',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.5,
+                              color: Color.fromARGB(255, 251, 251, 251), // Brighter, high-contrast orange
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Full Body\nPower Workout',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            height: 1.1,
+                          SizedBox(height: 8),
+                          Text(
+                            'Full Body\nPower Workout',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              height: 1.1,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: AppSpacing.md),
                     Container(
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
@@ -123,7 +132,7 @@ class PlanSection extends StatelessWidget {
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
-                  height: 54,
+                  height: 48,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF7F00),
@@ -163,15 +172,20 @@ class PlanSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 16, color: Colors.white),
           const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

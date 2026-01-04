@@ -28,34 +28,38 @@ class WaterIntakeCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Mục tiêu nước hàng ngày',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.cyan.shade100,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Mục tiêu nước hàng ngày',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.cyan.shade100,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    '${formState.waterIntake} ml',
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.white,
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      '${formState.waterIntake} ml',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.white,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    '≈ ${(formState.waterIntake / 250).toStringAsFixed(0)} ly nước mỗi ngày',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.cyan.shade100,
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      '≈ ${(formState.waterIntake / 250).toStringAsFixed(0)} ly nước mỗi ngày',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.cyan.shade100,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Container(
                 width: 60,

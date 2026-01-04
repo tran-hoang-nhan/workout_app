@@ -24,7 +24,7 @@ class CalorieGoals extends StatelessWidget {
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.lg),
         _buildCalorieGoalCard(
           'Thâm hụt Calo',
           'Giảm cân an toàn & hiệu quả',
@@ -32,7 +32,7 @@ class CalorieGoals extends StatelessWidget {
           const Color(0xFF00C6FF),
           Icons.trending_down_rounded,
         ),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.lg),
         _buildCalorieGoalCard(
           'Duy trì Cân nặng',
           'Giữ vững phong độ hiện tại',
@@ -80,9 +80,9 @@ class CalorieGoals extends StatelessWidget {
               color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 20),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,7 +90,7 @@ class CalorieGoals extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     fontWeight: FontWeight.w900,
                     color: AppColors.black,
                   ),
@@ -98,7 +98,7 @@ class CalorieGoals extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 10,
                     color: AppColors.grey.withValues(alpha: 0.6),
                     fontWeight: FontWeight.w500,
                   ),
@@ -112,10 +112,12 @@ class CalorieGoals extends StatelessWidget {
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 14,
                   fontWeight: FontWeight.w900,
                   color: color,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               Text(
                 'KCAL',

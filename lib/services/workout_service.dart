@@ -39,7 +39,8 @@ class WorkoutService {
   }
 
   Future<List<Workout>> getWorkoutsByCategory(String category) async {
-    final exerciseIds = await _workoutRepository.getExerciseIdsByMuscleGroup(category);
+    final muscleGroup = _mapCategoryToMuscleGroup(category);
+    final exerciseIds = await _workoutRepository.getExerciseIdsByMuscleGroup(muscleGroup);
     if (exerciseIds.isEmpty) return [];
 
     final workoutIds = await _workoutRepository.getWorkoutIdsByExerciseIds(exerciseIds);
@@ -47,5 +48,20 @@ class WorkoutService {
 
     final workoutsData = await _workoutRepository.getWorkoutsByIds(workoutIds);
     return workoutsData.map((data) => Workout.fromJson(data)).toList();
+  }
+
+  String _mapCategoryToMuscleGroup(String category) {
+    switch (category.toLowerCase()) {
+      case 'sức mạnh':
+        return 'strength';
+      case 'cardio':
+        return 'cardio';
+      case 'yoga':
+        return 'yoga';
+      case 'hiit':
+        return 'hiit';
+      default:
+        return category.toLowerCase();
+    }
   }
 }

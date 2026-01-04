@@ -3,13 +3,10 @@ import '../../../constants/app_constants.dart';
 
 class BMIScaleCard extends StatelessWidget {
   final double? currentBMI;
-
   const BMIScaleCard({super.key, this.currentBMI});
 
-  // Tính vị trí con trỏ BMI (0-100%)
   double _getBMIPosition() {
     if (currentBMI == null) return 0;
-    // BMI ranges: < 18.5 (0-25%), 18.5-24.9 (25-50%), 25-29.9 (50-75%), >= 30 (75-100%)
     if (currentBMI! < 18.5) return (currentBMI! / 18.5) * 25;
     if (currentBMI! < 25) return 25 + ((currentBMI! - 18.5) / 6.5) * 25;
     if (currentBMI! < 30) return 50 + ((currentBMI! - 25) / 5) * 25;
@@ -42,10 +39,8 @@ class BMIScaleCard extends StatelessWidget {
                   color: AppColors.black)),
           const SizedBox(height: 8),
           
-          // Gradient Bar with BMI Indicator
           Stack(
             children: [
-              // 4 color segments
               Row(
                 children: [
                   // Thiếu cân (< 18.5)
@@ -68,14 +63,12 @@ class BMIScaleCard extends StatelessWidget {
                       color: const Color(0xFF34D399),
                     ),
                   ),
-                  // Thừa cân (25-29.9)
                   Expanded(
                     child: Container(
                       height: 24,
                       color: const Color(0xFFFBBF24),
                     ),
                   ),
-                  // Béo phì (≥ 30)
                   Expanded(
                     child: Container(
                       height: 24,
@@ -99,7 +92,6 @@ class BMIScaleCard extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Tooltip
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
@@ -116,7 +108,7 @@ class BMIScaleCard extends StatelessWidget {
                           currentBMI!.toStringAsFixed(1),
                           style: const TextStyle(
                             color: Color(0xFF111827),
-                            fontSize: 10,
+                            fontSize: 8,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -142,8 +134,6 @@ class BMIScaleCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          
-          // BMI Categories Grid
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
@@ -189,7 +179,7 @@ class BMIScaleCard extends StatelessWidget {
                 Text(
                   label,
                   style: const TextStyle(
-                    fontSize: 10,
+                    fontSize: 8,
                     fontWeight: FontWeight.w600,
                     color: AppColors.black,
                   ),

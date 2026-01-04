@@ -9,17 +9,17 @@ class StepTitleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titles = [
-      'Thông tin cơ bản',
+      'Thông tin cá nhân',
       'Hoạt động & Mục tiêu',
-      'Lối sống',
-      'Sức khỏe',
+      'Thói quen lối sống',
+      'Tình trạng sức khỏe',
     ];
 
     final descriptions = [
-      'Cho chúng tôi biết về bạn',
-      'Mức độ vận động và mục tiêu của bạn',
-      'Thói quen sinh hoạt hàng ngày',
-      'Tình trạng sức khỏe hiện tại (có thể bỏ qua)',
+      'Cho chúng tôi biết một chút về chỉ số cơ thể của bạn',
+      'Xác định mức độ vận động để có kế hoạch phù hợp',
+      'Các thói quen sinh hoạt giúp tinh chỉnh mục tiêu',
+      'Thông tin y tế giúp bài tập an toàn hơn (không bắt buộc)',
     ];
 
     return Column(
@@ -28,17 +28,20 @@ class StepTitleWidget extends StatelessWidget {
         Text(
           titles[currentStep - 1],
           style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+            fontSize: 26,
+            fontWeight: FontWeight.w900,
+            color: AppColors.black,
+            letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: 8),
         Text(
           descriptions[currentStep - 1],
           style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey.shade400,
+            fontSize: 14,
+            color: AppColors.grey.withValues(alpha: 0.8),
+            fontWeight: FontWeight.w400,
+            height: 1.4,
           ),
         ),
       ],

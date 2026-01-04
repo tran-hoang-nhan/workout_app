@@ -150,7 +150,7 @@ class QuickWorkoutSection extends StatelessWidget {
                   Text(
                     workout.name,
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 16,
                       fontWeight: FontWeight.w900,
                       color: AppColors.black,
                       height: 1.2,

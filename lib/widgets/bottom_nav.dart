@@ -22,6 +22,7 @@ class _BottomNavState extends State<BottomNav> with SingleTickerProviderStateMix
   final List<TabItem> tabs = const [
     TabItem(id: 'home', label: 'Trang chủ', icon: Icons.home),
     TabItem(id: 'workouts', label: 'Bài tập', icon: Icons.fitness_center),
+    TabItem(id: 'progress', label: 'Tiến độ', icon: Icons.trending_up),
     TabItem(id: 'health', label: 'Sức khỏe', icon: Icons.local_activity),
     TabItem(id: 'profile', label: 'Cá nhân', icon: Icons.person),
   ];
@@ -95,7 +96,6 @@ class _BottomNavState extends State<BottomNav> with SingleTickerProviderStateMix
   }
 }
 
-// Đã loại bỏ _TabItem dư thừa, chỉ giữ lại TabItem
 class TabItem {
   final String id;
   final String label;
@@ -201,7 +201,7 @@ class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMi
                     scale: _scaleAnimation.value,
                     child: Icon(
                       widget.tab.icon,
-                      size: 20,
+                      size: 16,
                       color: widget.isActive ? Colors.white : AppColors.grey,
                     ),
                   ),
@@ -220,7 +220,7 @@ class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMi
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 8,
                       fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w500,
                       color: widget.isActive ? Colors.white : AppColors.grey,
                     ),

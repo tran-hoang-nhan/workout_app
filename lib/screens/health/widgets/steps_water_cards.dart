@@ -18,28 +18,32 @@ class _StepsWaterCardsState extends ConsumerState<StepsWaterCards> {
   Widget build(BuildContext context) {
     final healthDataAsync = ref.watch(healthDataProvider);
     final formState = ref.watch(healthFormProvider);
-    final waterCups = (formState.waterIntake / 250).floor(); // Derived or maintained locally if not synced
+    final waterCups = (formState.waterIntake / 250).floor(); 
+    
+    // Calculate adaptive height based on screen size
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardHeight = (screenWidth < 360) ? 190.0 : 220.0;
 
     return healthDataAsync.when(
-      loading: () => _buildLoadingState(),
-      error: (err, stack) => _buildErrorState(err.toString()),
+      loading: () => _buildLoadingState(cardHeight),
+      error: (err, stack) => _buildErrorState(err.toString(), cardHeight),
       data: (data) => Row(
         children: [
-          _buildStepsCard(data?.steps ?? 0),
+          _buildStepsCard(data?.steps ?? 0, cardHeight),
           const SizedBox(width: AppSpacing.md),
-          _buildWaterCard(waterCups),
+          _buildWaterCard(waterCups, cardHeight),
         ],
       ),
     );
   }
 
-  Widget _buildStepsCard(int steps) {
+  Widget _buildStepsCard(int steps, double height) {
     final progress = (steps / stepsGoal).clamp(0.0, 1.0);
     final percentage = (progress * 100).toInt();
 
     return Expanded(
       child: Container(
-        height: 220,
+        height: height,
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: _cardDecoration(),
         child: Column(
@@ -49,12 +53,16 @@ class _StepsWaterCardsState extends ConsumerState<StepsWaterCards> {
               children: [
                 _buildIconBox(Icons.directions_walk, AppColors.primary),
                 const SizedBox(width: AppSpacing.sm),
-                const Text(
-                  'Bước chân',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.black,
+                const Expanded(
+                  child: Text(
+                    'Bước chân',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -113,13 +121,13 @@ class _StepsWaterCardsState extends ConsumerState<StepsWaterCards> {
     );
   }
 
-  Widget _buildWaterCard(int currentCups) {
+  Widget _buildWaterCard(int currentCups, double height) {
     final progress = (currentCups / waterGoal).clamp(0.0, 1.0);
     final remaining = (waterGoal - currentCups).clamp(0, waterGoal);
 
     return Expanded(
       child: Container(
-        height: 220,
+        height: height,
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: _cardDecoration(),
         child: Column(
@@ -129,12 +137,16 @@ class _StepsWaterCardsState extends ConsumerState<StepsWaterCards> {
               children: [
                 _buildIconBox(Icons.local_drink, Colors.blue.shade500),
                 const SizedBox(width: AppSpacing.sm),
-                const Text(
-                  'Nước uống',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.black,
+                const Expanded(
+                  child: Text(
+                    'Nước uống',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -267,16 +279,16 @@ class _StepsWaterCardsState extends ConsumerState<StepsWaterCards> {
     );
   }
 
-  Widget _buildLoadingState() {
-    return const SizedBox(
-      height: 220,
-      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+  Widget _buildLoadingState(double height) {
+    return SizedBox(
+      height: height,
+      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
     );
   }
 
-  Widget _buildErrorState(String error) {
+  Widget _buildErrorState(String error, double height) {
     return Container(
-      height: 220,
+      height: height,
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: _cardDecoration(),
       child: Center(

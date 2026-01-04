@@ -49,7 +49,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                     const Text(
                       'Thư viện bài tập',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: 22,
                         fontWeight: FontWeight.w900,
                         color: AppColors.black,
                         letterSpacing: -0.5,
@@ -110,7 +110,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
   Widget _buildFeaturedHero() {
     return Container(
       width: double.infinity,
-      height: 220,
+      height: 180,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
         image: const DecorationImage(
@@ -161,20 +161,24 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
             Text(
               'HIIT Sức Mạnh Toàn Thân',
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Đốt cháy 400 kcal • 30 phút • Nâng cao',
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.white.withValues(alpha: 0.7),
-                fontWeight: FontWeight.w500,
+            const SizedBox(height: 4,),
+            Expanded(
+              child: Text(
+                'Đốt cháy 400 kcal • 30 phút • Nâng cao',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white.withValues(alpha: 0.7),
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -212,7 +216,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
   Widget _buildCategoryChips() {
     final categories = ['Tất cả', 'Cardio', 'Sức mạnh', 'Yoga', 'HIIT'];
     return SizedBox(
-      height: 44,
+      height: 38,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
@@ -249,7 +253,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
               child: Text(
                 category,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 10,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                   color: isSelected ? AppColors.white : AppColors.grey,
                 ),
@@ -262,7 +266,6 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
   }
 
   Widget _buildWorkoutCard(Workout workout) {
-    // Map colors for mesh effect based on category
     Color accentColor = AppColors.primary;
     String bgImage = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=400&auto=format&fit=crop';
     
@@ -275,7 +278,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
     }
 
     return Container(
-      height: 140,
+      height: 150,
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(28),
@@ -291,7 +294,6 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
         borderRadius: BorderRadius.circular(28),
         child: Stack(
           children: [
-            // Background Image with Dark Overlay
             Positioned.fill(
               child: Image.network(bgImage, fit: BoxFit.cover),
             ),
@@ -322,19 +324,19 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                         Text(
                           workout.title,
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         Row(
                           children: [
-                            _buildGlassTag(Icons.schedule, '${workout.estimatedDuration}m'),
-                            const SizedBox(width: 8),
-                            _buildGlassTag(Icons.bolt, workout.level ?? 'Dễ'),
+                            Expanded(child: _buildGlassTag(Icons.schedule, '${workout.estimatedDuration}m')),
+                            const SizedBox(width: 4),
+                            Expanded(child: _buildGlassTag(Icons.bolt, workout.level ?? 'Dễ')),
                           ],
                         ),
                       ],
@@ -402,12 +404,16 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
         children: [
           Icon(icon, size: 12, color: Colors.white),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 8,
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

@@ -27,6 +27,7 @@ class HealthIntegrationService {
   }
 
   Future<int> getTodaySteps() async {
+    if (kIsWeb) return 0;
     try {
       final now = DateTime.now();
       final midnight = DateTime(now.year, now.month, now.day);

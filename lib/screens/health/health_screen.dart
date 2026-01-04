@@ -160,7 +160,7 @@ class _HealthEditModalContentState extends ConsumerState<_HealthEditModalContent
       minChildSize: 0.5,
       builder: (context, scrollController) => Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF0A0E27),
+          color: AppColors.white,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),

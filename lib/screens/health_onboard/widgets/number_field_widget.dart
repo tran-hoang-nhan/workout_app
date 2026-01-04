@@ -24,46 +24,74 @@ class NumberFieldWidget extends StatefulWidget {
 }
 
 class _NumberFieldWidgetState extends State<NumberFieldWidget> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.value);
+  }
+
+  @override
+  void didUpdateWidget(NumberFieldWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.value != oldWidget.value && _controller.text != widget.value) {
+      _controller.text = widget.value;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          widget.label,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.grey,
-            fontWeight: FontWeight.w500,
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: AppSpacing.md),
+          child: Text(
+            widget.label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 12,
+              letterSpacing: 1.2,
+              color: AppColors.grey.withValues(alpha: 0.8),
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
         Container(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           decoration: BoxDecoration(
             color: AppColors.white,
-            border: Border.all(color: AppColors.cardBorder),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5), width: 2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
               ),
             ],
           ),
           child: TextField(
+            controller: _controller,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             onChanged: widget.onChanged,
             style: const TextStyle(
               color: AppColors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.all(AppSpacing.md),
-              hintText: widget.value,
-              hintStyle: const TextStyle(color: AppColors.grey),
+              contentPadding: const EdgeInsets.symmetric(vertical: 20),
+              hintText: 'Nhập giá trị...',
+              hintStyle: TextStyle(color: AppColors.grey.withValues(alpha: 0.5), fontWeight: FontWeight.normal),
+              suffixIcon: Icon(Icons.edit_outlined, color: AppColors.primary.withValues(alpha: 0.5), size: 20),
             ),
           ),
         ),

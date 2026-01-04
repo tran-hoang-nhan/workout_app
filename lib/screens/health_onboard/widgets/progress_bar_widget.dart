@@ -15,30 +15,43 @@ class ProgressBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
+        horizontal: AppSpacing.lg + 8,
+        vertical: AppSpacing.sm,
       ),
       child: Row(
         children: List.generate(
           totalSteps,
-          (index) => Expanded(
-            child: Container(
-              height: 6,
-              margin: EdgeInsets.only(right: index < totalSteps - 1 ? 8 : 0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-                gradient: (index + 1) <= currentStep
-                    ? LinearGradient(
-                        colors: [
-                          Colors.orange.shade500,
-                          Colors.red.shade500,
-                        ],
-                      )
-                    : null,
-                color: (index + 1) <= currentStep ? null : Colors.grey.shade800,
+          (index) {
+            final isActive = (index + 1) <= currentStep;
+            
+            return Expanded(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                height: 8,
+                margin: EdgeInsets.only(right: index < totalSteps - 1 ? 10 : 0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow: [
+                    if (isActive)
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                  ],
+                  gradient: isActive
+                      ? LinearGradient(
+                          colors: [
+                            AppColors.primary,
+                            AppColors.primaryDark,
+                          ],
+                        )
+                      : null,
+                  color: isActive ? null : AppColors.cardBorder.withValues(alpha: 0.3),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

@@ -14,26 +14,30 @@ class HealthHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Sức khỏe',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: AppColors.black,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Sức khỏe',
+                style: TextStyle(
+                    fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            const Text(
-              'Theo dõi các chỉ số sức khỏe của bạn',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.grey,
+              const SizedBox(height: AppSpacing.xs),
+              const Text(
+                'Theo dõi các chỉ số sức khỏe của bạn',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.grey,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         GestureDetector(
           onTap: onEditTap,

@@ -147,45 +147,52 @@ class _HealthOnboardingScreenState
             {
               'value': 'Ít vận động',
               'label': 'Ít vận động',
-              'desc': 'Ít hoặc không tập luyện'
+              'desc': 'Ít hoặc không tập luyện',
+              'icon': Icons.weekend_outlined,
             },
             {
               'value': 'Nhẹ nhàng',
               'label': 'Nhẹ nhàng',
-              'desc': '1-3 ngày/tuần'
+              'desc': '1-3 ngày/tuần',
+              'icon': Icons.directions_run_outlined,
             },
             {
               'value': 'Trung bình',
               'label': 'Trung bình',
-              'desc': '3-5 ngày/tuần'
+              'desc': '3-5 ngày/tuần',
+              'icon': Icons.fitness_center_outlined,
             },
             {
               'value': 'Rất tích cực',
               'label': 'Rất tích cực',
-              'desc': '6-7 ngày/tuần'
+              'desc': '6-7 ngày/tuần',
+              'icon': Icons.bolt_rounded,
             },
           ],
           selected: activityLevel,
           onSelected: (val) => setState(() => activityLevel = val),
         ),
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacing.xl),
         OptionSelectorWidget(
           label: 'Mục tiêu của bạn',
           options: [
             {
               'value': 'Giảm cân',
-              'label': '🎯 Giảm cân',
-              'desc': 'Giảm mỡ và cải thiện vóc dáng'
+              'label': 'Giảm cân',
+              'desc': 'Giảm mỡ và cải thiện vóc dáng',
+              'icon': Icons.trending_down_rounded,
             },
             {
               'value': 'Duy trì',
-              'label': '⚖️ Duy trì',
-              'desc': 'Giữ vóc dáng hiện tại'
+              'label': 'Duy trì',
+              'desc': 'Giữ vóc dáng hiện tại',
+              'icon': Icons.balance_rounded,
             },
             {
               'value': 'Tăng cơ',
-              'label': '💪 Tăng cơ',
-              'desc': 'Xây dựng cơ bắp'
+              'label': 'Tăng cơ',
+              'desc': 'Xây dựng cơ bắp',
+              'icon': Icons.fitness_center,
             },
           ],
           selected: goal,

@@ -14,55 +14,65 @@ class HeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final icons = [
-      Icons.fitness_center,
-      Icons.flag,
-      Icons.restaurant,
-      Icons.favorite,
+      Icons.person_rounded,
+      Icons.auto_awesome_motion_rounded,
+      Icons.insights_rounded,
+      Icons.health_and_safety_rounded,
     ];
 
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.only(
+        top: AppSpacing.xl,
+        left: AppSpacing.lg,
+        right: AppSpacing.lg,
+        bottom: AppSpacing.md,
+      ),
       child: Column(
         children: [
           Container(
-            width: 64,
-            height: 64,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [AppColors.primary, AppColors.primaryDark],
+                colors: [
+                  AppColors.primary,
+                  AppColors.primaryDark,
+                ],
               ),
-              borderRadius: BorderRadius.circular(32),
+              borderRadius: BorderRadius.circular(28),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.primary.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
             child: Icon(
               icons[currentStep - 1],
               color: Colors.white,
-              size: 32,
+              size: 40,
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          const Text(
-            'Thiết lập hồ sơ sức khỏe',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: AppColors.black,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.lg),
           Text(
-            'Bước $currentStep / $totalSteps',
-            style: const TextStyle(
+            'HỒ SƠ CÁ NHÂN'.toUpperCase(),
+            style: TextStyle(
+              fontSize: 12,
+              letterSpacing: 2.0,
+              fontWeight: FontWeight.w900,
+              color: AppColors.primary.withValues(alpha: 0.7),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'BƯỚC $currentStep / $totalSteps',
+            style: TextStyle(
               fontSize: 14,
-              color: AppColors.grey,
+              fontWeight: FontWeight.w600,
+              color: AppColors.grey.withValues(alpha: 0.6),
             ),
           ),
         ],

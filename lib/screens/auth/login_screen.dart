@@ -88,7 +88,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             right: -MediaQuery.of(context).size.width * 0.1,
             child: Container(
               width: 300,
-              height: 300,
+              height: 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
@@ -104,10 +104,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     maxWidth: 450,
+                    minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom - 40,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -159,7 +161,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const Text(
           'Workout App',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
             color: AppColors.black,
             letterSpacing: -0.5,
@@ -437,36 +439,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Widget _buildSignupLink() {
     return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'Chưa có tài khoản? ',
-            style: TextStyle(
-              color: AppColors.grey,
-              fontSize: 14,
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => RegisterScreen(
-                    onSignupSuccess: widget.onLoginSuccess,
-                  ),
-                ),
-              );
-            },
-            child: const Text(
-              'Đăng ký ngay',
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Chưa có tài khoản? ',
               style: TextStyle(
-                color: AppColors.primary,
+                color: AppColors.grey,
                 fontSize: 14,
-                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => RegisterScreen(
+                      onSignupSuccess: widget.onLoginSuccess,
+                    ),
+                  ),
+                );
+              },
+              child: const Text(
+                'Đăng ký ngay',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

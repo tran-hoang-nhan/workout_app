@@ -28,12 +28,12 @@ class AppColors {
 }
 
 class AppSpacing {
-  static const double xs = 4.0;
-  static const double sm = 8.0;
-  static const double md = 16.0;
-  static const double lg = 24.0;
-  static const double xl = 32.0;
-  static const double xxl = 48.0;
+  static const double xs = 2.0;
+  static const double sm = 6.0;
+  static const double md = 12.0;
+  static const double lg = 18.0;
+  static const double xl = 24.0;
+  static const double xxl = 36.0;
 }
 
 class AppBorderRadius {
@@ -46,13 +46,13 @@ class AppBorderRadius {
 }
 
 class AppFontSize {
-  static const double xs = 12.0;
-  static const double sm = 14.0;
-  static const double md = 16.0;
-  static const double lg = 18.0;
-  static const double xl = 20.0;
-  static const double xxl = 24.0;
-  static const double xxxl = 32.0;
+  static const double xs = 10.0;
+  static const double sm = 12.0;
+  static const double md = 14.0;
+  static const double lg = 16.0;
+  static const double xl = 18.0;
+  static const double xxl = 22.0;
+  static const double xxxl = 28.0;
 }
 
 class AppStrings {

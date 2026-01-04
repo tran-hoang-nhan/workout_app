@@ -110,8 +110,8 @@ class WeightHistoryCard extends StatelessWidget {
                       children: [
                         // Icon
                         Container(
-                          width: 40,
-                          height: 40,
+                          width: 35,
+                          height: 35,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               colors: [
@@ -124,7 +124,7 @@ class WeightHistoryCard extends StatelessWidget {
                           child: Center(
                             child: Text(
                               index == 0 ? '📍' : '📊',
-                              style: const TextStyle(fontSize: 18),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ),
                         ),
@@ -140,7 +140,7 @@ class WeightHistoryCard extends StatelessWidget {
                                 Text(
                                   '${record.weight} kg',
                                   style: const TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.black,
                                   ),
@@ -155,7 +155,7 @@ class WeightHistoryCard extends StatelessWidget {
                                     child: const Text(
                                       'Mới nhất',
                                       style: TextStyle(
-                                        fontSize: 10,
+                                        fontSize: 8,
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                       ),

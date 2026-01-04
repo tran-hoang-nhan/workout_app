@@ -39,7 +39,7 @@ class ProfileScreen extends ConsumerWidget {
                   const Text(
                     'Cá nhân',
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 24,
                       fontWeight: FontWeight.w900,
                       color: AppColors.black,
                       letterSpacing: -1,
@@ -70,7 +70,7 @@ class ProfileScreen extends ConsumerWidget {
                   const Text(
                     'Cài đặt & Hỗ trợ',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: AppColors.black,
                     ),

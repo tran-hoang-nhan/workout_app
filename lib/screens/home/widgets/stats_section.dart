@@ -14,7 +14,6 @@ class StatsSection extends StatelessWidget {
           height: 180,
           child: Row(
             children: [
-              // Main Large Card - Calories
               Expanded(
                 flex: 3,
                 child: _buildMainStatCard(
@@ -94,19 +93,23 @@ class StatsSection extends StatelessWidget {
                   Text(
                     value,
                     style: const TextStyle(
-                      fontSize: 32,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: AppColors.black,
                       height: 1,
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Text(
-                    unit,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.grey.withValues(alpha: 0.6),
+                  Flexible(
+                    child: Text(
+                      unit,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.grey.withValues(alpha: 0.6),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -153,12 +156,15 @@ class StatsSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.black,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                    ),
                   ),
                 ),
                 Text(
