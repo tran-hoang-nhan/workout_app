@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/workout_provider.dart';
 import '../../models/workout.dart';
+import '../../utils/app_error.dart';
+import '../../widgets/loading_animation.dart';
 
 class WorkoutsScreen extends ConsumerStatefulWidget {
   const WorkoutsScreen({super.key});
@@ -95,10 +97,15 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                 );
               },
               loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(child: AppLoading(message: 'Đang tải bài tập...')),
               ),
-              error: (err, stack) => SliverFillRemaining(
-                child: Center(child: Text('Lỗi: $err')),
+              error: (e, stack) => SliverFillRemaining(
+                child: Center(
+                  child: Text(
+                    e is AppError ? e.userMessage : 'Lỗi: $e',
+                    style: const TextStyle(color: AppColors.danger),
+                  ),
+                ),
               ),
             ),
           ],

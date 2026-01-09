@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/supabase_config.dart';
 import '../models/user.dart';
@@ -109,5 +110,45 @@ class AuthRepository {
   bool get isEmailVerified {
     final user = _supabase.auth.currentUser;
     return user?.emailConfirmedAt != null;
+  }
+
+  // Transaction: Sign up with profile creation
+  Future<AppUser?> signUpWithTransaction(SignUpParams params) async {
+    User? createdUser;
+    try {
+      // Step 1: Create auth user
+      final authResponse = await signUp(params);
+      if (authResponse.user == null) {
+        throw AppError('Failed to create auth user');
+      }
+      createdUser = authResponse.user;
+
+      // Step 2: Create profile
+      await createUserProfile(id: createdUser!.id, params: params);
+
+      // Step 3: Get and return user profile
+      return await getUserProfile(createdUser.id);
+    } catch (e, st) {
+      // Rollback: Delete auth user if profile creation failed
+      if (createdUser != null) {
+        try {
+          await _deleteAuthUser(createdUser.id);
+        } catch (deleteError) {
+          debugPrint('⚠️ Failed to rollback auth user: $deleteError');
+        }
+      }
+      throw handleException(e, st);
+    }
+  }
+
+  // Rollback helper: Delete auth user
+  Future<void> _deleteAuthUser(String userId) async {
+    try {
+      // Supabase doesn't allow deleting auth users from client
+      // So we delete the profile and let database cascade handle it
+      await _supabase.from(SupabaseConfig.profilesTable).delete().eq('id', userId);
+    } catch (e, st) {
+      throw handleException(e, st);
+    }
   }
 }

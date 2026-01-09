@@ -16,15 +16,14 @@ import 'screens/profile/profile_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/health_provider.dart';
 import 'widgets/bottom_nav.dart';
-
+import 'package:awesome_notifications/awesome_notifications.dart'; // Import thư viện
 import 'package:device_preview/device_preview.dart';
+import 'services/notification_service.dart';
 
 final logger = Logger();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Load .env file (gracefully handle if not found on mobile)
   try {
     await dotenv.load(fileName: '.env');
   } catch (e) {
@@ -32,17 +31,14 @@ void main() async {
   }
   
   logger.i('Starting Workout App...');
-  logger.i(SupabaseConfig.debugInfo());
   
   // Kiểm tra config
   if (!SupabaseConfig.isValid()) {
     logger.e('❌ Supabase config không hợp lệ!');
-    logger.e('Vui lòng kiểm tra file .env hoặc environment variables');
     return;
   }
   
   try {
-    // Khởi tạo Supabase với timeout cho web
     await Supabase.initialize(
       url: SupabaseConfig.supabaseUrl,
       anonKey: SupabaseConfig.supabaseAnonKey,
@@ -51,22 +47,51 @@ void main() async {
       onTimeout: () => throw TimeoutException('Supabase initialization timeout', null),
     );
     logger.i('✅ Supabase initialized successfully');
-  } on TimeoutException catch (e) {
-    logger.w('⚠️ Supabase initialization timeout on web: $e');
-    // Continue app even if Supabase initialization times out on web
   } catch (e) {
     logger.e('❌ Error initializing Supabase: $e');
-    rethrow;
+    // Không rethrow để app vẫn chạy tiếp được (có thể hiện màn hình lỗi sau)
   }
   
+  await AwesomeNotifications().initialize(
+      null, // null = dùng icon mặc định của app
+      [
+        NotificationChannel(
+          channelGroupKey: NotificationService.waterChannelGroupKey,
+          channelKey: NotificationService.waterChannelKey, 
+          channelName: 'Nhắc nhở uống nước',
+          channelDescription: 'Thông báo nhắc bạn uống nước đều đặn',
+          defaultColor: const Color(0xFF9D50DD),
+          ledColor: Colors.white,
+          importance: NotificationImportance.High, 
+          channelShowBadge: true,
+          playSound: true,
+        )
+      ],
+      debug: true,
+  );
+
   runApp(
     DevicePreview(
-      enabled: true,
+      enabled: true, // Set false khi build thật
       builder: (context) => const ProviderScope(
         child: MyApp(),
       ),
     ),
   );
+}
+
+// --- 2. THÊM CLASS XỬ LÝ SỰ KIỆN (CONTROLLER) ---
+class NotificationController {
+  @pragma("vm:entry-point")
+  static Future <void> onActionReceivedMethod(ReceivedAction receivedAction) async {
+    if(receivedAction.buttonKeyPressed == 'DRANK_WATER'){
+        debugPrint("User đã bấm: Đã uống nước! (Logic update DB sẽ nằm ở đây)");
+    }
+  }
+
+  @pragma("vm:entry-point") static Future <void> onNotificationCreatedMethod(ReceivedNotification receivedNotification) async {}
+  @pragma("vm:entry-point") static Future <void> onNotificationDisplayedMethod(ReceivedNotification receivedNotification) async {}
+  @pragma("vm:entry-point") static Future <void> onDismissActionReceivedMethod(ReceivedAction receivedAction) async {}
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -81,6 +106,23 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    
+    // --- 3. ĐĂNG KÝ LẮNG NGHE SỰ KIỆN & XIN QUYỀN ---
+    
+    // Đăng ký listener
+    AwesomeNotifications().setListeners(
+        onActionReceivedMethod:         NotificationController.onActionReceivedMethod,
+        onNotificationCreatedMethod:    NotificationController.onNotificationCreatedMethod,
+        onNotificationDisplayedMethod:  NotificationController.onNotificationDisplayedMethod,
+        onDismissActionReceivedMethod:  NotificationController.onDismissActionReceivedMethod
+    );
+
+    // Xin quyền gửi thông báo (Quan trọng cho Android 13+)
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
   }
 
   @override
@@ -91,13 +133,11 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    // Watch auth state - this will rebuild when it changes
     final authStateAsync = ref.watch(authStateProvider);
-    // Watch health data status
     final hasHealthDataAsync = ref.watch(hasHealthDataProvider);
-    // Initialize notification service
-    ref.watch(initializeNotificationProvider);
-
+    
+    // Lưu ý: Đã init notification ở initState, không cần gọi provider init ở đây nữa để tránh duplicate
+    
     return MaterialApp(
       title: 'Workout App',
       debugShowCheckedModeBanner: false,
@@ -122,21 +162,17 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           if (!isAuthenticated) {
             return LoginScreen(
               onLoginSuccess: () async {
-                // Invalidate both to ensure fresh data after login
                 ref.invalidate(healthDataProvider);
                 ref.invalidate(hasHealthDataProvider);
               },
             );
           }
 
-          // User is authenticated - check if has health data
           return hasHealthDataAsync.when(
             data: (hasHealthData) {
-              logger.i('Current Health Data Status: $hasHealthData');
               if (!hasHealthData) {
                 return HealthOnboardingScreen(
                   onComplete: () async {
-                    logger.i('Onboarding completed, invalidating health providers...');
                     ref.invalidate(healthDataProvider);
                     ref.invalidate(hasHealthDataProvider);
                   },
@@ -145,36 +181,22 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
               return const AppShell();
             },
             loading: () => const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                ),
-              ),
+              body: Center(child: CircularProgressIndicator()),
             ),
-            error: (error, stack) {
-              logger.e('Error checking health data: $error');
-              // Avoid loop: if there's an error, try to show the app but log it
-              // Or show a dedicated error screen
-              return HealthOnboardingScreen(
-                onComplete: () async {
-                  ref.invalidate(healthDataProvider);
-                  ref.invalidate(hasHealthDataProvider);
-                },
-              );
-            },
+            error: (error, stack) => HealthOnboardingScreen(
+              onComplete: () async {
+                ref.invalidate(healthDataProvider);
+                ref.invalidate(hasHealthDataProvider);
+              },
+            ),
           );
         },
         loading: () => const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-            ),
-          ),
+          body: Center(child: CircularProgressIndicator()),
         ),
         error: (error, stackTrace) => LoginScreen(
           onLoginSuccess: () async {
-            ref.invalidate(authStateProvider);
-            ref.invalidate(hasHealthDataProvider);
+             ref.invalidate(authStateProvider);
           },
         ),
       ),
@@ -198,18 +220,12 @@ class _AppShellState extends State<AppShell> {
 
   Widget _buildScreen(String tabId) {
     switch (tabId) {
-      case 'home':
-        return const HomeScreen();
-      case 'workouts':
-        return const WorkoutsScreen();
-      case 'progress':
-        return const ProgressScreen();
-      case 'health':
-        return const HealthScreen();
-      case 'profile':
-        return const ProfileScreen();
-      default:
-        return const HomeScreen();
+      case 'home': return const HomeScreen();
+      case 'workouts': return const WorkoutsScreen();
+      case 'progress': return const ProgressScreen();
+      case 'health': return const HealthScreen();
+      case 'profile': return const ProfileScreen();
+      default: return const HomeScreen();
     }
   }
 
@@ -220,9 +236,7 @@ class _AppShellState extends State<AppShell> {
         children: [
           Column(
             children: [
-              Expanded(
-                child: _buildScreen(_activeTab),
-              ),
+              Expanded(child: _buildScreen(_activeTab)),
             ],
           ),
           BottomNav(
@@ -234,4 +248,3 @@ class _AppShellState extends State<AppShell> {
     );
   }
 }
-

@@ -1,35 +1,17 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
-import 'dart:io';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  // Key trùng với main.dart
+  static const String waterChannelKey = 'water_reminder';
+  static const String waterChannelGroupKey = 'water_channel_group';
 
+  /// Hàm init này có thể gọi ở main hoặc home
   Future<void> init() async {
-    tz.initializeTimeZones();
-    
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
-
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-    );
-
-    await _notificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (details) {
-        // Handle notification tap
-      },
-    );
+    // Xin quyền ngay khi init service (tùy chọn, hoặc để lúc bấm nút mới xin)
+    bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+    if (!isAllowed) {
+      await AwesomeNotifications().requestPermissionToSendNotifications();
+    }
   }
 
   Future<void> scheduleWaterReminder({required int intervalHours}) async {
@@ -38,20 +20,32 @@ class NotificationService {
       await _notificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>() ?.requestNotificationsPermission();
     }
 
-    await _notificationsPlugin.zonedSchedule(
-      0,
-      'Thời gian uống nước!',
-      'Đã đến lúc bổ sung nước cho cơ thể rồi bạn ơi. Cùng uống một cốc nước nhé!',
-      tz.TZDateTime.now(tz.local).add(Duration(hours: intervalHours)),
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'water_reminder_channel',
-          'Water Reminders',
-          channelDescription: 'Reminders to drink water periodically',
-          importance: Importance.max,
-          priority: Priority.high,
+    // Lấy múi giờ hiện tại của máy user
+    String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
+
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 10, 
+        channelKey: waterChannelKey,
+        title: 'Thời gian uống nước!',
+        body: 'Đã đến lúc bổ sung nước cho cơ thể rồi bạn ơi. Cùng uống một cốc nước nhé!',
+        notificationLayout: NotificationLayout.Default,
+        category: NotificationCategory.Reminder,
+        wakeUpScreen: true, // Sáng màn hình khi có thông báo
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'DRANK_WATER',
+          label: 'Đã uống nước!',
+          actionType: ActionType.SilentAction, // SilentAction: Bấm xong xử lý ngầm, không mở App lên
         ),
-        iOS: DarwinNotificationDetails(),
+      ],
+      schedule: NotificationInterval(
+        interval: Duration(hours: intervalHours), 
+        timeZone: localTimeZone,
+        repeats: true,
+        preciseAlarm: true, // Đảm bảo giờ giấc chính xác
+        allowWhileIdle: true, // Chạy cả khi điện thoại đang ở chế độ nghỉ (Doze mode)
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time, // This makes it repeat daily at that time if we want
@@ -59,6 +53,6 @@ class NotificationService {
   }
 
   Future<void> cancelAllReminders() async {
-    await _notificationsPlugin.cancelAll();
+    await AwesomeNotifications().cancelAll();
   }
 }

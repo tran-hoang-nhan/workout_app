@@ -1,29 +1,73 @@
-import '../models/user.dart';
-import '../repositories/profile_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/auth.dart';
+import '../providers/auth_provider.dart';
+import '../providers/avatar_provider.dart';
+import '../utils/app_error.dart';
 
 class ProfileService {
-  final ProfileRepository _repository;
-  ProfileService({ProfileRepository? repository}) : _repository = repository ?? ProfileRepository();
+  final Ref _ref;
 
-  Future<UserStats> loadUserHealthData(String userId) async {
-    return await _repository.loadUserHealthData(userId);
-  }
+  ProfileService(this._ref);
 
-  Future<void> updateWeight(String userId, double newWeight) async {
-    await _repository.updateWeight(userId, newWeight);
-  }
-
-  Future<void> saveProfile(String userId, double weight, double height, int age) async {
-    await _repository.saveProfile(userId, weight, height, age);
-  }
-
-  String formatDate(String dateString) {
-    if (dateString.isEmpty) return '';
+  Future<void> pickAndUploadAvatar() async {
     try {
-      final date = DateTime.parse(dateString);
-      return '${date.day}/${date.month}/${date.year}';
+      await _ref.read(avatarControllerProvider.notifier).pickAndUploadAvatar();
+      
+      final state = _ref.read(avatarControllerProvider);
+      if (state.hasError) {
+        throw handleException(state.error!);
+      }
+
+      // Refresh and wait for updated user data
+      _ref.invalidate(currentUserProvider);
     } catch (e) {
-      return '';
+      throw handleException(e);
+    }
+  }
+
+  Future<void> removeAvatar() async {
+    try {
+      await _ref.read(avatarControllerProvider.notifier).removeAvatar();
+      
+      final state = _ref.read(avatarControllerProvider);
+      if (state.hasError) {
+        throw handleException(state.error!);
+      }
+    } catch (e) {
+      throw handleException(e);
+    }
+  }
+
+  Future<void> saveProfile({
+    required String userId,
+    required String fullName,
+    String? gender,
+    double? height,
+    String? goal,
+  }) async {
+    if (fullName.isEmpty) {
+      throw ValidationException('Vui lòng nhập tên');
+    }
+
+    try {
+      final params = UpdateProfileParams(
+        userId: userId,
+        fullName: fullName,
+        gender: gender,
+        height: height,
+        goal: goal,
+      );
+
+      await _ref.read(authControllerProvider.notifier).updateProfile(params);
+      
+      final authState = _ref.read(authControllerProvider);
+      if (authState.hasError) throw authState.error!;
+    } catch (e) {
+      throw handleException(e);
     }
   }
 }
+
+final profileServiceProvider = Provider<ProfileService>((ref) {
+  return ProfileService(ref);
+});
