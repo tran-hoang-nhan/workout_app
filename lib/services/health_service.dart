@@ -53,7 +53,7 @@ class HealthService {
   }
 
   Future<void> saveHealthData(HealthUpdateParams params) async {
-    await _repository.saveHealthData(params);
+    await _repository.saveHealthDataWithTransaction(params);
   }
 
   double calculateBMI(double weight, double height) => health_utils.calculateBMI(weight, height);

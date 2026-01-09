@@ -21,15 +21,8 @@ class AuthService {
   }
 
   Future<AppUser?> signUp(SignUpParams params) async {
-    final response = await _repository.signUp(params);
-    if (response.user != null) {
-      await _repository.createUserProfile(
-        id: response.user!.id,
-        params: params, 
-      );
-      return await _repository.getUserProfile(response.user!.id);
-    }
-    return null;
+    // Use transaction to ensure atomicity
+    return await _repository.signUpWithTransaction(params);
   }
 
   Future<void> signOut() async {

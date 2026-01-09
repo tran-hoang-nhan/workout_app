@@ -61,6 +61,10 @@ dependencies:
   logger: ^2.0.0
 
   device_preview: ^1.2.0
+  pedometer: ^4.1.1
+  awesome_notifications: ^0.10.1
+  fl_chart: ^0.66.0
+  table_calendar: ^3.1.0
 
 dev_dependencies:
   flutter_test:

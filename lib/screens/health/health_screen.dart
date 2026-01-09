@@ -7,7 +7,8 @@ import 'widgets/health_header.dart';
 import 'widgets/health_alerts.dart';
 import 'widgets/input_section.dart';
 import 'widgets/bmi_card.dart';
-import 'widgets/steps_water_cards.dart';
+import 'widgets/step_card.dart';
+import 'widgets/water_card.dart';
 import 'widgets/water_intake_card.dart';
 import 'widgets/heart_rate_zones.dart';
 import 'widgets/calorie_goals.dart';
@@ -57,9 +58,16 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
   @override
   Widget build(BuildContext context) {
     final formState = ref.watch(healthFormProvider);
+    final healthDataAsync = ref.watch(healthDataProvider);
     final calculations = ref.watch(healthCalculationsProvider);
+    final waterCups = (formState.waterIntake / 250).floor();
+    
     ref.watch(syncHealthProfileProvider);
     _updateControllers(formState);
+
+    // Calculate adaptive height based on screen size
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardHeight = (screenWidth < 360) ? 190.0 : 220.0;
 
     return Scaffold(
       backgroundColor: AppColors.bgLight,
@@ -91,8 +99,36 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               BMICard(calculations: calculations),
               const SizedBox(height: AppSpacing.md),
 
-              // Steps & Water
-              const StepsWaterCards(),
+              // Steps & Water Row
+              healthDataAsync.when(
+                loading: () => SizedBox(
+                  height: cardHeight,
+                  child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                ),
+                error: (err, stack) => Container(
+                  height: cardHeight,
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5)),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Lỗi tải dữ liệu: $err',
+                      style: const TextStyle(color: Colors.red, fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                data: (data) => Row(
+                  children: [
+                    StepCard(steps: data?.steps ?? 0, height: cardHeight),
+                    const SizedBox(width: AppSpacing.md),
+                    WaterCard(currentCups: waterCups, height: cardHeight),
+                  ],
+                ),
+              ),
               const SizedBox(height: AppSpacing.md),
 
               // Water Intake
