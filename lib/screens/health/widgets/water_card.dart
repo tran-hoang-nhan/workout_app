@@ -3,125 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
 import '../../../providers/health_provider.dart';
 
-class StepsWaterCards extends ConsumerStatefulWidget {
-  const StepsWaterCards({super.key});
-
-  @override
-  ConsumerState<StepsWaterCards> createState() => _StepsWaterCardsState();
-}
-
-class _StepsWaterCardsState extends ConsumerState<StepsWaterCards> {
-  static const int stepsGoal = 10000;
+class WaterCard extends ConsumerWidget {
+  final int currentCups;
+  final double height;
   static const int waterGoal = 8;
 
+  const WaterCard({
+    super.key,
+    required this.currentCups,
+    required this.height,
+  });
+
   @override
-  Widget build(BuildContext context) {
-    final healthDataAsync = ref.watch(healthDataProvider);
-    final formState = ref.watch(healthFormProvider);
-    final waterCups = (formState.waterIntake / 250).floor(); 
-    
-    // Calculate adaptive height based on screen size
-    final screenWidth = MediaQuery.of(context).size.width;
-    final cardHeight = (screenWidth < 360) ? 190.0 : 220.0;
-
-    return healthDataAsync.when(
-      loading: () => _buildLoadingState(cardHeight),
-      error: (err, stack) => _buildErrorState(err.toString(), cardHeight),
-      data: (data) => Row(
-        children: [
-          _buildStepsCard(data?.steps ?? 0, cardHeight),
-          const SizedBox(width: AppSpacing.md),
-          _buildWaterCard(waterCups, cardHeight),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStepsCard(int steps, double height) {
-    final progress = (steps / stepsGoal).clamp(0.0, 1.0);
-    final percentage = (progress * 100).toInt();
-
-    return Expanded(
-      child: Container(
-        height: height,
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: _cardDecoration(),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                _buildIconBox(Icons.directions_walk, AppColors.primary),
-                const SizedBox(width: AppSpacing.sm),
-                const Expanded(
-                  child: Text(
-                    'Bước chân',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.black,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: 80,
-                  height: 80,
-                  child: CircularProgressIndicator(
-                    value: progress,
-                    strokeWidth: 10,
-                    backgroundColor: Colors.orange.shade50,
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                    strokeCap: StrokeCap.round,
-                  ),
-                ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '$percentage%',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.black,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Text(
-                  steps.toString(),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.black,
-                  ),
-                ),
-                Text(
-                  'Mục tiêu: $stepsGoal',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: AppColors.grey.withValues(alpha: 0.8),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWaterCard(int currentCups, double height) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final progress = (currentCups / waterGoal).clamp(0.0, 1.0);
     final remaining = (waterGoal - currentCups).clamp(0, waterGoal);
 
@@ -278,28 +172,6 @@ class _StepsWaterCardsState extends ConsumerState<StepsWaterCards> {
       ],
     );
   }
-
-  Widget _buildLoadingState(double height) {
-    return SizedBox(
-      height: height,
-      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-    );
-  }
-
-  Widget _buildErrorState(String error, double height) {
-    return Container(
-      height: height,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: _cardDecoration(),
-      child: Center(
-        child: Text(
-          'Lỗi tải dữ liệu: $error',
-          style: const TextStyle(color: Colors.red, fontSize: 12),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
 }
 
 class _WaterCupPainter extends CustomPainter {
@@ -350,7 +222,6 @@ class _WaterCupPainter extends CustomPainter {
       
       canvas.drawPath(liquidPath, liquidPaint);
 
-      // Add a subtle shine to the liquid surface
       final surfacePaint = Paint()
         ..color = Colors.white.withValues(alpha: 0.3)
         ..style = PaintingStyle.stroke
