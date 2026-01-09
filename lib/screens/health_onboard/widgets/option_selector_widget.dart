@@ -36,7 +36,7 @@ class OptionSelectorWidget extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: options.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+          separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
           itemBuilder: (context, index) {
             final opt = options[index];
             final isSelected = selected == opt['value'];

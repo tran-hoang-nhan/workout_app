@@ -28,7 +28,7 @@ class CalorieGoals extends StatelessWidget {
         _buildCalorieGoalCard(
           'Thâm hụt Calo',
           'Giảm cân an toàn & hiệu quả',
-          '${(calculations.tdee * 0.85).toStringAsFixed(0)}',
+          (calculations.tdee * 0.85).toStringAsFixed(0),
           const Color(0xFF00C6FF),
           Icons.trending_down_rounded,
         ),
@@ -36,7 +36,7 @@ class CalorieGoals extends StatelessWidget {
         _buildCalorieGoalCard(
           'Duy trì Cân nặng',
           'Giữ vững phong độ hiện tại',
-          '${calculations.tdee.toStringAsFixed(0)}',
+          calculations.tdee.toStringAsFixed(0),
           const Color(0xFF10B981),
           Icons.rebase_edit,
         ),
@@ -44,7 +44,7 @@ class CalorieGoals extends StatelessWidget {
         _buildCalorieGoalCard(
           'Dư thừa Calo',
           'Tăng cơ & Phát triển sức mạnh',
-          '${(calculations.tdee * 1.15).toStringAsFixed(0)}',
+          (calculations.tdee * 1.15).toStringAsFixed(0),
           const Color(0xFFF97316),
           Icons.trending_up_rounded,
         ),

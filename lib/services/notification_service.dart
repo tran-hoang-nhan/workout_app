@@ -35,9 +35,7 @@ class NotificationService {
   Future<void> scheduleWaterReminder({required int intervalHours}) async {
     if (!kIsWeb && Platform.isAndroid) {
       // Need to request permission for Android 13+
-      await _notificationsPlugin
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-          ?.requestNotificationsPermission();
+      await _notificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>() ?.requestNotificationsPermission();
     }
 
     await _notificationsPlugin.zonedSchedule(
@@ -56,7 +54,6 @@ class NotificationService {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time, // This makes it repeat daily at that time if we want
     );
   }
