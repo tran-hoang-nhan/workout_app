@@ -5,9 +5,7 @@ import '../repositories/auth_repository.dart';
 
 class AuthService {
   final AuthRepository _repository;
-
   AuthService({AuthRepository? repository}): _repository = repository ?? AuthRepository();
-
   Stream<AuthState> get authStateStream => _repository.authStateChanges;
   bool get isAuthenticated => _repository.currentSession != null;
   User? get currentUser => _repository.currentUser;
@@ -21,7 +19,6 @@ class AuthService {
   }
 
   Future<AppUser?> signUp(SignUpParams params) async {
-    // Use transaction to ensure atomicity
     return await _repository.signUpWithTransaction(params);
   }
 

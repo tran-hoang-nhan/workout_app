@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import '../models/auth.dart';
 import '../models/health_params.dart';
 import '../models/user.dart';
@@ -26,7 +27,7 @@ class RegistrationTransactionService {
       }
       createdUserId = user.id;
       profileCreated = true;
-      print('Auth + Profile created');
+      debugPrint('User and profile created with ID: $createdUserId');
 
       // Step 3: Create health data with correct userId
       final healthParamsWithUserId = HealthUpdateParams(
@@ -48,16 +49,16 @@ class RegistrationTransactionService {
       );
       
       await _healthRepo.saveHealthDataWithTransaction(healthParamsWithUserId);
-      print('✅ Health data created');
+      debugPrint('✅ Health data created');
       return user;
     } catch (e, st) {
       if (profileCreated && createdUserId != null) {
         try {
           await _supabase.from('profiles').delete().eq('id', createdUserId);
           await _supabase.from('health').delete().eq('user_id', createdUserId);
-          print('Rolled back profile and health');
+          debugPrint('Rolled back profile and health');
         } catch (rollbackError) {
-          print('⚠️ Rollback failed: $rollbackError');
+          debugPrint('⚠️ Rollback failed: $rollbackError');
         }
       }
       throw handleException(e, st);
