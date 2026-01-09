@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/auth.dart';
+import '../../utils/app_error.dart';
+import '../../widgets/loading_animation.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -54,7 +56,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       
       final authState = ref.read(authControllerProvider);
       if (authState.hasError) {
-        setState(() => authError = authState.error.toString());
+        final error = authState.error;
+        setState(() => authError = error is AppError ? error.userMessage : error.toString());
         return;
       }
 
@@ -63,7 +66,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => authError = e.toString());
+        setState(() => authError = e is AppError ? e.userMessage : e.toString());
       }
     }
   }
@@ -404,14 +407,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         child: Center(
           child: isControllerLoading
-              ? SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor:
-                        AlwaysStoppedAnimation(Colors.grey.shade300),
-                  ),
+              ? const AppLoading(
+                  size: 24,
+                  color: Colors.white,
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,

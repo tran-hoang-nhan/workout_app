@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/profile_provider.dart';
+import '../../utils/app_error.dart';
+import '../../widgets/loading_animation.dart';
 import 'edit_profile_screen.dart';
 import 'widgets/profile_header_card.dart';
 import 'widgets/profile_stats_section.dart';
@@ -21,10 +23,13 @@ class ProfileScreen extends ConsumerWidget {
       body: SafeArea(
         child: userAsync.when(
           loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
+            child: AppLoading(message: 'Đang tải thông tin...'),
           ),
-          error: (err, stack) => Center(
-            child: Text('Lỗi: $err', style: const TextStyle(color: AppColors.danger)),
+          error: (e, st) => Center(
+            child: Text(
+              e is AppError ? e.userMessage : 'Lỗi: $e',
+              style: const TextStyle(color: AppColors.danger),
+            ),
           ),
           data: (user) {
             if (user == null) {
@@ -63,8 +68,13 @@ class ProfileScreen extends ConsumerWidget {
                       caloriesBurned: '${((stats?.totalCalories ?? 0) / 1000).toStringAsFixed(1)}k',
                       streakDays: '${stats?.streak ?? 0} ngày',
                     ),
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (err, _) => Center(child: Text('Lỗi tải stats: $err')),
+                    loading: () => const Center(child: AppLoading(size: 30)),
+                    error: (e, _) => Center(
+                      child: Text(
+                        e is AppError ? e.userMessage : 'Lỗi: $e',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 32),
                   const Text(

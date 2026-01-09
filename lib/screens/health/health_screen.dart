@@ -12,6 +12,9 @@ import 'widgets/water_card.dart';
 import 'widgets/water_intake_card.dart';
 import 'widgets/heart_rate_zones.dart';
 import 'widgets/calorie_goals.dart';
+import '../../utils/ui_utils.dart';
+import '../../widgets/loading_animation.dart';
+import '../../utils/app_error.dart';
 
 class HealthScreen extends ConsumerStatefulWidget {
   const HealthScreen({super.key});
@@ -103,9 +106,9 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               healthDataAsync.when(
                 loading: () => SizedBox(
                   height: cardHeight,
-                  child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  child: const Center(child: AppLoading()), // Replaced CircularProgressIndicator with AppLoading
                 ),
-                error: (err, stack) => Container(
+                error: (e, st) => Container( // Modified error handling
                   height: cardHeight,
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
@@ -115,7 +118,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      'Lỗi tải dữ liệu: $err',
+                      'Lỗi tải dữ liệu: ${e is AppError ? e.userMessage : e}',
                       style: const TextStyle(color: Colors.red, fontSize: 12),
                       textAlign: TextAlign.center,
                     ),
@@ -260,16 +263,12 @@ class _HealthEditModalContentState extends ConsumerState<_HealthEditModalContent
               )).future);
 
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Đã lưu thông tin sức khỏe thành công!')),
-                );
+                context.showSuccess('Đã lưu thông tin sức khỏe thành công!');
                 Navigator.pop(context);
               }
             } catch (e) {
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Lỗi: ${e.toString()}')),
-                );
+                context.showError(e);
               }
             }
           },
