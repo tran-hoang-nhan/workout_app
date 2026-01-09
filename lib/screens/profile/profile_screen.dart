@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/profile_provider.dart';
 import '../../utils/app_error.dart';
 import '../../widgets/loading_animation.dart';
-import 'edit_profile_screen.dart';
+import '../edit_profile/edit_profile_screen.dart';
 import 'widgets/profile_header_card.dart';
 import 'widgets/profile_stats_section.dart';
 import 'widgets/profile_menu_button.dart';
@@ -61,20 +60,11 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
-                  ref.watch(profileStatsProvider).when(
-                    data: (stats) => ProfileStatsSection(
-                      totalWorkouts: stats?.totalWorkouts.toString() ?? '0',
-                      totalTime: '${stats?.totalHours.toStringAsFixed(1) ?? '0'}h',
-                      caloriesBurned: '${((stats?.totalCalories ?? 0) / 1000).toStringAsFixed(1)}k',
-                      streakDays: '${stats?.streak ?? 0} ngày',
-                    ),
-                    loading: () => const Center(child: AppLoading(size: 30)),
-                    error: (e, _) => Center(
-                      child: Text(
-                        e is AppError ? e.userMessage : 'Lỗi: $e',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ),
+                  const ProfileStatsSection(
+                    totalWorkouts: '0',
+                    totalTime: '0h',
+                    caloriesBurned: '0k',
+                    streakDays: '0 ngày',
                   ),
                   const SizedBox(height: 32),
                   const Text(
