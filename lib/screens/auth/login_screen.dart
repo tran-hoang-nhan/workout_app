@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
@@ -407,9 +408,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         child: Center(
           child: isControllerLoading
-              ? const AppLoading(
-                  size: 24,
-                  color: Colors.white,
+              ? SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: LoadingAnimationWidget.staggeredDotsWave(
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,

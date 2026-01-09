@@ -15,13 +15,9 @@ class NotificationService {
   }
 
   Future<void> scheduleWaterReminder({required int intervalHours}) async {
-    // Check quyền lại lần nữa cho chắc
-    bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
-    if (!isAllowed) {
-      await AwesomeNotifications().requestPermissionToSendNotifications();
-      // Nếu user vẫn từ chối thì return luôn, không chạy tiếp
-      isAllowed = await AwesomeNotifications().isNotificationAllowed();
-      if (!isAllowed) return; 
+    if (!kIsWeb && Platform.isAndroid) {
+      // Need to request permission for Android 13+
+      await _notificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>() ?.requestNotificationsPermission();
     }
 
     // Lấy múi giờ hiện tại của máy user
@@ -51,6 +47,8 @@ class NotificationService {
         preciseAlarm: true, // Đảm bảo giờ giấc chính xác
         allowWhileIdle: true, // Chạy cả khi điện thoại đang ở chế độ nghỉ (Doze mode)
       ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time, // This makes it repeat daily at that time if we want
     );
   }
 
