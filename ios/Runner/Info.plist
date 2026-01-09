@@ -49,6 +49,8 @@
 	<string>Chúng tôi cần quyền truy cập dữ liệu sức khỏe để theo dõi bước chân của bạn.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Chúng tôi cần quyền cập nhật dữ liệu sức khỏe để đồng bộ thông tin luyện tập.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Ứng dụng cần truy cập cảm biến chuyển động để theo dõi số bước chân của bạn.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

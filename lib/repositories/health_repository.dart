@@ -59,4 +59,34 @@ class HealthRepository {
       throw handleException(e, st);
     }
   }
+
+  // Transaction: Save health data with rollback
+  Future<void> saveHealthDataWithTransaction(HealthUpdateParams params) async {
+    bool healthCreated = false;
+    bool profileUpdated = false;
+    
+    try {
+      // Step 1: Upsert health table
+      await _supabase.from('health').upsert(params.toHealthMap());
+      healthCreated = true;
+
+      // Step 2: Update profiles table
+      await _supabase
+          .from('profiles')
+          .update(params.toProfileMap())
+          .eq('id', params.userId);
+      profileUpdated = true;
+    } catch (e, st) {
+      // Rollback: Delete health data if profile update failed
+      if (healthCreated && !profileUpdated) {
+        try {
+          await _supabase.from('health').delete().eq('user_id', params.userId);
+          debugPrint('✅ Rolled back health data');
+        } catch (rollbackError) {
+          debugPrint('⚠️ Failed to rollback health data: $rollbackError');
+        }
+      }
+      throw handleException(e, st);
+    }
+  }
 }

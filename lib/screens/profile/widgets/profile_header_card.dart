@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
 import '../../../models/user.dart';
+import '../../../utils/label_utils.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
   final AppUser user;
@@ -62,10 +63,35 @@ class ProfileHeaderCard extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                         ),
-                        child: CircleAvatar(
-                          radius: 36,
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                          child: const Icon(Icons.person, size: 36, color: AppColors.primary),
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                          ),
+                          child: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
+                              ? ClipOval(
+                                  child: Image.network(
+                                    user.avatarUrl!,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress.expectedTotalBytes != null
+                                              ? loadingProgress.cumulativeBytesLoaded /
+                                                  loadingProgress.expectedTotalBytes!
+                                              : null,
+                                          strokeWidth: 2,
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        const Icon(Icons.person, size: 36, color: AppColors.primary),
+                                  ),
+                                )
+                              : const Icon(Icons.person, size: 36, color: AppColors.primary),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.lg),
@@ -114,8 +140,8 @@ class ProfileHeaderCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(child: _buildInfoTag('${user.height?.toStringAsFixed(0) ?? '0'} cm', 'Chiều cao')),
-                      Expanded(child: _buildInfoTag(user.goal ?? 'Duy trì', 'Mục tiêu')),
-                      Expanded(child: _buildInfoTag(user.gender ?? 'Nam', 'Giới tính')),
+                      Expanded(child: _buildInfoTag(LabelUtils.getGoalLabel(user.goal), 'Mục tiêu')),
+                      Expanded(child: _buildInfoTag(LabelUtils.getGenderLabel(user.gender), 'Giới tính')),
                     ],
                   ),
                 ],
