@@ -56,4 +56,5 @@ class WorkoutRepository {
     debugPrint('[WorkoutRepository] getWorkoutsByIds found: ${response.length} items');
     return response;
   }
+
 }
