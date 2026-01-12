@@ -10,6 +10,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/health_onboard/health_onboarding_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/workouts/workouts_screen.dart';
+
 import 'screens/progress/progress_screen.dart';
 import 'screens/health/health_screen.dart';
 import 'screens/profile/profile_screen.dart';
