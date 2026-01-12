@@ -7,6 +7,7 @@ class Workout {
   final int? estimatedDuration;
   final String? thumbnailUrl;
   final bool isPremium;
+  final int? days;
 
   Workout({
     required this.id,
@@ -17,6 +18,7 @@ class Workout {
     this.estimatedDuration,
     this.thumbnailUrl,
     this.isPremium = false,
+    this.days,
   });
 
   factory Workout.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,19 @@ class Workout {
       estimatedDuration: json['estimated_duration'],
       thumbnailUrl: json['thumbnail_url'],
       isPremium: json['is_premium'] ?? false,
+      days: (() {
+        final v = json['days'];
+        if (v == null) return null;
+        if (v is int) return v;
+        if (v is String) {
+          final m = RegExp(r'\d+').firstMatch(v);
+          if (m != null) {
+            return int.tryParse(m.group(0)!);
+          }
+          return null;
+        }
+        return null;
+      })(),
     );
   }
 
@@ -42,6 +57,7 @@ class Workout {
       'estimated_duration': estimatedDuration,
       'thumbnail_url': thumbnailUrl,
       'is_premium': isPremium,
+      'days': days,
     };
   }
 
@@ -54,6 +70,7 @@ class Workout {
     int? estimatedDuration,
     String? thumbnailUrl,
     bool? isPremium,
+    int? days,
   }) {
     return Workout(
       id: id ?? this.id,
@@ -64,6 +81,7 @@ class Workout {
       estimatedDuration: estimatedDuration ?? this.estimatedDuration,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       isPremium: isPremium ?? this.isPremium,
+      days: days ?? this.days,
     );
   }
 }

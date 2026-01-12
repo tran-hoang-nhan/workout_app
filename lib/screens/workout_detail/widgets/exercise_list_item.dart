@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../exercises/widgets/exercise_animation_widget.dart';
 import '../../../models/exercise.dart';
 import '../../../models/workout_item.dart';
 
@@ -41,7 +40,10 @@ class ExerciseListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.blue,
                     borderRadius: BorderRadius.circular(8),
@@ -68,151 +70,31 @@ class ExerciseListItem extends StatelessWidget {
               ],
             ),
           ),
-          
-          // Divider
-          Divider(
-            color: Colors.grey[200],
-            height: 1,
-            thickness: 1,
-          ),
-          
-          // Large Animation/GIF Image
-          Container(
-            width: double.infinity,
-            color: Colors.grey[100],
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Text(
-                  'Hướng dẫn động tác',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                // Animation
-                if (exercise.animationUrl != null && exercise.animationUrl!.isNotEmpty)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      height: 280,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ExerciseAnimationWidget(
-                        animationUrl: exercise.animationUrl!,
-                        height: 280,
-                      ),
-                    ),
-                  )
-                else
-                  Container(
-                    height: 280,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.image_not_supported, size: 48),
-                          SizedBox(height: 8),
-                          Text('Chưa có hình ảnh hướng dẫn'),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          
-          // Exercise Details Section
+
+          Divider(color: Colors.grey[200], height: 1, thickness: 1),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Muscle group and difficulty row
                 Row(
                   children: [
-                    if (exercise.muscleGroup != null) ...[
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.blue[50],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Nhóm cơ',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.blue[700],
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                exercise.muscleGroup!,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
+                    Expanded(
+                      child: Text(
+                        'Thông tin bài tập',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[700],
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                    ],
-                    if (exercise.difficulty != null) ...[
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.orange[50],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Độ khó',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.orange[700],
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                exercise.difficulty!,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                
-                // Workout details row
+                const SizedBox(height: 8),
                 Row(
                   children: [
-                    if (workoutItem.reps != null) ...[
+                    if ((workoutItem.reps ?? 0) > 0) ...[
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.all(12),
@@ -245,7 +127,7 @@ class ExerciseListItem extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                     ],
-                    if (workoutItem.durationSeconds != null) ...[
+                    if ((workoutItem.durationSeconds ?? 0) > 0) ...[
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.all(12),
@@ -266,7 +148,7 @@ class ExerciseListItem extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${(workoutItem.durationSeconds! / 60).toStringAsFixed(1)}m',
+                                '${workoutItem.durationSeconds} giây',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -277,7 +159,7 @@ class ExerciseListItem extends StatelessWidget {
                         ),
                       ),
                     ],
-                    if (workoutItem.restSeconds != null) ...[
+                    if ((workoutItem.restSeconds ?? 0) > 0) ...[
                       const SizedBox(width: 12),
                       Expanded(
                         child: Container(
@@ -299,7 +181,7 @@ class ExerciseListItem extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${(workoutItem.restSeconds! / 60).toStringAsFixed(1)}m',
+                                '${workoutItem.restSeconds} giây',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -312,40 +194,6 @@ class ExerciseListItem extends StatelessWidget {
                     ],
                   ],
                 ),
-                const SizedBox(height: 12),
-                
-                // Description
-                if (exercise.description != null && exercise.description!.isNotEmpty) ...[
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Mô tả',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[700],
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          exercise.description!,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[700],
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               ],
             ),
           ),

@@ -18,14 +18,33 @@ class WorkoutItem {
   });
 
   factory WorkoutItem.fromJson(Map<String, dynamic> json) {
+    final dynamic exerciseIdRaw = json['exercise_id'] ?? json['exerciseId'];
+    final int exerciseIdParsed = exerciseIdRaw is int
+        ? exerciseIdRaw
+        : (exerciseIdRaw is String ? int.tryParse(exerciseIdRaw) ?? 0 : 0);
+    final dynamic orderIndexRaw = json['order_index'] ?? json['orderIndex'];
+    final int orderIndexParsed = orderIndexRaw is int
+        ? orderIndexRaw
+        : (orderIndexRaw is String ? int.tryParse(orderIndexRaw) ?? 0 : 0);
+    final dynamic durationRaw =
+        json['duration_seconds'] ?? json['durationSeconds'];
+    final int? durationParsed = durationRaw is int
+        ? durationRaw
+        : (durationRaw is String ? int.tryParse(durationRaw) : null);
+    final dynamic repsRaw = json['reps'];
+    final int? repsParsed =
+        repsRaw is int ? repsRaw : (repsRaw is String ? int.tryParse(repsRaw) : null);
+    final dynamic restRaw = json['rest_seconds'] ?? json['restSeconds'];
+    final int? restParsed =
+        restRaw is int ? restRaw : (restRaw is String ? int.tryParse(restRaw) : null);
     return WorkoutItem(
       id: json['id'] ?? 0,
       workoutId: json['workout_id'] ?? 0,
-      exerciseId: json['exercise_id'] ?? 0,
-      orderIndex: json['order_index'] ?? 0,
-      durationSeconds: json['duration_seconds'],
-      reps: json['reps'],
-      restSeconds: json['rest_seconds'],
+      exerciseId: exerciseIdParsed,
+      orderIndex: orderIndexParsed,
+      durationSeconds: durationParsed,
+      reps: repsParsed,
+      restSeconds: restParsed,
     );
   }
 
