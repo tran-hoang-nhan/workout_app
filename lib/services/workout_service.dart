@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/workout.dart';
 import '../models/workout_item.dart';
@@ -23,7 +24,7 @@ class WorkoutService {
     try {
       return _supabase.storage.from(bucketName).getPublicUrl(url);
     } catch (e) {
-      print('⚠️ Lỗi chuyển đổi URL trong WorkoutService: $e (URL: $url)');
+      debugPrint('⚠️ Lỗi chuyển đổi URL trong WorkoutService: $e (URL: $url)');
       return url;
     }
   }
