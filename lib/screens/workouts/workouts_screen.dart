@@ -85,10 +85,15 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                 );
               },
               loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(child: AppLoading(message: 'Đang tải bài tập...')),
               ),
-              error: (err, stack) => SliverFillRemaining(
-                child: Center(child: Text('Lỗi: $err')),
+              error: (e, stack) => SliverFillRemaining(
+                child: Center(
+                  child: Text(
+                    e is AppError ? e.userMessage : 'Lỗi: $e',
+                    style: const TextStyle(color: AppColors.danger),
+                  ),
+                ),
               ),
             ),
           ],
