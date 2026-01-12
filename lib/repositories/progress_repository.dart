@@ -5,21 +5,12 @@ import '../utils/app_error.dart';
 
 class ProgressRepository {
   final SupabaseClient _supabase;
-  
-  ProgressRepository({SupabaseClient? supabase})
-      : _supabase = supabase ?? Supabase.instance.client;
-
+  ProgressRepository({SupabaseClient? supabase}): 
+    _supabase = supabase ?? Supabase.instance.client;
   Future<List<WorkoutHistory>> getWorkoutHistory(String userId) async {
     try {
-      final response = await _supabase
-          .from('workout_history')
-          .select()
-          .eq('user_id', userId)
-          .order('completed_at', ascending: false);
-      
-      return (response as List)
-          .map((data) => WorkoutHistory.fromJson(data))
-          .toList();
+      final response = await _supabase.from('workout_history').select().eq('user_id', userId).order('completed_at', ascending: false);
+      return (response as List).map((data) => WorkoutHistory.fromJson(data)).toList();
     } catch (e, st) {
       throw handleException(e, st);
     }
@@ -28,7 +19,6 @@ class ProgressRepository {
   Future<ProgressStats> getProgressStats(String userId) async {
     try {
       final history = await getWorkoutHistory(userId);
-      
       if (history.isEmpty) {
         return ProgressStats(
           totalCalories: 0,
