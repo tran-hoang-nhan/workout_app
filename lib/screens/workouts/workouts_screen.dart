@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:shimmer/shimmer.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/workout_provider.dart';
-import '../../models/workout.dart';
-import 'workout_detail_screen.dart';
+import '../../utils/app_error.dart';
+import 'widgets/workout_search_bar.dart';
+import 'widgets/workout_card.dart';
 
 class WorkoutsScreen extends ConsumerStatefulWidget {
   const WorkoutsScreen({super.key});
@@ -52,7 +51,14 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    _buildSearchBar(),
+                    WorkoutSearchBar(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                    ),
                     const SizedBox(height: AppSpacing.md),
                   ],
                 ),
@@ -76,7 +82,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                       (context, index) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                          child: _buildWorkoutCard(workouts[index]),
+                          child: WorkoutCard(workout: workouts[index]),
                         );
                       },
                       childCount: workouts.length,
@@ -85,7 +91,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                 );
               },
               loading: () => const SliverFillRemaining(
-                child: Center(child: AppLoading(message: 'Đang tải bài tập...')),
+                child: Center(child: CircularProgressIndicator()),
               ),
               error: (e, stack) => SliverFillRemaining(
                 child: Center(
@@ -101,299 +107,4 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
       ),
     );
   }
-
-  Widget _buildSearchBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FA),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.transparent),
-      ),
-      child: TextField(
-        controller: _searchController,
-        onChanged: (value) {
-          setState(() {
-            _searchQuery = value;
-          });
-        },
-        decoration: InputDecoration(
-          hintText: 'Tìm kiếm...',
-          hintStyle: TextStyle(color: AppColors.grey.withValues(alpha: 0.5), fontSize: 15),
-          prefixIcon: Icon(Icons.search, color: AppColors.grey.withValues(alpha: 0.5)),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 16),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWorkoutCard(Workout workout) {
-    final color = _getWorkoutColor(workout.category ?? 'default');
-    
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => WorkoutDetailScreen(workout: workout),
-          ),
-        );
-      },
-      child: Container(
-        height: 240,
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.15),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(28),
-          child: Stack(
-            children: [
-              // Background Image
-              if (workout.thumbnailUrl != null)
-                Positioned.fill(
-                  child: CachedNetworkImage(
-                    imageUrl: workout.thumbnailUrl!,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: Container(
-                        color: Colors.white,
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      color: color.withOpacity(0.1),
-                    ),
-                  ),
-                )
-              else
-                Positioned.fill(
-                  child: Container(
-                    color: color.withOpacity(0.1),
-                  ),
-                ),
-
-              // Gradient Overlay (dark from bottom)
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.7),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              // Mesh Gradient Background Effect (top right)
-              Positioned(
-                top: -50,
-                right: -50,
-                child: Container(
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        color.withOpacity(0.1),
-                        color.withOpacity(0),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Icon & Difficulty
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: color.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            _getWorkoutIcon(workout.category),
-                            color: color,
-                            size: 24,
-                          ),
-                        ),
-                        if (workout.level != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.95),
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              workout.level!.toUpperCase(),
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.5,
-                                color: color,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    const Spacer(),
-
-                    // Title
-                    Text(
-                      workout.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        height: 1.2,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    
-                    const SizedBox(height: 8),
-
-                    // Duration & Play Button
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.schedule,
-                              size: 14,
-                              color: Colors.white.withOpacity(0.7),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${workout.estimatedDuration ?? 30} phút',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withOpacity(0.8),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: color.withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.play_arrow_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Tap Effect
-              Positioned.fill(
-                child: Material(
-                  color: Colors.transparent,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Color _getWorkoutColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'chest':
-      case 'ngực':
-        return const Color(0xFF00C6FF);
-      case 'back':
-      case 'lưng':
-        return const Color(0xFF8B00FF);
-      case 'legs':
-      case 'chân':
-        return const Color(0xFFFF4B2B);
-      case 'arms':
-      case 'tay':
-        return const Color(0xFF00D98E);
-      case 'cardio':
-        return const Color(0xFFFFD700);
-      case 'hiit':
-        return const Color(0xFFFF6B6B);
-      case 'yoga':
-        return const Color(0xFF7C3AED);
-      default:
-        return const Color(0xFF00C6FF);
-    }
-  }
-
-  IconData _getWorkoutIcon(String? category) {
-    switch (category?.toLowerCase()) {
-      case 'chest':
-      case 'ngực':
-        return Icons.fitness_center;
-      case 'back':
-      case 'lưng':
-        return Icons.accessibility;
-      case 'legs':
-      case 'chân':
-        return Icons.directions_run;
-      case 'arms':
-      case 'tay':
-        return Icons.power;
-      case 'cardio':
-        return Icons.favorite;
-      case 'hiit':
-        return Icons.flash_on;
-      case 'yoga':
-        return Icons.self_improvement;
-      default:
-        return Icons.fitness_center;
-    }
-  }
 }
-

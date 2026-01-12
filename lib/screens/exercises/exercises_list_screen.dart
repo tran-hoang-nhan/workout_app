@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/exercise.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/exercise_provider.dart';
-import 'exercise_detail_screen.dart';
+import '../exercise_detail/exercise_detail_screen.dart';
 
 class ExercisesListScreen extends ConsumerWidget {
   const ExercisesListScreen({super.key});
@@ -75,7 +75,7 @@ class ExercisesListScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -207,7 +207,7 @@ class ExercisesListScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/exercise.dart';
-import 'widgets/exercise_animation_widget.dart';
+import '../exercises/widgets/exercise_animation_widget.dart';
+import 'widgets/exercise_info_row.dart';
 
 class ExerciseDetailScreen extends StatefulWidget {
   final Exercise exercise;
@@ -102,7 +103,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   const SizedBox(height: 16),
                   
                   if (widget.exercise.muscleGroup != null) ...[
-                    _buildInfoRow(
+                    ExerciseInfoRow(
                       icon: Icons.fitness_center,
                       label: 'Nhóm cơ',
                       value: widget.exercise.muscleGroup!,
@@ -111,7 +112,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   ],
                   
                   if (widget.exercise.difficulty != null) ...[
-                    _buildInfoRow(
+                    ExerciseInfoRow(
                       icon: Icons.speed,
                       label: 'Độ khó',
                       value: widget.exercise.difficulty!,
@@ -120,7 +121,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   ],
                   
                   if (widget.exercise.caloriesPerMinute != null) ...[
-                    _buildInfoRow(
+                    ExerciseInfoRow(
                       icon: Icons.local_fire_department,
                       label: 'Calories/phút',
                       value: '${widget.exercise.caloriesPerMinute!.toStringAsFixed(1)} kcal',
@@ -153,33 +154,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildInfoRow({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: Theme.of(context).primaryColor),
-        const SizedBox(width: 8),
-        Text(
-          '$label: ',
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[700],
-          ),
-        ),
-      ],
     );
   }
 }
