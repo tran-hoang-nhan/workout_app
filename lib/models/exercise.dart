@@ -2,7 +2,8 @@ class Exercise {
   final int id;
   final String name;
   final String? description;
-  final String? animationUrl;
+  final String? videoUrl;
+  final String? gifUrl;
   final String? thumbnailUrl;
   final String? muscleGroup;
   final String? difficulty;
@@ -12,7 +13,8 @@ class Exercise {
     required this.id,
     required this.name,
     this.description,
-    this.animationUrl,
+    this.videoUrl,
+    this.gifUrl,
     this.thumbnailUrl,
     this.muscleGroup,
     this.difficulty,
@@ -24,7 +26,8 @@ class Exercise {
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       description: json['description'],
-      animationUrl: json['animation_url'],
+      videoUrl: json['video_url'],
+      gifUrl: json['gif_url'],
       thumbnailUrl: json['thumbnail_url'],
       muscleGroup: json['muscle_group'],
       difficulty: json['difficulty'],
@@ -37,7 +40,8 @@ class Exercise {
       'id': id,
       'name': name,
       'description': description,
-      'animation_url': animationUrl,
+      'video_url': videoUrl,
+      'gif_url': gifUrl,
       'thumbnail_url': thumbnailUrl,
       'muscle_group': muscleGroup,
       'difficulty': difficulty,
@@ -49,7 +53,8 @@ class Exercise {
     int? id,
     String? name,
     String? description,
-    String? animationUrl,
+    String? videoUrl,
+    String? gifUrl,
     String? thumbnailUrl,
     String? muscleGroup,
     String? difficulty,
@@ -59,7 +64,8 @@ class Exercise {
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
-      animationUrl: animationUrl ?? this.animationUrl,
+      videoUrl: videoUrl ?? this.videoUrl,
+      gifUrl: gifUrl ?? this.gifUrl,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       muscleGroup: muscleGroup ?? this.muscleGroup,
       difficulty: difficulty ?? this.difficulty,
