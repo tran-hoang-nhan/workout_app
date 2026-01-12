@@ -5,7 +5,6 @@ import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/auth.dart';
 import '../../utils/app_error.dart';
-import '../../widgets/loading_animation.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
