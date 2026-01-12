@@ -49,10 +49,6 @@ dependencies:
   google_fonts: ^6.0.0
   shimmer: ^3.0.0
   
-  # Media
-  lottie: ^3.0.0
-  cached_network_image: ^3.3.0
-  
   # Utilities
   intl: any
   uuid: ^4.0.0
