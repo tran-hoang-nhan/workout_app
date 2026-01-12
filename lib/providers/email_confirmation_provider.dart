@@ -5,21 +5,23 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 final emailConfirmationServiceProvider = Provider((ref) {
   return EmailConfirmationService();
 });
+final verifyOTPProvider = NotifierProvider.family<OTPNotifier, bool, String>(OTPNotifier.new);
 
-final verifyOTPProvider =StateNotifierProvider.family<OTPNotifier, bool, String>((ref, email) {
-  final service = ref.watch(emailConfirmationServiceProvider);
-  return OTPNotifier(service, email);
-});
-
-class OTPNotifier extends StateNotifier<bool> {
-  final EmailConfirmationService _service;
+class OTPNotifier extends Notifier<bool> {
   final String email;
-  OTPNotifier(this._service, this.email) : super(false);
+  OTPNotifier(this.email);
+  late final EmailConfirmationService _service;
+
+  @override
+  bool build() {
+    _service = ref.watch(emailConfirmationServiceProvider);
+    return false;
+  }
 
   Future<void> verifyOTP(String token) async {
     state = true;
-    try {
-      await _service.verifyOTP(
+    try { 
+      await _service.verifyOTP (
         email: email,
         token: token,
         type: OtpType.signup,
@@ -30,15 +32,18 @@ class OTPNotifier extends StateNotifier<bool> {
   }
 }
 
-final resendEmailProvider = StateNotifierProvider.family<ResendNotifier, bool, String>((ref, email) {
-  final service = ref.watch(emailConfirmationServiceProvider);
-  return ResendNotifier(service, email);
-});
+final resendEmailProvider = NotifierProvider.family<ResendNotifier, bool, String>(ResendNotifier.new);
 
-class ResendNotifier extends StateNotifier<bool> {
-  final EmailConfirmationService _service;
+class ResendNotifier extends Notifier<bool> {
   final String email;
-  ResendNotifier(this._service, this.email) : super(false);
+  ResendNotifier(this.email);
+  late final EmailConfirmationService _service;
+
+  @override
+  bool build() {
+    _service = ref.watch(emailConfirmationServiceProvider);
+    return false;
+  }
 
   Future<void> resendEmail() async {
     state = true;

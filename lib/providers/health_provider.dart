@@ -129,9 +129,11 @@ class HealthFormState {
 }
 
 // 2. HealthFormNotifier
-class HealthFormNotifier extends StateNotifier<HealthFormState> {
-  final Ref ref;
-  HealthFormNotifier(this.ref) : super(HealthFormState.initial());
+class HealthFormNotifier extends Notifier<HealthFormState> {
+  @override
+  HealthFormState build() {
+    return HealthFormState.initial();
+  }
 
   void setAge(int age) => state = state.copyWith(age: age);
   void setWeight(double weight) => state = state.copyWith(weight: weight);
@@ -275,9 +277,7 @@ class HealthFormNotifier extends StateNotifier<HealthFormState> {
   }
 }
 
-final healthFormProvider = StateNotifierProvider<HealthFormNotifier, HealthFormState>((ref) {
-  return HealthFormNotifier(ref);
-});
+final healthFormProvider = NotifierProvider<HealthFormNotifier, HealthFormState>(HealthFormNotifier.new);
 
 final healthControllerProvider = AsyncNotifierProvider<HealthController, void>(() {
   return HealthController();

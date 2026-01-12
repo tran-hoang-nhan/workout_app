@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import '../models/auth.dart';
 import '../models/health_params.dart';
 import '../models/user.dart';
@@ -10,24 +11,15 @@ class RegistrationTransactionService {
   final AuthRepository _authRepo;
   final HealthRepository _healthRepo;
   final SupabaseClient _supabase;
+  RegistrationTransactionService({ AuthRepository? authRepo, HealthRepository? healthRepo,}):
+    _authRepo = authRepo ?? AuthRepository(),
+    _healthRepo = healthRepo ?? HealthRepository(),
+    _supabase = Supabase.instance.client;
 
-  RegistrationTransactionService({
-    AuthRepository? authRepo,
-    HealthRepository? healthRepo,
-  })  : _authRepo = authRepo ?? AuthRepository(),
-        _healthRepo = healthRepo ?? HealthRepository(),
-        _supabase = Supabase.instance.client;
-
-  Future<AppUser?> completeRegistration({
-    required SignUpParams signUpParams,
-    required HealthUpdateParams healthParams,
-  }) async {
+  Future<AppUser?> completeRegistration({ required SignUpParams signUpParams, required HealthUpdateParams healthParams,}) async {
     String? createdUserId;
     bool profileCreated = false;
-
     try {
-      print('🔄 Starting registration transaction...');
-
       // Step 1 & 2: Create auth user + profile
       final user = await _authRepo.signUpWithTransaction(signUpParams);
       if (user == null) {
@@ -35,7 +27,7 @@ class RegistrationTransactionService {
       }
       createdUserId = user.id;
       profileCreated = true;
-      print('✅ Auth + Profile created');
+      debugPrint('User and profile created with ID: $createdUserId');
 
       // Step 3: Create health data with correct userId
       final healthParamsWithUserId = HealthUpdateParams(
@@ -57,24 +49,18 @@ class RegistrationTransactionService {
       );
       
       await _healthRepo.saveHealthDataWithTransaction(healthParamsWithUserId);
-      print('✅ Health data created');
-
-      print('✅ Registration completed');
+      debugPrint('✅ Health data created');
       return user;
     } catch (e, st) {
-      print('❌ Registration failed: $e');
-
-      // Rollback profile if created
       if (profileCreated && createdUserId != null) {
         try {
           await _supabase.from('profiles').delete().eq('id', createdUserId);
           await _supabase.from('health').delete().eq('user_id', createdUserId);
-          print('✅ Rolled back profile and health');
+          debugPrint('Rolled back profile and health');
         } catch (rollbackError) {
-          print('⚠️ Rollback failed: $rollbackError');
+          debugPrint('⚠️ Rollback failed: $rollbackError');
         }
       }
-
       throw handleException(e, st);
     }
   }
