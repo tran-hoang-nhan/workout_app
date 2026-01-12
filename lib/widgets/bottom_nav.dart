@@ -59,20 +59,20 @@ class BottomNav extends StatelessWidget {
             hoverColor: Colors.grey[100]!,
             gap: 4,
             activeColor: AppColors.primary,
-            iconSize: 20,
+            iconSize: 22,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               duration: const Duration(milliseconds: 400),
               tabBackgroundColor: AppColors.primary.withValues(alpha: 0.1),
               color: AppColors.grey,
               textStyle: const TextStyle(
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,
               ),
               tabs: const [
                 GButton(
                   icon: Icons.home_rounded,
-                  text: 'Home',
+                  text: 'Trang chủ',
                 ),
                 GButton(
                   icon: Icons.fitness_center_rounded,
