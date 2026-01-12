@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+=======
+>>>>>>> a3765084fb1a30e57af7763144d9d118c306f086
 import '../models/workout.dart';
 import '../models/workout_item.dart';
 import '../models/exercise.dart';
@@ -7,10 +10,9 @@ import '../repositories/workout_repository.dart';
 
 class WorkoutService {
   final WorkoutRepository _workoutRepository;
-  final SupabaseClient _supabase = Supabase.instance.client;
-  
   WorkoutService({WorkoutRepository? repository}): _workoutRepository = repository ?? WorkoutRepository();
 
+<<<<<<< HEAD
   /// Chuyển đổi storage path thành public URL nếu cần
   String? _convertToPublicUrl(String? url, String bucketName) {
     if (url == null || url.isEmpty) return null;
@@ -52,6 +54,8 @@ class WorkoutService {
     return processed;
   }
 
+=======
+>>>>>>> a3765084fb1a30e57af7763144d9d118c306f086
   Future<List<Workout>> getAllWorkouts() async {
     final response = await _workoutRepository.getAllWorkouts();
     return response.map((data) => Workout.fromJson(data)).toList();
@@ -68,30 +72,13 @@ class WorkoutService {
     final itemsData = await _workoutRepository.getWorkoutItems(workoutId);
   
     List<WorkoutItem> items = itemsData.map((data) => WorkoutItem.fromJson(data)).toList();
-    // Sort items by orderIndex
-    items.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
-    
     if (items.isEmpty) {
       return (workout: workout, items: <WorkoutItem>[], exercises: <Exercise>[]);
     }
 
     final exerciseIds = items.map((item) => item.exerciseId).toList();
     final exercisesData = await _workoutRepository.getExercisesByIds(exerciseIds);
-    
-    // Create a map of exercise by ID for easier lookup
-    final exerciseMap = <int, Exercise>{};
-    for (var data in exercisesData) {
-      final processedData = _processExerciseJson(data);
-      final exercise = Exercise.fromJson(processedData);
-      exerciseMap[exercise.id] = exercise;
-    }
-    
-    // Sort exercises to match the order of items
-    List<Exercise> exercises = items
-        .map((item) => exerciseMap[item.exerciseId])
-        .whereType<Exercise>()
-        .toList();
-
+    List<Exercise> exercises = exercisesData.map((data) => Exercise.fromJson(data)).toList();
     return (workout: workout, items: items, exercises: exercises);
   }
 
