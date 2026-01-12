@@ -370,9 +370,12 @@ final healthCalculationsProvider = Provider<HealthCalculations>((ref) {
   );
 });
 
-// Provider check has health data
+// Provider check has health data - decoupled from healthDataProvider to prevent app restarts
 final hasHealthDataProvider = FutureProvider<bool>((ref) async {
-  final data = await ref.watch(healthDataProvider.future);
+  final userId = await ref.watch(currentUserIdProvider.future);
+  if (userId == null) return false;
+  final service = ref.watch(healthServiceProvider);
+  final data = await service.checkHealthProfile(userId);
   return data != null;
 });
 

@@ -36,7 +36,7 @@ class NotificationService {
         ),
       ],
       schedule: NotificationInterval(
-        interval: Duration(hours: intervalHours), 
+        interval: Duration(seconds: 10), 
         timeZone: localTimeZone,
         repeats: true,
         preciseAlarm: true, // Đảm bảo giờ giấc chính xác
