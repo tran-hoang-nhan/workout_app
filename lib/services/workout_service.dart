@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+=======
+>>>>>>> a3765084fb1a30e57af7763144d9d118c306f086
 import '../models/workout.dart';
 import '../models/workout_item.dart';
 import '../models/exercise.dart';
@@ -7,6 +12,50 @@ class WorkoutService {
   final WorkoutRepository _workoutRepository;
   WorkoutService({WorkoutRepository? repository}): _workoutRepository = repository ?? WorkoutRepository();
 
+<<<<<<< HEAD
+  /// Chuyển đổi storage path thành public URL nếu cần
+  String? _convertToPublicUrl(String? url, String bucketName) {
+    if (url == null || url.isEmpty) return null;
+    
+    // Nếu đã là full URL (bắt đầu với http/https), trả về nguyên
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    
+    // Nếu là storage path, chuyển đổi thành public URL
+    try {
+      return _supabase.storage.from(bucketName).getPublicUrl(url);
+    } catch (e) {
+      debugPrint('⚠️ Lỗi chuyển đổi URL trong WorkoutService: $e (URL: $url)');
+      return url;
+    }
+  }
+
+  /// Xử lý và chuyển đổi URLs trong JSON response của exercise
+  Map<String, dynamic> _processExerciseJson(Map<String, dynamic> json) {
+    final processed = Map<String, dynamic>.from(json);
+    
+    // Chuyển đổi animation_url nếu có
+    if (processed['animation_url'] != null) {
+      processed['animation_url'] = _convertToPublicUrl(
+        processed['animation_url'] as String?,
+        'exercises',
+      );
+    }
+    
+    // Chuyển đổi thumbnail_url nếu có
+    if (processed['thumbnail_url'] != null) {
+      processed['thumbnail_url'] = _convertToPublicUrl(
+        processed['thumbnail_url'] as String?,
+        'exercises',
+      );
+    }
+    
+    return processed;
+  }
+
+=======
+>>>>>>> a3765084fb1a30e57af7763144d9d118c306f086
   Future<List<Workout>> getAllWorkouts() async {
     final response = await _workoutRepository.getAllWorkouts();
     return response.map((data) => Workout.fromJson(data)).toList();

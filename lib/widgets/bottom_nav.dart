@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import '../constants/app_constants.dart';
 
-class BottomNav extends StatefulWidget {
+class BottomNav extends StatelessWidget {
   final String activeTab;
   final void Function(String) setActiveTab;
 
@@ -11,6 +12,17 @@ class BottomNav extends StatefulWidget {
     required this.setActiveTab,
   });
 
+<<<<<<< HEAD
+  int _getSelectedIndex() {
+    switch (activeTab) {
+      case 'home': return 0;
+      case 'workouts': return 1;
+      case 'progress': return 2;
+      case 'health': return 3;
+      case 'profile': return 4;
+      default: return 0;
+    }
+=======
   @override
   State<BottomNav> createState() => _BottomNavState();
 }
@@ -44,17 +56,38 @@ class _BottomNavState extends State<BottomNav> with SingleTickerProviderStateMix
     ));
 
     _entryController.forward();
+>>>>>>> a3765084fb1a30e57af7763144d9d118c306f086
   }
 
-  @override
-  void dispose() {
-    _entryController.dispose();
-    super.dispose();
+  String _getTabId(int index) {
+    switch (index) {
+      case 0: return 'home';
+      case 1: return 'workouts';
+      case 2: return 'progress';
+      case 3: return 'health';
+      case 4: return 'profile';
+      default: return 'home';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
+<<<<<<< HEAD
+      bottom: 20,
+      left: 16,
+      right: 16,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 15,
+              color: Colors.black.withValues(alpha: .08),
+              offset: const Offset(0, 4),
+            )
+=======
       bottom: 0,
       left: 0,
       right: 0,
@@ -228,9 +261,55 @@ class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMi
                 );
               },
             ),
+>>>>>>> a3765084fb1a30e57af7763144d9d118c306f086
           ],
         ),
-      ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 14.0),
+          child: GNav(
+            rippleColor: Colors.grey[300]!,
+            hoverColor: Colors.grey[100]!,
+            gap: 4,
+            activeColor: AppColors.primary,
+            iconSize: 22,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              duration: const Duration(milliseconds: 400),
+              tabBackgroundColor: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.grey,
+              textStyle: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
+              tabs: const [
+                GButton(
+                  icon: Icons.home_rounded,
+                  text: 'Trang chủ',
+                ),
+                GButton(
+                  icon: Icons.fitness_center_rounded,
+                  text: 'Bài tập',
+                ),
+                GButton(
+                  icon: Icons.trending_up_rounded,
+                  text: 'Tiến độ',
+                ),
+                GButton(
+                  icon: Icons.local_activity_rounded,
+                  text: 'Sức khỏe',
+                ),
+                GButton(
+                  icon: Icons.person_rounded,
+                  text: 'Cá nhân',
+                ),
+              ],
+              selectedIndex: _getSelectedIndex(),
+              onTabChange: (index) {
+                setActiveTab(_getTabId(index));
+              },
+            ),
+          ),
+        ),
     );
   }
 }

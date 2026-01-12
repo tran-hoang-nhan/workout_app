@@ -370,7 +370,13 @@ class _HealthOnboardingScreenState
         await widget.onComplete();
       }
     } catch (e) {
+<<<<<<< HEAD
+      if (mounted) {
+        ScaffoldMessenger.of( context,).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+      }
+=======
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+>>>>>>> a3765084fb1a30e57af7763144d9d118c306f086
     } finally {
       if (mounted) setState(() => isSaving = false);
     }

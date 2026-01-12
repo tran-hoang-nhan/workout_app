@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/workout_provider.dart';
+<<<<<<< HEAD
+import '../../utils/app_error.dart';
+import 'widgets/workout_search_bar.dart';
+import 'widgets/workout_card.dart';
+=======
 import '../../models/workout.dart';
 import '../../utils/app_error.dart';
 import '../../widgets/loading_animation.dart';
+>>>>>>> a3765084fb1a30e57af7763144d9d118c306f086
 
 class WorkoutsScreen extends ConsumerStatefulWidget {
   const WorkoutsScreen({super.key});
@@ -58,6 +64,16 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
+<<<<<<< HEAD
+                    WorkoutSearchBar(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                    ),
+=======
                     _buildSearchBar(),
                     const SizedBox(height: AppSpacing.lg),
                     if (_searchQuery.isEmpty && _selectedCategory == 'Tất cả') ...[
@@ -65,6 +81,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                       const SizedBox(height: AppSpacing.xl),
                     ],
                     _buildCategoryChips(),
+>>>>>>> a3765084fb1a30e57af7763144d9d118c306f086
                     const SizedBox(height: AppSpacing.md),
                   ],
                 ),
@@ -88,7 +105,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                       (context, index) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                          child: _buildWorkoutCard(workouts[index]),
+                          child: WorkoutCard(workout: workouts[index]),
                         );
                       },
                       childCount: workouts.length,
@@ -97,7 +114,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                 );
               },
               loading: () => const SliverFillRemaining(
-                child: Center(child: AppLoading(message: 'Đang tải bài tập...')),
+                child: Center(child: CircularProgressIndicator()),
               ),
               error: (e, stack) => SliverFillRemaining(
                 child: Center(
@@ -113,6 +130,8 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
       ),
     );
   }
+<<<<<<< HEAD
+=======
 
   Widget _buildFeaturedHero() {
     return Container(
@@ -427,5 +446,5 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
       ),
     );
   }
+>>>>>>> a3765084fb1a30e57af7763144d9d118c306f086
 }
-
