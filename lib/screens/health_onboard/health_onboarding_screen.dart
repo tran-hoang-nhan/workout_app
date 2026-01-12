@@ -45,8 +45,6 @@ class _HealthOnboardingScreenState
 
   bool isSaving = false;
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -357,8 +355,7 @@ class _HealthOnboardingScreenState
     try {
       final userId = Supabase.instance.client.auth.currentUser?.id;
       if (userId == null) return;
-      await ref.read(healthFormProvider.notifier).
-      saveHealthOnboarding(
+      await ref.read(healthFormProvider.notifier).saveHealthOnboarding(
         userId: userId, age: age, weight: weight, height: height, gender: gender,
         activityLevel: activityLevel, goal: goal, 
         dietType: dietType, sleepHours: sleepHours, waterIntake: waterIntake,
@@ -370,7 +367,9 @@ class _HealthOnboardingScreenState
         await widget.onComplete();
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+      }
     } finally {
       if (mounted) setState(() => isSaving = false);
     }

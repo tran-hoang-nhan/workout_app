@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:table_calendar/table_calendar.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/progress_provider.dart';
-import '../../providers/daily_stats_provider.dart';
-import 'widgets/activity_calendar.dart';
-import 'widgets/activity_chart.dart';
+import '../../providers/progress_user_provider.dart';
 import 'widgets/history_list.dart';
 import 'widgets/progress_header.dart';
 import 'widgets/summary_cards.dart';
+import 'widgets/weekly_activity_slider.dart';
+import 'widgets/running_card.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});
@@ -18,22 +17,18 @@ class ProgressScreen extends ConsumerStatefulWidget {
 }
 
 class _ProgressScreenState extends ConsumerState<ProgressScreen> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  DateTime _selectedDay = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    _selectedDay = _focusedDay;
+    final now = DateTime.now();
+    _selectedDay = DateTime(now.year, now.month, now.day);
   }
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final todayStatsAsync = ref.watch(dailyStatsProvider(today));
-    final weeklyStatsAsync = ref.watch(weeklyStatsProvider);
+    final dailyStatsAsync = ref.watch(progressDailyProvider(_selectedDay));
     final historyAsync = ref.watch(workoutHistoryProvider);
 
     return Scaffold(
@@ -43,44 +38,25 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
           physics: const BouncingScrollPhysics(),
           slivers: [
             const ProgressHeader(),
-            ProgressSummaryCards(statsAsync: todayStatsAsync),
-            WeeklyActivityChart(statsAsync: weeklyStatsAsync),
+            WeeklyActivitySlider(
+              selectedDay: _selectedDay,
+              onDaySelected: (day) {
+                setState(() {
+                  _selectedDay = day;
+                });
+              },
+            ),
+            const RunningCard(),
+            ProgressSummaryCards(statsAsync: dailyStatsAsync),
             const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
                 child: Text(
-                  'Lịch hoạt động',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            ActivityCalendar(
-              focusedDay: _focusedDay,
-              calendarFormat: _calendarFormat,
-              selectedDay: _selectedDay,
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-              },
-              onFormatChanged: (format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              },
-            ),
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(AppSpacing.lg),
-                child: Text(
                   'Hoạt động gần đây',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: AppColors.black,
                   ),
                 ),
               ),
