@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/daily_stats.dart';
+import '../../../models/progress_user.dart';
 import '../../../utils/app_error.dart';
 import '../../../widgets/loading_animation.dart';
 
 class ProgressSummaryCards extends StatelessWidget {
-  final AsyncValue<DailyStats?> statsAsync;
+  final AsyncValue<ProgressUser?> statsAsync;
 
   const ProgressSummaryCards({
     super.key,
@@ -17,7 +17,7 @@ class ProgressSummaryCards extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
         child: statsAsync.when(
           data: (stats) => GridView.count(
             shrinkWrap: true,
@@ -29,28 +29,28 @@ class ProgressSummaryCards extends StatelessWidget {
             children: [
               _buildStatSquare(
                 'Calo',
-                '${stats?.caloriesBurned ?? 0}',
+                '${stats?.totalCaloriesBurned.toInt() ?? 0}',
                 'kcal',
                 Icons.local_fire_department,
                 AppColors.primary,
               ),
               _buildStatSquare(
                 'Tập luyện',
-                '${stats?.workoutDuration ?? 0}',
+                '${(stats?.totalDurationSeconds ?? 0) ~/ 60}',
                 'phút',
                 Icons.timer,
                 AppColors.info,
               ),
               _buildStatSquare(
                 'Bước chân',
-                '${stats?.stepsCount ?? 0}',
+                '${stats?.steps ?? 0}',
                 'bước',
                 Icons.directions_walk,
                 Colors.orange,
               ),
               _buildStatSquare(
                 'Nước uống',
-                '${stats?.waterIntake ?? 0}',
+                '${stats?.waterMl ?? 0}',
                 'ml',
                 Icons.local_drink,
                 Colors.blue,
