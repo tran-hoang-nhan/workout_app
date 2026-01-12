@@ -36,7 +36,9 @@ class WorkoutRepository {
 
   Future<List<Map<String, dynamic>>> getWorkoutItems(int workoutId) async {
     try {
-      return await _supabase.from('workout_items').select().eq('workout_id', workoutId);
+      final response = await _supabase.from('workout_items').select().eq('workout_id', workoutId);
+      debugPrint('[WorkoutRepository] getWorkoutItems ($workoutId) found: ${response.length} items');
+      return response;
     } catch (e, st) {
       throw handleException(e, st);
     }
@@ -45,7 +47,9 @@ class WorkoutRepository {
   Future<List<Map<String, dynamic>>> getExercisesByIds(List<int> exerciseIds) async {
     try {
       if (exerciseIds.isEmpty) return [];
-      return await _supabase.from('exercises').select().inFilter('id', exerciseIds);
+      final response = await _supabase.from('exercises').select().inFilter('id', exerciseIds);
+      debugPrint('[WorkoutRepository] getExercisesByIds (${exerciseIds.length} ids) found: ${response.length} exercises');
+      return response;
     } catch (e, st) {
       throw handleException(e, st);
     }
