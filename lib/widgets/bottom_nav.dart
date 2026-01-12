@@ -15,7 +15,8 @@ class BottomNav extends StatefulWidget {
   State<BottomNav> createState() => _BottomNavState();
 }
 
-class _BottomNavState extends State<BottomNav> with SingleTickerProviderStateMixin {
+class _BottomNavState extends State<BottomNav>
+    with SingleTickerProviderStateMixin {
   late AnimationController _entryController;
   late Animation<Offset> _offsetAnimation;
 
@@ -35,13 +36,10 @@ class _BottomNavState extends State<BottomNav> with SingleTickerProviderStateMix
       duration: const Duration(milliseconds: 800),
     );
 
-    _offsetAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _entryController,
-      curve: Curves.easeOutBack,
-    ));
+    _offsetAnimation =
+        Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(
+          CurvedAnimation(parent: _entryController, curve: Curves.easeOutBack),
+        );
 
     _entryController.forward();
   }
@@ -61,7 +59,12 @@ class _BottomNavState extends State<BottomNav> with SingleTickerProviderStateMix
       child: SlideTransition(
         position: _offsetAnimation,
         child: Container(
-          padding: const EdgeInsets.only(left: 4, right: 4, bottom: 20, top: 12),
+          padding: const EdgeInsets.only(
+            left: 4,
+            right: 4,
+            bottom: 20,
+            top: 12,
+          ),
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.white,
@@ -101,11 +104,7 @@ class TabItem {
   final String label;
   final IconData icon;
 
-  const TabItem({
-    required this.id,
-    required this.label,
-    required this.icon,
-  });
+  const TabItem({required this.id, required this.label, required this.icon});
 }
 
 class _TabButton extends StatefulWidget {
@@ -123,7 +122,8 @@ class _TabButton extends StatefulWidget {
   State<_TabButton> createState() => _TabButtonState();
 }
 
-class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMixin {
+class _TabButtonState extends State<_TabButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _yOffsetAnimation;
@@ -221,7 +221,9 @@ class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMi
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 8,
-                      fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w500,
+                      fontWeight: widget.isActive
+                          ? FontWeight.w600
+                          : FontWeight.w500,
                       color: widget.isActive ? Colors.white : AppColors.grey,
                     ),
                   ),
@@ -234,4 +236,3 @@ class _TabButtonState extends State<_TabButton> with SingleTickerProviderStateMi
     );
   }
 }
-
