@@ -56,7 +56,7 @@ class HomeScreen extends ConsumerWidget {
                             ),
                             child: const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))),
                           ),
-                          error: (_, __) => Container(
+                          error: (_, _) => Container(
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
@@ -121,7 +121,7 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                            error: (_, __) => const Column(
+                            error: (_, _) => const Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
