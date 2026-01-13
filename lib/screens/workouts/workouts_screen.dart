@@ -119,63 +119,59 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
   }
 
   Widget _buildCategoryChips() {
-      final categories = ['Tất cả', 'Cardio', 'Sức mạnh', 'Yoga', 'HIIT'];
-      return SizedBox(
-        height: 38,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: categories.length,
-          separatorBuilder: (context, index) =>
-              const SizedBox(width: AppSpacing.sm),
-          itemBuilder: (context, index) {
-            final category = categories[index];
-            final isSelected = _selectedCategory == category;
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedCategory = category;
-                  _searchQuery = '';
-                  _searchController.clear();
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 0,
+    final categories = ['Tất cả', 'Cardio', 'Sức mạnh', 'Yoga', 'HIIT'];
+    return SizedBox(
+      height: 38,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        separatorBuilder: (context, index) =>
+            const SizedBox(width: AppSpacing.sm),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          final isSelected = _selectedCategory == category;
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedCategory = category;
+                _searchQuery = '';
+                _searchController.clear();
+              });
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.black : AppColors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isSelected
+                      ? AppColors.black
+                      : AppColors.cardBorder.withValues(alpha: 0.5),
                 ),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.black : AppColors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColors.black
-                        : AppColors.cardBorder.withValues(alpha: 0.5),
-                  ),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: AppColors.black.withValues(alpha: 0.2),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Text(
-                  category,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected ? AppColors.white : AppColors.grey,
-                  ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: AppColors.black.withValues(alpha: 0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Text(
+                category,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected ? AppColors.white : AppColors.grey,
                 ),
               ),
-            );
-          },
-        ),
-      );
-    }
+            ),
+          );
+        },
+      ),
+    );
   }
 }
