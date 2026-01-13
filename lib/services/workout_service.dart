@@ -1,13 +1,10 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/workout.dart';
 import '../models/workout_item.dart';
 import '../models/exercise.dart';
 import '../repositories/workout_repository.dart';
-import '../utils/storage_utils.dart';
 
 class WorkoutService {
   final WorkoutRepository _workoutRepository;
-  final SupabaseClient _supabase = Supabase.instance.client;
 
   WorkoutService({WorkoutRepository? repository})
     : _workoutRepository = repository ?? WorkoutRepository();
@@ -51,18 +48,8 @@ class WorkoutService {
       exerciseIds,
     );
 
-    // Create a map of exercise by ID for easier lookup
-    final exerciseMap = <int, Exercise>{};
-    for (var data in exercisesData) {
-      final processedData = processExerciseJson(_supabase, data);
-      final exercise = Exercise.fromJson(processedData);
-      exerciseMap[exercise.id] = exercise;
-    }
-
-    // Sort exercises to match the order of items
-    List<Exercise> exercises = items
-        .map((item) => exerciseMap[item.exerciseId])
-        .whereType<Exercise>()
+    final exercises = exercisesData
+        .map((data) => Exercise.fromJson(data))
         .toList();
 
     return (workout: workout, items: items, exercises: exercises);

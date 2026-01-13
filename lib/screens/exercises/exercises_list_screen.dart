@@ -22,9 +22,7 @@ class ExercisesListScreen extends ConsumerWidget {
       body: exercisesAsync.when(
         data: (exercises) {
           if (exercises.isEmpty) {
-            return const Center(
-              child: Text('Chưa có bài tập nào'),
-            );
+            return const Center(child: Text('Chưa có bài tập nào'));
           }
           return ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -34,9 +32,7 @@ class ExercisesListScreen extends ConsumerWidget {
             },
           );
         },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -57,7 +53,8 @@ class ExercisesListScreen extends ConsumerWidget {
   }
 
   Widget _buildExerciseCard(BuildContext context, Exercise exercise) {
-    final hasAnimation = exercise.animationUrl != null && exercise.animationUrl!.isNotEmpty;
+    final hasAnimation =
+        exercise.animationUrl != null && exercise.animationUrl!.isNotEmpty;
 
     return GestureDetector(
       onTap: () {
@@ -159,10 +156,7 @@ class ExercisesListScreen extends ConsumerWidget {
                     if (exercise.muscleGroup != null)
                       Text(
                         exercise.muscleGroup!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
