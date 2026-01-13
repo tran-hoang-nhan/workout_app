@@ -10,7 +10,6 @@ import 'screens/auth/login_screen.dart';
 import 'screens/health_onboard/health_onboarding_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/workouts/workouts_screen.dart';
-
 import 'screens/progress/progress_screen.dart';
 import 'screens/health/health_screen.dart';
 import 'screens/profile/profile_screen.dart';
@@ -90,8 +89,15 @@ class NotificationController {
     }
   }
 
-  @pragma("vm:entry-point") static Future <void> onNotificationCreatedMethod(ReceivedNotification receivedNotification) async {}
-  @pragma("vm:entry-point") static Future <void> onNotificationDisplayedMethod(ReceivedNotification receivedNotification) async {}
+  @pragma("vm:entry-point") 
+  static Future <void> onNotificationCreatedMethod(ReceivedNotification receivedNotification) async {
+    debugPrint("🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})");
+  }
+
+  @pragma("vm:entry-point") 
+  static Future <void> onNotificationDisplayedMethod(ReceivedNotification receivedNotification) async {
+    debugPrint("📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})");
+  }
   @pragma("vm:entry-point") static Future <void> onDismissActionReceivedMethod(ReceivedAction receivedAction) async {}
 }
 
@@ -158,50 +164,47 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           foregroundColor: AppColors.black,
         ),
       ),
-      home: authStateAsync.when(
-        data: (isAuthenticated) {
-          if (!isAuthenticated) {
-            return LoginScreen(
-              onLoginSuccess: () async {
-                ref.invalidate(healthDataProvider);
-                ref.invalidate(hasHealthDataProvider);
-              },
-            );
-          }
-
-          return hasHealthDataAsync.when(
-            data: (hasHealthData) {
-              if (!hasHealthData) {
-                return HealthOnboardingScreen(
-                  onComplete: () async {
-                    ref.invalidate(healthDataProvider);
-                    ref.invalidate(hasHealthDataProvider);
-                  },
-                );
-              }
-              return const AppShell();
-            },
-            loading: () => const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
-            error: (error, stack) => HealthOnboardingScreen(
-              onComplete: () async {
-                ref.invalidate(healthDataProvider);
-                ref.invalidate(hasHealthDataProvider);
-              },
-            ),
-          );
-        },
-        loading: () => const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
-        error: (error, stackTrace) => LoginScreen(
-          onLoginSuccess: () async {
-             ref.invalidate(authStateProvider);
-          },
-        ),
-      ),
+      home: _buildHome(authStateAsync, hasHealthDataAsync),
     );
+  }
+
+  Widget _buildHome(AsyncValue<bool> authState, AsyncValue<bool> hasHealthData) {
+    // 1. Kiểm tra xác thực (Auth)
+    // Chỉ hiện loading nếu thực sự lần đầu không có dữ liệu (hasValue == false)
+    if (authState.isLoading && !authState.hasValue) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    // .value trả về giá trị hiện tại (kể cả khi đang loading ngầm)
+    final isAuthenticated = authState.value ?? false;
+    if (!isAuthenticated) {
+      return LoginScreen(
+        onLoginSuccess: () async {
+          ref.invalidate(healthDataProvider);
+          ref.invalidate(hasHealthDataProvider);
+        },
+      );
+    }
+
+    // 2. Kiểm tra dữ liệu sức khỏe (Health Data)
+    // Nhờ việc tách provider ở health_provider.dart, hasHealthData sẽ không bị refresh
+    // mỗi khi healthDataProvider thay đổi nữa.
+    if (hasHealthData.isLoading && !hasHealthData.hasValue) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final hasData = hasHealthData.value ?? false;
+    if (!hasData) {
+      return HealthOnboardingScreen(
+        onComplete: () async {
+          ref.invalidate(healthDataProvider);
+          ref.invalidate(hasHealthDataProvider);
+        },
+      );
+    }
+
+    // 3. App Shell chính - Tuyệt đối không bị unmount khi update settings
+    return const AppShell();
   }
 }
 
