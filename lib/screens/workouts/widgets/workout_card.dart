@@ -51,8 +51,12 @@ class WorkoutCard extends StatelessWidget {
                       highlightColor: Colors.grey[100]!,
                       child: Container(color: Colors.white),
                     ),
-                    errorWidget: (context, url, error) =>
-                        Container(color: color.withValues(alpha: 0.1)),
+                    errorWidget: (context, url, error) {
+                      debugPrint(
+                        '[WorkoutCard] thumbnail load failed: title=${workout.title} url=$url error=$error',
+                      );
+                      return Container(color: color.withValues(alpha: 0.1));
+                    },
                   ),
                 )
               else

@@ -7,7 +7,7 @@ class WorkoutService {
   final WorkoutRepository _workoutRepository;
 
   WorkoutService({WorkoutRepository? repository})
-    : _workoutRepository = repository ?? WorkoutRepository();
+      : _workoutRepository = repository ?? WorkoutRepository();
 
   Future<List<Workout>> getAllWorkouts() async {
     final response = await _workoutRepository.getAllWorkouts();

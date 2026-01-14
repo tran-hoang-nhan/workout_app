@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/workout.dart';
 import '../../models/workout_item.dart';
 import '../../models/exercise.dart';
@@ -241,77 +242,121 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      ex.name,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    if (ex.animationUrl != null && ex.animationUrl!.isNotEmpty)
-                      Center(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: ExerciseAnimationWidget(
-                            animationUrl: ex.animationUrl!,
-                            height: 240,
-                          ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              ex.name,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            if (ex.animationUrl != null &&
+                                ex.animationUrl!.isNotEmpty)
+                              Center(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: ExerciseAnimationWidget(
+                                    animationUrl: ex.animationUrl!,
+                                    height: 240,
+                                  ),
+                                ),
+                              )
+                            else if (ex.thumbnailUrl != null &&
+                                ex.thumbnailUrl!.isNotEmpty)
+                              Center(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: CachedNetworkImage(
+                                    imageUrl: ex.thumbnailUrl!,
+                                    height: 240,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      height: 240,
+                                      color: Colors.grey[200],
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                          height: 240,
+                                          color: Colors.grey[200],
+                                          child: const Icon(
+                                            Icons.image_not_supported,
+                                            size: 40,
+                                          ),
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: 8),
+                            Center(
+                              child: Builder(
+                                builder: (_) {
+                                  final chips = <Widget>[];
+                                  if (hasDuration) {
+                                    chips.add(
+                                      _InfoChip(
+                                        icon: Icons.timer_outlined,
+                                        color: Colors.purple,
+                                        text:
+                                            'Tập: ${item.durationSeconds} giây',
+                                      ),
+                                    );
+                                  } else if (hasReps) {
+                                    chips.add(
+                                      _InfoChip(
+                                        icon: Icons.repeat,
+                                        color: Colors.green,
+                                        text: 'Số lần: ${item.reps}',
+                                      ),
+                                    );
+                                  } else {
+                                    chips.add(
+                                      _InfoChip(
+                                        icon: Icons.fitness_center,
+                                        color: Colors.blueGrey,
+                                        text: 'Tập tự do',
+                                      ),
+                                    );
+                                  }
+                                  if ((item.restSeconds ?? 0) > 0) {
+                                    chips.add(
+                                      _InfoChip(
+                                        icon: Icons.pause_circle_outline,
+                                        color: Colors.red,
+                                        text: 'Nghỉ: ${item.restSeconds} giây',
+                                      ),
+                                    );
+                                  }
+                                  return Wrap(
+                                    alignment: WrapAlignment.center,
+                                    spacing: 12,
+                                    runSpacing: 8,
+                                    children: chips,
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            if (ex.description != null)
+                              Text(
+                                ex.description!,
+                                style: TextStyle(color: Colors.grey[700]),
+                              ),
+                          ],
                         ),
                       ),
-                    const SizedBox(height: 8),
-                    Builder(
-                      builder: (_) {
-                        final chips = <Widget>[];
-                        if (hasDuration) {
-                          chips.add(
-                            _InfoChip(
-                              icon: Icons.timer_outlined,
-                              color: Colors.purple,
-                              text: 'Tập: ${item.durationSeconds} giây',
-                            ),
-                          );
-                        } else if (hasReps) {
-                          chips.add(
-                            _InfoChip(
-                              icon: Icons.repeat,
-                              color: Colors.green,
-                              text: 'Số lần: ${item.reps}',
-                            ),
-                          );
-                        } else {
-                          chips.add(
-                            _InfoChip(
-                              icon: Icons.fitness_center,
-                              color: Colors.blueGrey,
-                              text: 'Tập tự do',
-                            ),
-                          );
-                        }
-                        if ((item.restSeconds ?? 0) > 0) {
-                          chips.add(
-                            _InfoChip(
-                              icon: Icons.pause_circle_outline,
-                              color: Colors.red,
-                              text: 'Nghỉ: ${item.restSeconds} giây',
-                            ),
-                          );
-                        }
-                        return Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 12,
-                          runSpacing: 8,
-                          children: chips,
-                        );
-                      },
                     ),
-                    const SizedBox(height: 8),
-                    if (ex.description != null)
-                      Text(
-                        ex.description!,
-                        style: TextStyle(color: Colors.grey[700]),
-                      ),
-                    const Spacer(),
+                    const SizedBox(height: 12),
                     if (_started)
                       Column(
                         children: [
@@ -371,7 +416,17 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _started ? _next : _start,
-                    child: Text(_started ? 'Tiếp' : 'Bắt đầu'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(56),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      _started ? 'Tiếp' : 'Bắt đầu',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
               ],
