@@ -72,6 +72,7 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                         children: [
                           SizedBox(
                             width: double.infinity,
+                            height: 56,
                             child: ElevatedButton(
                               onPressed: () {
                                 Navigator.push(
@@ -87,7 +88,13 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                                   ),
                                 );
                               },
-                              child: const Text('Bắt đầu'),
+                              child: const Text(
+                                'Bắt đầu',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
