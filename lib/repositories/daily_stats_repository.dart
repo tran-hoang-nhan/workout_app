@@ -4,20 +4,13 @@ import '../utils/app_error.dart';
 
 class DailyStatsRepository {
   final SupabaseClient _supabase;
-
-  DailyStatsRepository({SupabaseClient? supabase})
-      : _supabase = supabase ?? Supabase.instance.client;
+  DailyStatsRepository({SupabaseClient? supabase}): 
+    _supabase = supabase ?? Supabase.instance.client;
 
   Future<DailyStats?> getDailyStats(String userId, DateTime date) async {
     try {
       final dateStr = date.toIso8601String().split('T')[0];
-      final response = await _supabase
-          .from('daily_stats')
-          .select()
-          .eq('user_id', userId)
-          .eq('date', dateStr)
-          .maybeSingle();
-
+      final response = await _supabase.from('daily_stats').select().eq('user_id', userId).eq('date', dateStr).maybeSingle();
       if (response == null) return null;
       return DailyStats.fromJson(response);
     } catch (e, st) {
@@ -29,15 +22,7 @@ class DailyStatsRepository {
     try {
       final startStr = start.toIso8601String().split('T')[0];
       final endStr = end.toIso8601String().split('T')[0];
-
-      final response = await _supabase
-          .from('daily_stats')
-          .select()
-          .eq('user_id', userId)
-          .gte('date', startStr)
-          .lte('date', endStr)
-          .order('date', ascending: true);
-
+      final response = await _supabase.from('daily_stats').select().eq('user_id', userId).gte('date', startStr).lte('date', endStr).order('date', ascending: true);
       return (response as List).map((json) => DailyStats.fromJson(json)).toList();
     } catch (e, st) {
       throw handleException(e, st);
@@ -55,18 +40,10 @@ class DailyStatsRepository {
     }
   }
 
-  Future<void> updateActivityStats({
-    required String userId,
-    required DateTime date,
-    int? addCalories,
-    int? addDurationMinutes,
-    int? steps,
-    int? waterMl,
-  }) async {
+  Future<void> updateActivityStats({required String userId, required DateTime date, int? addCalories, int? addDurationMinutes, int? steps, int? waterMl,}) async {
     try {
       final existing = await getDailyStats(userId, date);
       final dateStr = date.toIso8601String().split('T')[0];
-
       if (existing == null) {
         final newStats = DailyStats(
           userId: userId,
@@ -84,13 +61,8 @@ class DailyStatsRepository {
           if (steps != null) 'steps_count': steps,
           if (waterMl != null) 'water_intake': waterMl,
         };
-
         if (updateData.isNotEmpty) {
-          await _supabase
-              .from('daily_stats')
-              .update(updateData)
-              .eq('user_id', userId)
-              .eq('date', dateStr);
+          await _supabase.from('daily_stats').update(updateData).eq('user_id', userId).eq('date', dateStr);
         }
       }
     } catch (e, st) {

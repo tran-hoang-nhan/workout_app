@@ -18,7 +18,7 @@ class OTPNotifier extends Notifier<bool> {
     return false;
   }
 
-  Future<void> verifyOTP(String token) async {
+  Future<bool> verifyOTP(String token) async {
     state = true;
     try { 
       await _service.verifyOTP (
@@ -26,8 +26,11 @@ class OTPNotifier extends Notifier<bool> {
         token: token,
         type: OtpType.signup,
       );
-    } finally {
       state = false;
+      return true; // Thành công
+    } catch (e) {
+      state = false;
+      rethrow; // Ném lỗi để xử lý ở UI
     }
   }
 }
