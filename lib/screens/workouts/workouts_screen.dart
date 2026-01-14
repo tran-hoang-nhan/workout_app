@@ -28,7 +28,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
   @override
   Widget build(BuildContext context) {
     AsyncValue<List<Workout>> workoutsAsync;
-    
+
     if (_searchQuery.isNotEmpty) {
       workoutsAsync = ref.watch(searchWorkoutsProvider(_searchQuery));
     } else if (_selectedCategory != 'Tất cả') {
@@ -74,29 +74,29 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                 ),
               ),
             ),
-            
+
             // Workouts List
             workoutsAsync.when(
               data: (workouts) {
                 if (workouts.isEmpty) {
                   return const SliverFillRemaining(
-                    child: Center(
-                      child: Text('Không tìm thấy bài tập nào'),
-                    ),
+                    child: Center(child: Text('Không tìm thấy bài tập nào')),
                   );
                 }
                 return SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 120),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    120,
+                  ),
                   sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                          child: WorkoutCard(workout: workouts[index]),
-                        );
-                      },
-                      childCount: workouts.length,
-                    ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                        child: WorkoutCard(workout: workouts[index]),
+                      );
+                    }, childCount: workouts.length),
                   ),
                 );
               },
@@ -125,7 +125,8 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
-        separatorBuilder: (context, index) => const SizedBox(width: AppSpacing.sm),
+        separatorBuilder: (context, index) =>
+            const SizedBox(width: AppSpacing.sm),
         itemBuilder: (context, index) {
           final category = categories[index];
           final isSelected = _selectedCategory == category;
@@ -145,15 +146,19 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                 color: isSelected ? AppColors.black : AppColors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isSelected ? AppColors.black : AppColors.cardBorder.withValues(alpha: 0.5),
+                  color: isSelected
+                      ? AppColors.black
+                      : AppColors.cardBorder.withValues(alpha: 0.5),
                 ),
-                boxShadow: isSelected ? [
-                  BoxShadow(
-                    color: AppColors.black.withValues(alpha: 0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  )
-                ] : null,
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: AppColors.black.withValues(alpha: 0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null,
               ),
               child: Text(
                 category,

@@ -363,12 +363,16 @@ class _HealthOnboardingScreenState
       );
       
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('✅ Hoàn thành thông tin sức khỏe!')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('✅ Hoàn thành thông tin sức khỏe!')),
+        );
         await widget.onComplete();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: $e')),
+        );
       }
     } finally {
       if (mounted) setState(() => isSaving = false);

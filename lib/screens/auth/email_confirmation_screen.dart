@@ -40,6 +40,52 @@ class _EmailConfirmationScreenState
     });
   }
 
+  Future<void> _handleVerifyOTP() async {
+    if (_otpController.text.trim().isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Vui lòng nhập mã xác nhận'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      final success = await ref
+          .read(verifyOTPProvider(widget.email).notifier)
+          .verifyOTP(_otpController.text.trim());
+      
+      if (success && mounted) {
+        // Hiển thị thông báo thành công
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Xác nhận email thành công!'),
+            backgroundColor: AppColors.success,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        
+        // Chờ 500ms để user thấy thông báo, sau đó pop về màn hình trước (health onboard)
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi: ${e.toString()}'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isVerifying = ref.watch(verifyOTPProvider(widget.email));
@@ -168,9 +214,7 @@ class _EmailConfirmationScreenState
                           CustomButton(
                             label: 'Xác Nhận Mã',
                             isLoading: isLoading,
-                            onPressed: () => ref
-                                .read(verifyOTPProvider(widget.email).notifier)
-                                .verifyOTP(_otpController.text),
+                            onPressed: () => _handleVerifyOTP(),
                           ),
                         ],
                       ),

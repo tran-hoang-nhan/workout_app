@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import '../config/supabase_config.dart';
 import '../repositories/avatar_repository.dart';
 import '../utils/app_error.dart';

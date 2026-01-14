@@ -5,10 +5,7 @@ import '../../../models/workout.dart';
 class WorkoutHeader extends StatelessWidget {
   final Workout workout;
 
-  const WorkoutHeader({
-    super.key,
-    required this.workout,
-  });
+  const WorkoutHeader({super.key, required this.workout});
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +28,16 @@ class WorkoutHeader extends StatelessWidget {
                 height: 250,
                 child: const Center(child: CircularProgressIndicator()),
               ),
-              errorWidget: (context, url, error) => Container(
-                color: Colors.grey[200],
-                height: 250,
-                child: const Icon(Icons.image_not_supported, size: 48),
-              ),
+              errorWidget: (context, url, error) {
+                debugPrint(
+                  '[WorkoutHeader] thumbnail load failed: title=${workout.title} url=$url error=$error',
+                );
+                return Container(
+                  color: Colors.grey[200],
+                  height: 250,
+                  child: const Icon(Icons.image_not_supported, size: 48),
+                );
+              },
             ),
           ),
         Padding(
@@ -60,8 +62,9 @@ class WorkoutHeader extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: _getDifficultyColor(workout.level!)
-                            .withValues(alpha: 0.1),
+                        color: _getDifficultyColor(
+                          workout.level!,
+                        ).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -92,10 +95,7 @@ class WorkoutHeader extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Danh mục: ${workout.category}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
             ],
