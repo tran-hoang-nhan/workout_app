@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class WorkoutDescription extends StatelessWidget {
   final String description;
 
-  const WorkoutDescription({
-    super.key,
-    required this.description,
-  });
+  const WorkoutDescription({super.key, required this.description});
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +16,7 @@ class WorkoutDescription extends StatelessWidget {
           const SizedBox(height: 16),
           const Text(
             'Mô tả',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(

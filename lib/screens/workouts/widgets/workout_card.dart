@@ -3,15 +3,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../constants/app_constants.dart';
 import '../../../models/workout.dart';
-import '../../workout_detail/workout_detail_screens.dart';
+import '../../workout_detail/workout_detail_screen.dart';
 
 class WorkoutCard extends StatelessWidget {
   final Workout workout;
 
-  const WorkoutCard({
-    super.key,
-    required this.workout,
-  });
+  const WorkoutCard({super.key, required this.workout});
 
   @override
   Widget build(BuildContext context) {
@@ -52,20 +49,19 @@ class WorkoutCard extends StatelessWidget {
                     placeholder: (context, url) => Shimmer.fromColors(
                       baseColor: Colors.grey[300]!,
                       highlightColor: Colors.grey[100]!,
-                      child: Container(
-                        color: Colors.white,
-                      ),
+                      child: Container(color: Colors.white),
                     ),
-                    errorWidget: (context, url, error) => Container(
-                      color: color.withValues(alpha: 0.1),
-                    ),
+                    errorWidget: (context, url, error) {
+                      debugPrint(
+                        '[WorkoutCard] thumbnail load failed: title=${workout.title} url=$url error=$error',
+                      );
+                      return Container(color: color.withValues(alpha: 0.1));
+                    },
                   ),
                 )
               else
                 Positioned.fill(
-                  child: Container(
-                    color: color.withValues(alpha: 0.1),
-                  ),
+                  child: Container(color: color.withValues(alpha: 0.1)),
                 ),
 
               // Gradient Overlay (dark from bottom)
@@ -169,7 +165,7 @@ class WorkoutCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    
+
                     const SizedBox(height: 8),
 
                     // Duration & Play Button
@@ -192,6 +188,23 @@ class WorkoutCard extends StatelessWidget {
                                 color: Colors.white.withValues(alpha: 0.8),
                               ),
                             ),
+                            if (workout.days != null && workout.days! > 0) ...[
+                              const SizedBox(width: 12),
+                              Icon(
+                                Icons.calendar_month,
+                                size: 14,
+                                color: Colors.white.withValues(alpha: 0.7),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${workout.days} ngày',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white.withValues(alpha: 0.8),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                         Container(
@@ -220,11 +233,7 @@ class WorkoutCard extends StatelessWidget {
               ),
 
               // Tap Effect
-              Positioned.fill(
-                child: Material(
-                  color: Colors.transparent,
-                ),
-              ),
+              Positioned.fill(child: Material(color: Colors.transparent)),
             ],
           ),
         ),

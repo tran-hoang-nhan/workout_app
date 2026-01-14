@@ -11,7 +11,7 @@ class ProgressUserRepository {
       final dateStr = date.toIso8601String().split('T')[0];
       final response = await _supabase.from('progress_user').select().eq('user_id', userId).eq('date', dateStr).maybeSingle();
       if (response == null) return null;
-      return ProgressUser.fromJson(response as Map<String, dynamic>);
+      return ProgressUser.fromJson(response);
     } catch (e, st) {
       throw handleException(e, st);
     }
@@ -22,7 +22,7 @@ class ProgressUserRepository {
       final startStr = start.toIso8601String().split('T')[0];
       final endStr = end.toIso8601String().split('T')[0];
       final response = await _supabase.from('progress_user').select().eq('user_id', userId).gte('date', startStr).lte('date', endStr).order('date', ascending: true);
-      return (response as List).map((json) => ProgressUser.fromJson(json as Map<String, dynamic>)).toList();
+      return (response as List).map((json) => ProgressUser.fromJson(json)).toList();
     } catch (e, st) {
       throw handleException(e, st);
     }

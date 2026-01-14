@@ -7,25 +7,21 @@ import 'widgets/exercise_info_row.dart';
 class ExerciseDetailScreen extends StatefulWidget {
   final Exercise exercise;
 
-  const ExerciseDetailScreen({
-    super.key,
-    required this.exercise,
-  });
+  const ExerciseDetailScreen({super.key, required this.exercise});
 
   @override
   State<ExerciseDetailScreen> createState() => _ExerciseDetailScreenState();
 }
 
 class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
-
   @override
   Widget build(BuildContext context) {
-    final hasAnimation = widget.exercise.animationUrl != null && widget.exercise.animationUrl!.isNotEmpty;
+    final hasAnimation =
+        widget.exercise.animationUrl != null &&
+        widget.exercise.animationUrl!.isNotEmpty;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.exercise.name),
-      ),
+      appBar: AppBar(title: Text(widget.exercise.name)),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,28 +30,32 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             if (hasAnimation)
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: ExerciseAnimationWidget(
-                  animationUrl: widget.exercise.animationUrl!,
-                  height: 350,
+                child: Center(
+                  child: ExerciseAnimationWidget(
+                    animationUrl: widget.exercise.animationUrl!,
+                    height: 350,
+                  ),
                 ),
               )
             else if (widget.exercise.thumbnailUrl != null)
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: CachedNetworkImage(
-                    imageUrl: widget.exercise.thumbnailUrl!,
-                    height: 300,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: Colors.grey[200],
-                      child: const Center(child: CircularProgressIndicator()),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      color: Colors.grey[200],
-                      child: const Icon(Icons.image_not_supported, size: 48),
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: CachedNetworkImage(
+                      imageUrl: widget.exercise.thumbnailUrl!,
+                      height: 300,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[200],
+                        child: const Center(child: CircularProgressIndicator()),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.image_not_supported, size: 48),
+                      ),
                     ),
                   ),
                 ),
@@ -75,7 +75,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.fitness_center, size: 48, color: Colors.grey),
+                        Icon(
+                          Icons.fitness_center,
+                          size: 48,
+                          color: Colors.grey,
+                        ),
                         SizedBox(height: 8),
                         Text(
                           'Chưa có hình ảnh hướng dẫn',
@@ -101,7 +105,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   if (widget.exercise.muscleGroup != null) ...[
                     ExerciseInfoRow(
                       icon: Icons.fitness_center,
@@ -110,7 +114,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     ),
                     const SizedBox(height: 12),
                   ],
-                  
+
                   if (widget.exercise.difficulty != null) ...[
                     ExerciseInfoRow(
                       icon: Icons.speed,
@@ -119,16 +123,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     ),
                     const SizedBox(height: 12),
                   ],
-                  
+
                   if (widget.exercise.caloriesPerMinute != null) ...[
                     ExerciseInfoRow(
                       icon: Icons.local_fire_department,
                       label: 'Calories/phút',
-                      value: '${widget.exercise.caloriesPerMinute!.toStringAsFixed(1)} kcal',
+                      value:
+                          '${widget.exercise.caloriesPerMinute!.toStringAsFixed(1)} kcal',
                     ),
                     const SizedBox(height: 12),
                   ],
-                  
+
                   if (widget.exercise.description != null) ...[
                     const Divider(height: 32),
                     const Text(
