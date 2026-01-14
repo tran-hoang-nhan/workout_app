@@ -36,10 +36,7 @@ class AvatarRepository {
   Future<void> updateProfileAvatar(String userId, String? avatarUrl) async {
     try {
       debugPrint('AvatarRepository: Updating profile avatar URL in DB: $avatarUrl');
-      await _supabase.from('profiles').update({
-        'avatar_url': avatarUrl,
-        'updated_at': DateTime.now().toIso8601String(),
-      }).eq('id', userId);
+      await _supabase.from('profiles').update({'avatar_url': avatarUrl, 'updated_at': DateTime.now().toIso8601String(),}).eq('id', userId);
       debugPrint('AvatarRepository: Profile updated successfully');
     } catch (e, st) {
       debugPrint('AvatarRepository Exception (updateProfileAvatar): $e');
