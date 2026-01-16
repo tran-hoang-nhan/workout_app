@@ -92,7 +92,6 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
 
   void _next() {
     _timer?.cancel();
-    // If current item is reps-based and has rest, enter rest before moving on
     final reps = _currentItem.reps ?? 0;
     final rest = _currentItem.restSeconds ?? 0;
     if (!_inRest && reps > 0 && rest > 0) {
