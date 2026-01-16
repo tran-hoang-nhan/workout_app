@@ -1,8 +1,7 @@
-/// Định nghĩa các class và hàm xử lý lỗi chung cho toàn app
-library;
-
+import 'dart:io'; // Cần import để bắt SocketException
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// 1. Class gốc
 class AppError implements Exception {
   final String message;
   final String? code;
@@ -11,40 +10,40 @@ class AppError implements Exception {
 
   AppError(this.message, {this.code, this.originalException, this.stackTrace});
 
-  /// Thông báo lỗi thân thiện để hiển thị lên UI
+  /// Thông báo hiển thị cho User (Logic Dart 3)
   String get userMessage {
+    // Nếu có code, ưu tiên map code sang tiếng Việt
     if (code != null) {
-      return _mapCodeToMessage(code!);
+      return _mapCodeToUserMessage(code!);
     }
-    return message;
+    // Nếu là lỗi Validation (lỗi logic form), hiển thị message gốc
+    if (this is ValidationException) return message;
+    
+    // Nếu lỗi lạ (Exception kỹ thuật), không show cho user xem -> show thông báo chung
+    return 'Đã có lỗi không mong muốn xảy ra. Vui lòng thử lại.';
   }
 
   @override
   String toString() => 'AppError[$code]: $message';
-
-  static String _mapCodeToMessage(String code) {
-    switch (code) {
-      // Supabase / Postgrest Errors
-      case '23505': return 'Dữ liệu đã tồn tại trong hệ thống.';
-      case '23503': return 'Dữ liệu liên quan không tồn tại hoặc đang được sử dụng.';
-      case '42P01': return 'Lỗi hệ thống database (Table not found).';
-      
-      // Auth Errors
-      case 'invalid_credentials': return 'Email hoặc mật khẩu không chính xác.';
-      case 'user_not_found': return 'Người dùng không tồn tại.';
-      case 'email_not_confirmed': return 'Vui lòng xác nhận email trước khi đăng nhập.';
-      case 'user_already_exists': return 'Email này đã được đăng ký.';
-      case 'invalid_grant': return 'Thông tin đăng nhập không hợp lệ hoặc đã hết hạn.';
-      
-      default: return 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
-    }
-  }
+  static String _mapCodeToUserMessage(String code) => switch (code) {
+    '23505' => 'Dữ liệu này đã tồn tại trong hệ thống.',
+    '23503' => 'Dữ liệu liên quan không hợp lệ hoặc đang được sử dụng.',
+    '42P01' => 'Lỗi cấu hình hệ thống (Bảng không tồn tại).',
+    'PGRST116' => 'Không tìm thấy dữ liệu yêu cầu.', 
+    'invalid_credentials' => 'Email hoặc mật khẩu không chính xác.',
+    'user_not_found' => 'Tài khoản không tồn tại.',
+    'email_not_confirmed' => 'Vui lòng xác nhận email trước khi đăng nhập.',
+    'user_already_exists' => 'Email này đã được đăng ký.',
+    'otp_expired' => 'Mã xác thực đã hết hạn.',
+    'weak_password' => 'Mật khẩu quá yếu.',
+    _ => 'Lỗi hệ thống ($code). Vui lòng báo cho admin.',
+  };
 }
 
 class NetworkException extends AppError {
-  NetworkException(super.message, {super.code, super.originalException, super.stackTrace});
+  NetworkException({super.originalException, super.stackTrace}) : super('Lỗi kết nối mạng', code: 'network_error');
   @override
-  String get userMessage => 'Không thể kết nối mạng. Vui lòng kiểm tra lại đường truyền.';
+  String get userMessage => 'Không thể kết nối mạng. Vui lòng kiểm tra đường truyền.';
 }
 
 class DatabaseException extends AppError {
@@ -52,25 +51,20 @@ class DatabaseException extends AppError {
 }
 
 class ValidationException extends AppError {
-  ValidationException(super.message, {super.code, super.originalException, super.stackTrace});
-  @override
-  String get userMessage => message; // Validation thường đã là message thân thiện
+  ValidationException(super.message);
 }
 
 class UnauthorizedException extends AppError {
-  UnauthorizedException(super.message, {super.code, super.originalException, super.stackTrace});
+  UnauthorizedException(super.message, {super.code, super.originalException});
   @override
-  String get userMessage => 'Phiên làm việc hết hạn hoặc không có quyền truy cập.';
-}
-
-class ServerException extends AppError {
-  ServerException(super.message, {super.code, super.originalException, super.stackTrace});
+  String get userMessage => 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.';
 }
 
 AppError handleException(Object error, [StackTrace? stackTrace]) {
-  if (error is AppError) return error;
-  
-  // Supabase specific errors
+  if (error is AppError) {
+    return error; 
+  }
+
   if (error is PostgrestException) {
     return DatabaseException(
       error.message,
@@ -79,29 +73,44 @@ AppError handleException(Object error, [StackTrace? stackTrace]) {
       stackTrace: stackTrace,
     );
   }
-  
+
   if (error is AuthException) {
-    // AuthException có thể có message là technical, dùng code hoặc message thô
+    String? mappedCode;
+    final msg = error.message.toLowerCase();
+    if (msg.contains('invalid login')) {
+      mappedCode = 'invalid_credentials';
+    }
+    else if (msg.contains('user not found')) {
+      mappedCode = 'user_not_found';
+    }
+    else if (msg.contains('email not confirmed')) {
+      mappedCode = 'email_not_confirmed';
+    }
+    else if (msg.contains('already registered')) {
+      mappedCode = 'user_already_exists';
+    }
+
     return UnauthorizedException(
       error.message,
-      code: error.message.contains('Invalid login credentials') ? 'invalid_credentials' : null,
+      code: mappedCode ?? error.statusCode, 
       originalException: error,
-      stackTrace: stackTrace,
     );
   }
 
-  // Generic mapping
+  if (error is SocketException) {
+    return NetworkException(originalException: error, stackTrace: stackTrace);
+  }
+  
   final errorStr = error.toString().toLowerCase();
   if (errorStr.contains('socketexception') || 
-      errorStr.contains('network') || 
-      errorStr.contains('connection failed')) {
-    return NetworkException('Network error', originalException: error, stackTrace: stackTrace);
+      errorStr.contains('connection failed') || 
+      errorStr.contains('network is unreachable')) {
+    return NetworkException(originalException: error, stackTrace: stackTrace);
   }
 
-  if (errorStr.contains('timeout')) {
-    return AppError('Yêu cầu quá hạn. Vui lòng thử lại.', code: 'timeout', originalException: error, stackTrace: stackTrace);
-  }
-
-  return AppError(error.toString(), stackTrace: stackTrace);
+  return AppError(
+    error.toString(), 
+    originalException: error, 
+    stackTrace: stackTrace
+  );
 }
-

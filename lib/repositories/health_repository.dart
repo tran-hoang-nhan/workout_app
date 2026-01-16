@@ -39,7 +39,6 @@ class HealthRepository {
   Future<void> saveHealthDataWithTransaction(HealthUpdateParams params) async {
     bool healthCreated = false;
     bool profileUpdated = false;
-    
     try {
       await _supabase.from('health').upsert(params.toHealthMap());
       healthCreated = true;

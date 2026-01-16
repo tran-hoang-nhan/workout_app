@@ -5,7 +5,8 @@ import '../utils/app_error.dart';
 
 class ProfileRepository {
   final SupabaseClient _supabase;
-  ProfileRepository({SupabaseClient? supabase}): _supabase = supabase ?? Supabase.instance.client;
+  ProfileRepository({SupabaseClient? supabase}): 
+    _supabase = supabase ?? Supabase.instance.client;
 
   Future<UserStats> loadUserHealthData(String userId) async {
     int tempTotalWorkouts = 0;
@@ -15,7 +16,6 @@ class ProfileRepository {
     double tempWeight = 0.0;
     double tempHeight = 0.0;
     int tempAge = 0;
-
     try {
       final profileData = await _supabase.from('profiles').select('height, date_of_birth').eq('id', userId).maybeSingle();
       if (profileData != null) {
@@ -27,7 +27,6 @@ class ProfileRepository {
            tempAge = DateTime.now().year - dob.year;
         }
       }
-
       final healthData = await _supabase.from('health').select('weight').eq('user_id', userId).maybeSingle();
       if (healthData != null) {
         if (healthData['weight'] != null) {
@@ -56,17 +55,8 @@ class ProfileRepository {
     }
   }
 
-  Future<void> saveProfile({
-    required String userId,
-    required String fullName,
-    String? gender,
-    double? height,
-    double? weight,
-    int? age,
-    String? goal,
-  }) async {
+  Future<void> saveProfile({required String userId, required String fullName, String? gender, double? height, double? weight, int? age, String? goal,}) async {
     try {
-      // Sử dụng transaction function từ Supabase
       await _supabase.rpc('update_profile_with_health', params: {
         'p_user_id': userId,
         'p_full_name': fullName,
@@ -83,29 +73,14 @@ class ProfileRepository {
 
   Future<AppUser?> getFullUserProfile(String userId) async {
     try {
-      // Load profile data
-      final profileResponse = await _supabase
-          .from(SupabaseConfig.profilesTable)
-          .select()
-          .eq('id', userId)
-          .maybeSingle();
-      
+      final profileResponse = await _supabase.from(SupabaseConfig.profilesTable).select().eq('id', userId).maybeSingle();
       if (profileResponse == null) return null;
-      
-      // Load health data riêng
-      final healthResponse = await _supabase
-          .from('health')
-          .select('weight, age')
-          .eq('user_id', userId)
-          .maybeSingle();
-      
-      // Merge health data vào profile
+      final healthResponse = await _supabase.from('health').select('weight, age').eq('user_id', userId).maybeSingle();
       final userData = Map<String, dynamic>.from(profileResponse);
       if (healthResponse != null) {
         userData['weight'] = healthResponse['weight'];
         userData['age'] = healthResponse['age'];
       }
-      
       return AppUser.fromJson(userData);
     } catch (e, st) {
       throw handleException(e, st);
