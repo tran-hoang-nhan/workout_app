@@ -70,7 +70,7 @@ class ProfileScreen extends ConsumerWidget {
                   const Text(
                     'Cài đặt & Hỗ trợ',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.black,
                     ),

@@ -40,10 +40,10 @@ class AvatarController extends AsyncNotifier<void> {
       final fileName = 'avatar_${DateTime.now().millisecondsSinceEpoch}_${image.name}';
 
       await ref.read(avatarServiceProvider).uploadAvatar(
-            userId: user.id,
-            bytes: bytes,
-            fileName: fileName,
-          );
+        userId: user.id,
+        bytes: bytes,
+        fileName: fileName,
+      );
       
       debugPrint('AvatarController: Upload completed, invalidating currentUserProvider');
       // Refresh user data to show new avatar

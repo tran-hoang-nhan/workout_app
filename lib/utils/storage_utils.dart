@@ -9,12 +9,7 @@ String _normalizeUrl(String url) {
   }
 }
 
-String? convertToPublicUrl(
-  SupabaseClient supabase,
-  String? url,
-  String bucketName, {
-  String Function(String bucket, String path)? publicUrlResolver,
-}) {
+String? convertToPublicUrl(SupabaseClient supabase, String? url, String bucketName, { String Function(String bucket, String path)? publicUrlResolver,}) {
   if (url == null || url.isEmpty) return null;
   final trimmed = url.trim();
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
@@ -34,12 +29,7 @@ String? convertToPublicUrl(
   }
 }
 
-Map<String, dynamic> processExerciseJson(
-  SupabaseClient supabase,
-  Map<String, dynamic> json, {
-  String bucketName = 'exercises',
-  String Function(String bucket, String path)? publicUrlResolver,
-}) {
+Map<String, dynamic> processExerciseJson(SupabaseClient supabase, Map<String, dynamic> json, { String bucketName = 'exercises', String Function(String bucket, String path)? publicUrlResolver,}) {
   final processed = Map<String, dynamic>.from(json);
   if (processed['animation_url'] != null) {
     processed['animation_url'] = convertToPublicUrl(
@@ -60,12 +50,7 @@ Map<String, dynamic> processExerciseJson(
   return processed;
 }
 
-Map<String, dynamic> processWorkoutJson(
-  SupabaseClient supabase,
-  Map<String, dynamic> json, {
-  String bucketName = 'thumbnail',
-  String Function(String bucket, String path)? publicUrlResolver,
-}) {
+Map<String, dynamic> processWorkoutJson( SupabaseClient supabase, Map<String, dynamic> json, { String bucketName = 'thumbnail', String Function(String bucket, String path)? publicUrlResolver,}) {
   final processed = Map<String, dynamic>.from(json);
   if (processed['thumbnail_url'] != null) {
     processed['thumbnail_url'] = convertToPublicUrl(

@@ -5,19 +5,14 @@ import '../utils/storage_utils.dart';
 
 class WorkoutRepository {
   final SupabaseClient _supabase;
-  WorkoutRepository({SupabaseClient? supabase})
-    : _supabase = supabase ?? Supabase.instance.client;
+  WorkoutRepository({SupabaseClient? supabase}): 
+    _supabase = supabase ?? Supabase.instance.client;
 
   Future<List<Map<String, dynamic>>> getAllWorkouts() async {
     try {
       final response = await _supabase.from('workouts').select().order('id', ascending: true);
       debugPrint( '[WorkoutRepository] getAllWorkouts found: ${response.length} items',);
-      return (response as List)
-          .map(
-            (json) =>
-              processWorkoutJson(_supabase, json),
-          )
-          .toList();
+      return (response as List).map((json) =>processWorkoutJson(_supabase, json),).toList();
     } catch (e, st) {
       throw handleException(e, st);
     }
@@ -25,16 +20,9 @@ class WorkoutRepository {
 
   Future<List<Map<String, dynamic>>> getWorkoutsByLevel(String level) async {
     try {
-      final response = await _supabase
-          .from('workouts')
-          .select()
-          .eq('level', level)
-          .order('id', ascending: true);
-      debugPrint(
-        '[WorkoutRepository] getWorkoutsByLevel ($level) found: ${response.length} items',
-      );
-      return (response as List).map( (json) => processWorkoutJson(_supabase, json as Map<String, dynamic>),)
-          .toList();
+      final response = await _supabase.from('workouts').select().eq('level', level).order('id', ascending: true);
+      debugPrint('[WorkoutRepository] getWorkoutsByLevel ($level) found: ${response.length} items',);
+      return (response as List).map( (json) => processWorkoutJson(_supabase, json as Map<String, dynamic>),).toList();
     } catch (e, st) {
       throw handleException(e, st);
     }
@@ -59,9 +47,7 @@ class WorkoutRepository {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getExercisesByIds(
-    List<int> exerciseIds,
-  ) async {
+  Future<List<Map<String, dynamic>>> getExercisesByIds(List<int> exerciseIds,) async {
     try {
       if (exerciseIds.isEmpty) return [];
       final response = await _supabase.from('exercises').select().inFilter('id', exerciseIds);

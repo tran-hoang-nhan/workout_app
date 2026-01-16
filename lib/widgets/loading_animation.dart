@@ -16,7 +16,6 @@ class AppLoading extends StatefulWidget {
 
   @override
   State<AppLoading> createState() => _AppLoadingState();
-
   static Widget fullScreen({String? message}) {
     return Container(
       color: Colors.white.withValues(alpha: 0.8),
@@ -29,7 +28,6 @@ class AppLoading extends StatefulWidget {
 
 class _AppLoadingState extends State<AppLoading> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-
   @override
   void initState() {
     super.initState();
@@ -48,7 +46,6 @@ class _AppLoadingState extends State<AppLoading> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     final color = widget.color ?? AppColors.primary;
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -59,7 +56,6 @@ class _AppLoadingState extends State<AppLoading> with SingleTickerProviderStateM
               return Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Rotating outer ring
                   Transform.rotate(
                     angle: _controller.value * 2 * math.pi,
                     child: Container(
@@ -80,7 +76,7 @@ class _AppLoadingState extends State<AppLoading> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-                  // Pulsating center dot or icon
+
                   TweenAnimationBuilder<double>(
                     tween: Tween(begin: 0.8, end: 1.2),
                     duration: const Duration(milliseconds: 750),
@@ -130,7 +126,6 @@ class _AppLoadingState extends State<AppLoading> with SingleTickerProviderStateM
 class SCenter extends StatelessWidget {
   final Widget child;
   const SCenter({super.key, required this.child});
-
   @override
   Widget build(BuildContext context) {
     return Center(child: child);

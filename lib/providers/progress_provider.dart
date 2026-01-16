@@ -11,7 +11,6 @@ final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
 final workoutHistoryProvider = FutureProvider<List<WorkoutHistory>>((ref) async {
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) return [];
-  
   final repo = ref.watch(progressRepositoryProvider);
   return await repo.getWorkoutHistory(userId);
 });
@@ -26,7 +25,6 @@ final progressStatsProvider = FutureProvider<ProgressStats>((ref) async {
       avgCaloriesPerSession: 0,
     );
   }
-  
   final repo = ref.watch(progressRepositoryProvider);
   return await repo.getProgressStats(userId);
 });

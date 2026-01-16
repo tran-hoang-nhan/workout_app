@@ -10,7 +10,6 @@ final progressUserRepositoryProvider = Provider<ProgressUserRepository>((ref) {
 final progressDailyProvider = FutureProvider.family<ProgressUser?, DateTime>((ref, date) async {
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) return null;
-  
   final repo = ref.watch(progressUserRepositoryProvider);
   return await repo.getProgress(userId, date);
 });
@@ -22,6 +21,5 @@ final progressWeeklyProvider = FutureProvider<List<ProgressUser>>((ref) async {
   final now = DateTime.now();
   final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
   final endOfWeek = startOfWeek.add(const Duration(days: 6));
-  
   return await repo.getProgressRange(userId, startOfWeek, endOfWeek);
 });
