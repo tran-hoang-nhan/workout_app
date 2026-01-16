@@ -5,7 +5,6 @@ class AppUser {
   final String? avatarUrl;
   final String? gender;
   final DateTime? dateOfBirth;
-  final double? height;
   final double? weight;
   final int? age;
   final String? goal;
@@ -19,21 +18,14 @@ class AppUser {
     this.avatarUrl,
     this.gender,
     this.dateOfBirth,
-    this.height,
     this.weight,
-    this.age,
+    this. age,
     this.goal,
     required this.createdAt,
     this.updatedAt,
   }) : assert(id.isNotEmpty), assert(email.isNotEmpty);
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
-    double? height;
-    final heightValue = json['height'];
-    if (heightValue != null) {
-      height = heightValue is int ? heightValue.toDouble() : heightValue as double;
-    }
-
     return AppUser(
       id: json['id'] as String,
       email: json['email'] as String,
@@ -43,7 +35,6 @@ class AppUser {
       dateOfBirth: json['date_of_birth'] != null
           ? DateTime.parse(json['date_of_birth'] as String)
           : null,
-      height: height,
       weight: json['weight'] != null
           ? (json['weight'] is int ? (json['weight'] as int).toDouble() : json['weight'] as double)
           : null,
@@ -64,7 +55,6 @@ class AppUser {
       'avatar_url': avatarUrl,
       'gender': gender,
       'date_of_birth': dateOfBirth?.toIso8601String().split('T')[0],
-      'height': height,
       'weight': weight,
       'age': age,
       'goal': goal,
@@ -80,7 +70,6 @@ class AppUser {
     String? avatarUrl,
     String? gender,
     DateTime? dateOfBirth,
-    double? height,
     double? weight,
     int? age,
     String? goal,
@@ -94,7 +83,6 @@ class AppUser {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       gender: gender ?? this.gender,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
-      height: height ?? this.height,
       weight: weight ?? this.weight,
       age: age ?? this.age,
       goal: goal ?? this.goal,
@@ -109,9 +97,8 @@ class UserStats {
   final double totalHours;
   final int totalCalories;
   final int streak;
-  double? weight;
-  double? height;
-  int? age;
+  final double? weight;
+  final int? age;
 
   UserStats({
     required this.totalWorkouts,
@@ -119,7 +106,6 @@ class UserStats {
     required this.totalCalories,
     required this.streak,
     this.weight,
-    this.height,
     this.age,
   });
 

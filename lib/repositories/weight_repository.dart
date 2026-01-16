@@ -20,7 +20,7 @@ class WeightRepository {
 
   Future<double?> getUserHeight(String userId) async {
     try {
-      final response = await _supabase.from('profiles').select('height').eq('id', userId).maybeSingle();
+      final response = await _supabase.from('health').select('height').eq('user_id', userId).maybeSingle();
       return (response?['height'] as num?)?.toDouble();
     } catch (e, st) {
       debugPrint('[WeightRepo] Error fetching height: $e');
@@ -30,8 +30,12 @@ class WeightRepository {
 
   Future<void> addWeightRecord({required String userId, required double weight, required double? bmi, required DateTime date,}) async {
     try {
-      await _supabase.from('body_metrics').insert({'user_id': userId, 'weight': weight, 'bmi': bmi, 'recorded_at': date.toIso8601String(),});
-      await _supabase.from('health').upsert({'user_id': userId, 'weight': weight, 'updated_at': DateTime.now().toIso8601String(),});
+      await _supabase.rpc('add_weight_transaction', params: {
+        'p_user_id': userId,
+        'p_weight': weight,
+        'p_bmi': bmi,
+        'p_date': date.toIso8601String(), 
+      });
     } catch (e, st) {
       debugPrint('[WeightRepo] Error adding weight: $e');
       throw handleException(e, st);
