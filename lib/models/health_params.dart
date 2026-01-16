@@ -39,6 +39,7 @@ class HealthUpdateParams {
       'user_id': userId,
       'age': age,
       'weight': weight,
+      'height': height,
       'activity_level': activityLevel,
       'diet_type': dietType,
       'sleep_hours_avg': sleepHours,
@@ -61,7 +62,6 @@ class HealthUpdateParams {
 
   Map<String, dynamic> toProfileMap() {
     return {
-      'height': height,
       'gender': gender,
       'goal': goal,
     };

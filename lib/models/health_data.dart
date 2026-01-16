@@ -34,12 +34,12 @@ class HealthData {
     this.waterReminderInterval = 2,
   });
 
-  factory HealthData.fromJson(Map<String, dynamic> json, String userId, {double? height, String? gender}) {
+  factory HealthData.fromJson(Map<String, dynamic> json, String userId, {String? gender}) {
     return HealthData(
       userId: userId,
       age: json['age'] as int? ?? 25,
       weight: (json['weight'] as num?)?.toDouble() ?? 65.0,
-      height: height,
+      height: (json['height'] as num?)?.toDouble(),
       injuries: List<String>.from(json['injuries'] ?? []),
       medicalConditions: List<String>.from(json['medical_conditions'] ?? []),
       activityLevel: json['activity_level'] as String? ?? 'moderately_active',
