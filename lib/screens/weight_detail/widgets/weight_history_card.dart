@@ -7,12 +7,14 @@ class WeightHistoryCard extends StatelessWidget {
   final List<BodyMetric> weightHistory;
   final double height;
   final Function(int) onDelete;
+
   const WeightHistoryCard({
     super.key,
     required this.weightHistory,
     required this.height,
     required this.onDelete,
   });
+
   Map<String, dynamic> _getBMICategory(double bmi) {
     if (bmi < 18.5) {
       return {
@@ -64,26 +66,22 @@ class WeightHistoryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Lịch sử cân nặng',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black)),
+          const Text(
+            'Lịch sử cân nặng',
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.black)),
           const SizedBox(height: AppSpacing.lg),
           if (weightHistory.isEmpty)
             Center(
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: AppSpacing.sm),
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                 child: Column(
                   children: [
-                    Icon(Icons.calendar_today,
-                        size: 36,
-                        color: Colors.grey.shade700),
+                    Icon(Icons.calendar_today, size: 36, color: Colors.grey.shade700),
                     const SizedBox(height: AppSpacing.sm),
-                    const Text('Chưa có dữ liệu cân nặng',
-                        style: TextStyle(
-                            color: AppColors.grey)),
+                    const Text('Chưa có dữ liệu cân nặng', style: TextStyle(color: AppColors.grey)),
                   ],
                 ),
               ),
@@ -108,7 +106,6 @@ class WeightHistoryCard extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        // Icon
                         Container(
                           width: 35,
                           height: 35,
@@ -154,11 +151,7 @@ class WeightHistoryCard extends StatelessWidget {
                                     ),
                                     child: const Text(
                                       'Mới nhất',
-                                      style: TextStyle(
-                                        fontSize: 8,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.bold,),
                                     ),
                                   ),
                               ],
@@ -166,10 +159,7 @@ class WeightHistoryCard extends StatelessWidget {
                             const SizedBox(height: 2),
                             Text(
                               _formatDate(record.recordedAt),
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: AppColors.grey,
-                              ),
+                              style: const TextStyle(fontSize: 10, color: AppColors.grey,),
                             ),
                           ],
                         ),

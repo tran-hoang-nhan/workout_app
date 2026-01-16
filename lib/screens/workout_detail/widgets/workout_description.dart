@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class WorkoutDescription extends StatelessWidget {
   final String description;
-
   const WorkoutDescription({super.key, required this.description});
 
   @override

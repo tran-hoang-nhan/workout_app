@@ -23,7 +23,6 @@ class WeightDetailScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: const Row(
@@ -38,18 +37,18 @@ class WeightDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                const Text('Cân nặng & BMI',
+                const Text(
+                  'Cân nặng & BMI',
                     style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.black)),
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black)),
                 const SizedBox(height: AppSpacing.xs),
-                const Text('Theo dõi cân nặng và chỉ số BMI của bạn',
-                    style: TextStyle(
-                        color: AppColors.grey, fontSize: 14)),
+                const Text(
+                  'Theo dõi cân nặng và chỉ số BMI của bạn',
+                  style: TextStyle(color: AppColors.grey, fontSize: 14)),
                 const SizedBox(height: AppSpacing.lg),
 
-                // Current Weight & BMI Card
                 CurrentWeightCard(
                   weight: weightData.weight,
                   height: weightData.height,
@@ -57,7 +56,6 @@ class WeightDetailScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.lg),
 
-                // BMI Scale
                 BMIScaleCard(
                   currentBMI: weightData.height > 0 
                     ? weightData.weight / ((weightData.height / 100) * (weightData.height / 100))
@@ -65,7 +63,6 @@ class WeightDetailScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.lg),
 
-                // Add Weight Form
                 AddWeightForm(
                   onAddWeight: (weightValue) {
                     _saveWeight(context, ref, weightValue);
@@ -73,7 +70,6 @@ class WeightDetailScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.lg),
 
-                // Weight History
                 if (weightData.weightHistory.isNotEmpty)
                   WeightHistoryCard(
                     weightHistory: weightData.weightHistory,
@@ -86,26 +82,18 @@ class WeightDetailScreen extends ConsumerWidget {
             ),
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => Center(
-            child: Text('Lỗi: $error',
-                style: const TextStyle(color: AppColors.black)),
+          error: (error, stack) => Center(child: Text('Lỗi: $error', style: const TextStyle(color: AppColors.black)),
           ),
         ),
       ),
     );
   }
 
-  void _saveWeight(
-    BuildContext context,
-    WidgetRef ref,
-    String weightValue,
-  ) async {
+  void _saveWeight( BuildContext context, WidgetRef ref, String weightValue,) async {
     try {
       final weight = double.tryParse(weightValue);
       if (weight == null) return;
-
       await ref.read(weightControllerProvider.notifier).addWeight(weight);
-
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Đã lưu cân nặng')),
@@ -120,14 +108,9 @@ class WeightDetailScreen extends ConsumerWidget {
     }
   }
 
-  void _deleteWeight(
-    BuildContext context,
-    WidgetRef ref,
-    int recordId,
-  ) async {
+  void _deleteWeight( BuildContext context, WidgetRef ref, int recordId,) async {
     try {
       await ref.read(weightControllerProvider.notifier).deleteWeight(recordId);
-      
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Đã xóa bản ghi')),
