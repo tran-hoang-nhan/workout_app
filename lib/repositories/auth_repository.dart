@@ -64,7 +64,6 @@ class AuthRepository {
         'avatar_url': params.avatarUrl,
         'gender': params.gender ?? 'male', 
         'date_of_birth': params.dateOfBirth?.toIso8601String().split('T')[0],
-        'height': params.height ?? 170.0,
         'goal': params.goal ?? 'maintain',
         'created_at': DateTime.now().toIso8601String(),
       });

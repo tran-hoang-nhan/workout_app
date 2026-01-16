@@ -20,8 +20,6 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _nameController;
-  late TextEditingController _heightController;
-  late TextEditingController _weightController;
   late TextEditingController _ageController;
   late TextEditingController _goalController;
   String? _gender;
@@ -32,8 +30,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController();
-    _heightController = TextEditingController();
-    _weightController = TextEditingController();
     _ageController = TextEditingController();
     _goalController = TextEditingController();
   }
@@ -43,8 +39,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (user != null && !_isDataLoaded) {
       setState(() {
         _nameController.text = user.fullName ?? '';
-        _heightController.text = user.height?.toStringAsFixed(0) ?? '';
-        _weightController.text = user.weight?.toStringAsFixed(1) ?? '';
         _ageController.text = user.age?.toString() ?? '';
         _goalController.text = user.goal ?? '';
         _gender = user.gender;
@@ -56,8 +50,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _heightController.dispose();
-    _weightController.dispose();
     _ageController.dispose();
     _goalController.dispose();
     super.dispose();
@@ -116,8 +108,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         userId: user.id,
         fullName: _nameController.text,
         gender: _gender,
-        height: double.tryParse(_heightController.text),
-        weight: double.tryParse(_weightController.text),
         age: int.tryParse(_ageController.text),
         goal: _goalController.text,
       );
@@ -196,22 +186,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ]),
                       
                       const SizedBox(height: 24),
-                      const EditProfileSectionTitle(title: 'Chỉ số cơ thể'),
+                      const EditProfileSectionTitle(title: 'Thông tin cá nhân'),
                       EditProfileInfoCard(children: [
-                        EditProfileTextField(
-                          label: 'Chiều cao (cm)',
-                          controller: _heightController,
-                          icon: Icons.height_rounded,
-                          keyboardType: TextInputType.number,
-                        ),
-                        const Divider(height: 32, color: AppColors.cardBorder),
-                        EditProfileTextField(
-                          label: 'Cân nặng (kg)',
-                          controller: _weightController,
-                          icon: Icons.monitor_weight_rounded,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        ),
-                        const Divider(height: 32, color: AppColors.cardBorder),
                         EditProfileTextField(
                           label: 'Tuổi',
                           controller: _ageController,

@@ -139,7 +139,6 @@ class ProfileHeaderCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(child: _buildInfoTag('${user.height?.toStringAsFixed(0) ?? '0'} cm', 'Chiều cao')),
                       Expanded(child: _buildInfoTag(LabelUtils.getGoalLabel(user.goal), 'Mục tiêu')),
                       Expanded(child: _buildInfoTag(LabelUtils.getGenderLabel(user.gender), 'Giới tính')),
                     ],

@@ -25,7 +25,7 @@ class EditProfileController extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
   
-  Future<bool> saveProfile({required String userId, required String fullName, String? gender, double? height, double? weight, int? age, String? goal,}) async {
+  Future<bool> saveProfile({required String userId, required String fullName, String? gender, int? age, String? goal,}) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       try {
@@ -33,8 +33,6 @@ class EditProfileController extends AsyncNotifier<void> {
           userId: userId,
           fullName: fullName,
           gender: gender,
-          height: height,
-          weight: weight,
           age: age,
           goal: goal,
         );
