@@ -77,7 +77,7 @@ class _WeightProgressChartState extends State<WeightProgressChart> {
                     return _buildLineChart(filteredData);
                   },
                   loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (_, __) => const Center(child: Text('Lỗi tải biểu đồ')),
+                  error: (_, _) => const Center(child: Text('Lỗi tải biểu đồ')),
                 );
               },
             ),

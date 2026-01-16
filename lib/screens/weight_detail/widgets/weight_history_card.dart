@@ -69,9 +69,9 @@ class WeightHistoryCard extends StatelessWidget {
           const Text(
             'Lịch sử cân nặng',
             style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.black)),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.black)),
           const SizedBox(height: AppSpacing.lg),
           if (weightHistory.isEmpty)
             Center(
@@ -95,8 +95,6 @@ class WeightHistoryCard extends StatelessWidget {
                 final record = weightHistory[index];
                 final recordBMI = calculateBMI(record.weight, height);
                 final recordCategory = _getBMICategory(recordBMI);
-                
-                // Calculate weight change compared to previous record (the one after it in the list)
                 double? change;
                 if (index + 1 < weightHistory.length) {
                   change = record.weight - weightHistory[index + 1].weight;
