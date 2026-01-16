@@ -11,7 +11,6 @@ import '../../models/workout_item.dart';
 
 class WorkoutDetailScreen extends ConsumerStatefulWidget {
   final Workout workout;
-
   const WorkoutDetailScreen({super.key, required this.workout});
 
   @override
