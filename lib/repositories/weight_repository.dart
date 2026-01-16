@@ -5,7 +5,8 @@ import '../utils/app_error.dart';
 
 class WeightRepository {
   final SupabaseClient _supabase;
-  WeightRepository({SupabaseClient? supabase}): _supabase = supabase ?? Supabase.instance.client;
+  WeightRepository({SupabaseClient? supabase}): 
+    _supabase = supabase ?? Supabase.instance.client;
 
   Future<List<BodyMetric>> getWeightHistory(String userId) async {
     try {

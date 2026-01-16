@@ -6,8 +6,8 @@ import '../repositories/workout_repository.dart';
 class WorkoutService {
   final WorkoutRepository _workoutRepository;
 
-  WorkoutService({WorkoutRepository? repository})
-      : _workoutRepository = repository ?? WorkoutRepository();
+  WorkoutService({WorkoutRepository? repository}): 
+    _workoutRepository = repository ?? WorkoutRepository();
 
   Future<List<Workout>> getAllWorkouts() async {
     final response = await _workoutRepository.getAllWorkouts();
@@ -24,13 +24,8 @@ class WorkoutService {
     final workoutData = await _workoutRepository.getWorkoutById(workoutId);
     final workout = Workout.fromJson(workoutData);
     final itemsData = await _workoutRepository.getWorkoutItems(workoutId);
-
-    List<WorkoutItem> items = itemsData
-        .map((data) => WorkoutItem.fromJson(data))
-        .toList();
-    // Sort items by orderIndex
+    List<WorkoutItem> items = itemsData.map((data) => WorkoutItem.fromJson(data)).toList();
     items.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
-
     if (items.isEmpty) {
       return (
         workout: workout,
@@ -47,11 +42,7 @@ class WorkoutService {
     final exercisesData = await _workoutRepository.getExercisesByIds(
       exerciseIds,
     );
-
-    final exercises = exercisesData
-        .map((data) => Exercise.fromJson(data))
-        .toList();
-
+    final exercises = exercisesData.map((data) => Exercise.fromJson(data)).toList();
     return (workout: workout, items: items, exercises: exercises);
   }
 
@@ -76,18 +67,11 @@ class WorkoutService {
     return workoutsData.map((data) => Workout.fromJson(data)).toList();
   }
 
-  String _mapCategoryToMuscleGroup(String category) {
-    switch (category.toLowerCase()) {
-      case 'sức mạnh':
-        return 'strength';
-      case 'cardio':
-        return 'cardio';
-      case 'yoga':
-        return 'yoga';
-      case 'hiit':
-        return 'hiit';
-      default:
-        return category.toLowerCase();
-    }
-  }
+  String _mapCategoryToMuscleGroup(String category) => switch (category.trim().toLowerCase()) {
+    'sức mạnh' => 'strength',
+    'cardio'   => 'cardio',
+    'yoga'     => 'yoga',
+    'hiit'     => 'hiit',
+    _          => category.toLowerCase(),
+  };
 }

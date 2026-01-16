@@ -6,6 +6,8 @@ class AppUser {
   final String? gender;
   final DateTime? dateOfBirth;
   final double? height;
+  final double? weight;
+  final int? age;
   final String? goal;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -18,6 +20,8 @@ class AppUser {
     this.gender,
     this.dateOfBirth,
     this.height,
+    this.weight,
+    this.age,
     this.goal,
     required this.createdAt,
     this.updatedAt,
@@ -40,6 +44,10 @@ class AppUser {
           ? DateTime.parse(json['date_of_birth'] as String)
           : null,
       height: height,
+      weight: json['weight'] != null
+          ? (json['weight'] is int ? (json['weight'] as int).toDouble() : json['weight'] as double)
+          : null,
+      age: json['age'] as int?,
       goal: json['goal'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] != null
@@ -57,6 +65,8 @@ class AppUser {
       'gender': gender,
       'date_of_birth': dateOfBirth?.toIso8601String().split('T')[0],
       'height': height,
+      'weight': weight,
+      'age': age,
       'goal': goal,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
@@ -71,6 +81,8 @@ class AppUser {
     String? gender,
     DateTime? dateOfBirth,
     double? height,
+    double? weight,
+    int? age,
     String? goal,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -83,6 +95,8 @@ class AppUser {
       gender: gender ?? this.gender,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       height: height ?? this.height,
+      weight: weight ?? this.weight,
+      age: age ?? this.age,
       goal: goal ?? this.goal,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

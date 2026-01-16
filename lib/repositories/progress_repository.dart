@@ -7,6 +7,7 @@ class ProgressRepository {
   final SupabaseClient _supabase;
   ProgressRepository({SupabaseClient? supabase}): 
     _supabase = supabase ?? Supabase.instance.client;
+    
   Future<List<WorkoutHistory>> getWorkoutHistory(String userId) async {
     try {
       final response = await _supabase.from('workout_history').select().eq('user_id', userId).order('completed_at', ascending: false);

@@ -5,8 +5,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 final emailConfirmationServiceProvider = Provider((ref) {
   return EmailConfirmationService();
 });
-final verifyOTPProvider = NotifierProvider.family<OTPNotifier, bool, String>(OTPNotifier.new);
 
+final verifyOTPProvider = NotifierProvider.family<OTPNotifier, bool, String>(OTPNotifier.new);
 class OTPNotifier extends Notifier<bool> {
   final String email;
   OTPNotifier(this.email);
@@ -27,16 +27,15 @@ class OTPNotifier extends Notifier<bool> {
         type: OtpType.signup,
       );
       state = false;
-      return true; // Thành công
+      return true; 
     } catch (e) {
       state = false;
-      rethrow; // Ném lỗi để xử lý ở UI
+      rethrow; 
     }
   }
 }
 
 final resendEmailProvider = NotifierProvider.family<ResendNotifier, bool, String>(ResendNotifier.new);
-
 class ResendNotifier extends Notifier<bool> {
   final String email;
   ResendNotifier(this.email);

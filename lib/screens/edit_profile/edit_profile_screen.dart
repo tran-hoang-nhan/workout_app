@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
-import '../../providers/auth_provider.dart';
 import '../../providers/avatar_provider.dart';
+import '../../providers/profile_provider.dart';
 import '../../services/profile_service.dart';
 import '../../utils/ui_utils.dart';
 import '../../widgets/loading_animation.dart';
@@ -21,26 +21,35 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _heightController;
+  late TextEditingController _weightController;
+  late TextEditingController _ageController;
   late TextEditingController _goalController;
   String? _gender;
   bool _isSaving = false;
+  bool _isDataLoaded = false;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController();
     _heightController = TextEditingController();
+    _weightController = TextEditingController();
+    _ageController = TextEditingController();
     _goalController = TextEditingController();
-    _loadUserData();
   }
 
   void _loadUserData() {
-    final user = ref.read(currentUserProvider).value;
-    if (user != null) {
-      _nameController.text = user.fullName ?? '';
-      _heightController.text = user.height?.toStringAsFixed(0) ?? '';
-      _goalController.text = user.goal ?? '';
-      _gender = user.gender;
+    final user = ref.read(fullUserProfileProvider).value;
+    if (user != null && !_isDataLoaded) {
+      setState(() {
+        _nameController.text = user.fullName ?? '';
+        _heightController.text = user.height?.toStringAsFixed(0) ?? '';
+        _weightController.text = user.weight?.toStringAsFixed(1) ?? '';
+        _ageController.text = user.age?.toString() ?? '';
+        _goalController.text = user.goal ?? '';
+        _gender = user.gender;
+        _isDataLoaded = true;
+      });
     }
   }
 
@@ -48,6 +57,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void dispose() {
     _nameController.dispose();
     _heightController.dispose();
+    _weightController.dispose();
+    _ageController.dispose();
     _goalController.dispose();
     super.dispose();
   }
@@ -95,7 +106,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Future<void> _saveProfile() async {
-    final user = ref.read(currentUserProvider).value;
+    final user = ref.read(fullUserProfileProvider).value;
     if (user == null) return;
 
     setState(() => _isSaving = true);
@@ -106,11 +117,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         fullName: _nameController.text,
         gender: _gender,
         height: double.tryParse(_heightController.text),
+        weight: double.tryParse(_weightController.text),
+        age: int.tryParse(_ageController.text),
         goal: _goalController.text,
       );
 
       if (!mounted) return;
       context.showSuccess('Đã cập nhật hồ sơ thành công!');
+      ref.invalidate(fullUserProfileProvider);
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
@@ -122,8 +136,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userAsync = ref.watch(currentUserProvider);
+    final userAsync = ref.watch(fullUserProfileProvider);
     final user = userAsync.value;
+    
+    // Load data khi có sẵn
+    if (user != null && !_isDataLoaded) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadUserData();
+      });
+    }
     
     // Sync name controller if not focused
     if (user != null && !_nameController.selection.isValid) {
@@ -181,6 +202,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           label: 'Chiều cao (cm)',
                           controller: _heightController,
                           icon: Icons.height_rounded,
+                          keyboardType: TextInputType.number,
+                        ),
+                        const Divider(height: 32, color: AppColors.cardBorder),
+                        EditProfileTextField(
+                          label: 'Cân nặng (kg)',
+                          controller: _weightController,
+                          icon: Icons.monitor_weight_rounded,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        ),
+                        const Divider(height: 32, color: AppColors.cardBorder),
+                        EditProfileTextField(
+                          label: 'Tuổi',
+                          controller: _ageController,
+                          icon: Icons.cake_rounded,
                           keyboardType: TextInputType.number,
                         ),
                         const Divider(height: 32, color: AppColors.cardBorder),
