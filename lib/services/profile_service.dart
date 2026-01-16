@@ -37,7 +37,7 @@ class ProfileService {
     }
   }
 
-  Future<void> saveProfile({required String userId, required String fullName, String? gender, double? height, String? goal, double? weight, int? age,}) async {
+  Future<void> saveProfile({required String userId, required String fullName, String? gender, String? goal, double? weight, int? age,}) async {
     if (fullName.isEmpty) {
       throw ValidationException('Vui lòng nhập tên');
     }
@@ -47,7 +47,6 @@ class ProfileService {
         userId: userId,
         fullName: fullName,
         gender: gender,
-        height: height,
         goal: goal,
         weight: weight,
         age: age,

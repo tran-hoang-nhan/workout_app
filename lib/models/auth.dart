@@ -17,7 +17,6 @@ class SignUpParams {
   final String? avatarUrl;
   final String? gender;
   final DateTime? dateOfBirth;
-  final double? height;
   final String? goal;
 
   SignUpParams({
@@ -27,7 +26,6 @@ class SignUpParams {
     this.avatarUrl,
     this.gender,
     this.dateOfBirth,
-    this.height,
     this.goal,
   });
 }
@@ -39,7 +37,6 @@ class UpdateProfileParams {
   final String? avatarUrl;
   final String? gender;
   final DateTime? dateOfBirth;
-  final double? height;
   final String? goal;
 
   UpdateProfileParams({
@@ -48,7 +45,6 @@ class UpdateProfileParams {
     this.avatarUrl,
     this.gender,
     this.dateOfBirth,
-    this.height,
     this.goal,
   });
   
@@ -65,9 +61,6 @@ class UpdateProfileParams {
     }
     if (dateOfBirth != null) {
       map['date_of_birth'] = dateOfBirth!.toIso8601String().split('T')[0];
-    }
-    if (height != null) {
-      map['height'] = height;
     }
     if (goal != null) {
       map['goal'] = goal;
