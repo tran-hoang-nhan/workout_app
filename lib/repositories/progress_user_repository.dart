@@ -6,6 +6,7 @@ class ProgressUserRepository {
   final SupabaseClient _supabase;
   ProgressUserRepository({SupabaseClient? supabase}):
     _supabase = supabase ?? Supabase.instance.client;
+    
   Future<ProgressUser?> getProgress(String userId, DateTime date) async {
     try {
       final dateStr = date.toIso8601String().split('T')[0];

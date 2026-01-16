@@ -20,7 +20,6 @@ class RegistrationTransactionService {
     String? createdUserId;
     bool profileCreated = false;
     try {
-      // Step 1 & 2: Create auth user + profile
       final user = await _authRepo.signUpWithTransaction(signUpParams);
       if (user == null) {
         throw AppError('Failed to create user');
@@ -29,7 +28,6 @@ class RegistrationTransactionService {
       profileCreated = true;
       debugPrint('User and profile created with ID: $createdUserId');
 
-      // Step 3: Create health data with correct userId
       final healthParamsWithUserId = HealthUpdateParams(
         userId: createdUserId,
         age: healthParams.age,

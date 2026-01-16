@@ -128,18 +128,15 @@ class HealthFormState {
   }
 }
 
-// 2. HealthFormNotifier
 class HealthFormNotifier extends Notifier<HealthFormState> {
   @override
   HealthFormState build() {
     return HealthFormState.initial();
   }
-
   void setAge(int age) => state = state.copyWith(age: age);
   void setWeight(double weight) => state = state.copyWith(weight: weight);
   void setHeight(double height) => state = state.copyWith(height: height);
   void setGender(String gender) => state = state.copyWith(gender: gender);
-  
   void setWaterReminderEnabled(bool enabled) => state = state.copyWith(waterReminderEnabled: enabled);
   void setWaterReminderInterval(int interval) => state = state.copyWith(waterReminderInterval: interval);
   
@@ -218,7 +215,6 @@ class HealthFormNotifier extends Notifier<HealthFormState> {
   }) async {
     final activityKey = _mapActivityLevel(activityLevel);
     final goalKey = _mapGoal(goal);
-    
     final injuriesList = injuries.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
     final conditionsList = medicalConditions.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
     final allergiesList = allergies.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
@@ -240,10 +236,7 @@ class HealthFormNotifier extends Notifier<HealthFormState> {
       waterReminderEnabled: waterReminderEnabled,
       waterReminderInterval: waterReminderInterval,
     );
-
     await ref.read(healthControllerProvider.notifier).saveHealthData(params);
-    
-    // Update local form state too
     state = state.copyWith(
       age: age,
       weight: weight,
@@ -278,7 +271,6 @@ class HealthFormNotifier extends Notifier<HealthFormState> {
 }
 
 final healthFormProvider = NotifierProvider<HealthFormNotifier, HealthFormState>(HealthFormNotifier.new);
-
 final healthControllerProvider = AsyncNotifierProvider<HealthController, void>(() {
   return HealthController();
 });
@@ -293,12 +285,9 @@ class HealthController extends AsyncNotifier<void> {
       try {
         final service = ref.read(healthServiceProvider);
         await service.saveHealthData(params);
-
-        // Sync reminders if values are provided
         if (params.waterReminderEnabled != null && params.waterReminderInterval != null) {
           await service.syncWaterReminders(params.waterReminderEnabled!, params.waterReminderInterval!);
         }
-
         ref.invalidate(healthDataProvider);
       } catch (e, st) {
         throw handleException(e, st);
@@ -314,7 +303,6 @@ final syncHealthProfileProvider = FutureProvider<void>((ref) async {
   }
 });
 
-// Health calculations output
 class HealthCalculations {
   final double bmi;
   final String bmiCategory;
@@ -350,7 +338,6 @@ class HealthCalculations {
 final healthCalculationsProvider = Provider<HealthCalculations>((ref) {
   final form = ref.watch(healthFormProvider);
   final service = ref.watch(healthServiceProvider);
-
   final bmi = service.calculateBMI(form.weight, form.height);
   final bmiCategory = service.getBMICategory(bmi);
   final bmr = service.calculateBMR(form.weight, form.height, form.age, form.gender);
@@ -370,7 +357,6 @@ final healthCalculationsProvider = Provider<HealthCalculations>((ref) {
   );
 });
 
-// Provider check has health data - decoupled from healthDataProvider to prevent app restarts
 final hasHealthDataProvider = FutureProvider<bool>((ref) async {
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) return false;
@@ -379,7 +365,6 @@ final hasHealthDataProvider = FutureProvider<bool>((ref) async {
   return data != null;
 });
 
-// Save params for editing
 class HealthProfileSaveParams {
   final double height;
   final String? gender;
@@ -389,10 +374,10 @@ class HealthProfileSaveParams {
 final saveHealthProfileProvider = FutureProvider.family<void, HealthProfileSaveParams>((ref, params) async {
   try {
     final userId = await ref.read(currentUserIdProvider.future);
-    if (userId == null) throw UnauthorizedException('Chưa đăng nhập');
-    
+    if (userId == null) {
+      throw UnauthorizedException('Chưa đăng nhập');
+    }
     final form = ref.read(healthFormProvider);
-    
     final updateParams = HealthUpdateParams(
       userId: userId,
       age: form.age,
@@ -400,7 +385,7 @@ final saveHealthProfileProvider = FutureProvider.family<void, HealthProfileSaveP
       height: params.height,
       gender: params.gender ?? form.gender,
       activityLevel: form.activityLevel,
-      goal: 'maintain', // Default or could be in form
+      goal: 'maintain', 
       dietType: form.dietType,
       sleepHours: form.sleepHours.toInt(),
       waterIntake: form.waterIntake.toInt(),
@@ -410,7 +395,6 @@ final saveHealthProfileProvider = FutureProvider.family<void, HealthProfileSaveP
       waterReminderEnabled: form.waterReminderEnabled,
       waterReminderInterval: form.waterReminderInterval,
     );
-
     await ref.read(healthControllerProvider.notifier).saveHealthData(updateParams);
   } catch (e, st) {
     throw handleException(e, st);

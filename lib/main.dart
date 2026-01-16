@@ -16,7 +16,7 @@ import 'screens/profile/profile_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/health_provider.dart';
 import 'widgets/bottom_nav.dart';
-import 'package:awesome_notifications/awesome_notifications.dart'; // Import thư viện
+import 'package:awesome_notifications/awesome_notifications.dart'; 
 import 'package:device_preview/device_preview.dart';
 import 'services/notification_service.dart';
 
@@ -29,10 +29,8 @@ void main() async {
   } catch (e) {
     logger.w('⚠️ Warning: .env file not found. Using fallback values.');
   }
-  
   logger.i('Starting Workout App...');
   
-  // Kiểm tra config
   if (!SupabaseConfig.isValid()) {
     logger.e('❌ Supabase config không hợp lệ!');
     return;
@@ -49,11 +47,10 @@ void main() async {
     logger.i('✅ Supabase initialized successfully');
   } catch (e) {
     logger.e('❌ Error initializing Supabase: $e');
-    // Không rethrow để app vẫn chạy tiếp được (có thể hiện màn hình lỗi sau)
   }
   
   await AwesomeNotifications().initialize(
-      null, // null = dùng icon mặc định của app
+      null, 
       [
         NotificationChannel(
           channelGroupKey: NotificationService.waterChannelGroupKey,
@@ -72,7 +69,7 @@ void main() async {
 
   runApp(
     DevicePreview(
-      enabled: true, // Set false khi build thật
+      enabled: true, 
       builder: (context) => const ProviderScope(
         child: MyApp(),
       ),
@@ -80,7 +77,6 @@ void main() async {
   );
 }
 
-// --- 2. THÊM CLASS XỬ LÝ SỰ KIỆN (CONTROLLER) ---
 class NotificationController {
   @pragma("vm:entry-point")
   static Future <void> onActionReceivedMethod(ReceivedAction receivedAction) async {
@@ -113,18 +109,14 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
-    // --- 3. ĐĂNG KÝ LẮNG NGHE SỰ KIỆN & XIN QUYỀN ---
-    
-    // Đăng ký listener
+
     AwesomeNotifications().setListeners(
-        onActionReceivedMethod:         NotificationController.onActionReceivedMethod,
-        onNotificationCreatedMethod:    NotificationController.onNotificationCreatedMethod,
-        onNotificationDisplayedMethod:  NotificationController.onNotificationDisplayedMethod,
-        onDismissActionReceivedMethod:  NotificationController.onDismissActionReceivedMethod
+      onActionReceivedMethod:         NotificationController.onActionReceivedMethod,
+      onNotificationCreatedMethod:    NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod:  NotificationController.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod:  NotificationController.onDismissActionReceivedMethod
     );
 
-    // Xin quyền gửi thông báo (Quan trọng cho Android 13+)
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
       if (!isAllowed) {
         AwesomeNotifications().requestPermissionToSendNotifications();
@@ -142,9 +134,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final authStateAsync = ref.watch(authStateProvider);
     final hasHealthDataAsync = ref.watch(hasHealthDataProvider);
-    
-    // Lưu ý: Đã init notification ở initState, không cần gọi provider init ở đây nữa để tránh duplicate
-    
     return MaterialApp(
       title: 'Workout App',
       debugShowCheckedModeBanner: false,
@@ -172,7 +161,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     if (authState.isLoading && !authState.hasValue) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
     final isAuthenticated = authState.value ?? false;
     if (!isAuthenticated) {
       return LoginScreen(
@@ -205,22 +193,18 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         },
       );
     }
-
-    // 3. App Shell chính - Tuyệt đối không bị unmount khi update settings
     return const AppShell();
   }
 }
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
-
   @override
   State<AppShell> createState() => _AppShellState();
 }
 
 class _AppShellState extends State<AppShell> {
   String _activeTab = 'home';
-
   void _setActiveTab(String tabId) {
     setState(() => _activeTab = tabId);
   }

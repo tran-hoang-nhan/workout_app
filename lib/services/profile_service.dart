@@ -9,19 +9,15 @@ import '../utils/app_error.dart';
 class ProfileService {
   final Ref _ref;
   final ProfileRepository _profileRepo;
-
   ProfileService(this._ref, this._profileRepo);
 
   Future<void> pickAndUploadAvatar() async {
     try {
       await _ref.read(avatarControllerProvider.notifier).pickAndUploadAvatar();
-      
       final state = _ref.read(avatarControllerProvider);
       if (state.hasError) {
         throw handleException(state.error!);
       }
-
-      // Refresh and wait for updated user data
       _ref.invalidate(currentUserProvider);
     } catch (e) {
       throw handleException(e);
@@ -41,15 +37,7 @@ class ProfileService {
     }
   }
 
-  Future<void> saveProfile({
-    required String userId,
-    required String fullName,
-    String? gender,
-    double? height,
-    String? goal,
-    double? weight,
-    int? age,
-  }) async {
+  Future<void> saveProfile({required String userId, required String fullName, String? gender, double? height, String? goal, double? weight, int? age,}) async {
     if (fullName.isEmpty) {
       throw ValidationException('Vui lòng nhập tên');
     }
@@ -64,8 +52,6 @@ class ProfileService {
         weight: weight,
         age: age,
       );
-      
-      // Invalidate để refresh data ở tất cả màn hình
       _ref.invalidate(currentUserProvider);
       _ref.invalidate(fullUserProfileProvider);
       _ref.invalidate(healthDataProvider);

@@ -10,21 +10,15 @@ class HealthService {
   final HealthIntegrationService _healthIntegration;
   final NotificationService _notifications;
 
-  HealthService({
-    HealthRepository? repository,
-    HealthIntegrationService? healthIntegration,
-    NotificationService? notifications,
-  })  : _repository = repository ?? HealthRepository(),
-        _healthIntegration = healthIntegration ?? HealthIntegrationService(),
-        _notifications = notifications ?? NotificationService();
+  HealthService({HealthRepository? repository, HealthIntegrationService? healthIntegration, NotificationService? notifications,}):
+    _repository = repository ?? HealthRepository(),
+    _healthIntegration = healthIntegration ?? HealthIntegrationService(),
+    _notifications = notifications ?? NotificationService();
 
   Future<HealthData?> checkHealthProfile(String userId) async {
     final profile = await _repository.getHealthData(userId);
     if (profile == null) return null;
-
-    // Fetch real-time steps
     final steps = await _healthIntegration.getTodaySteps();
-    
     return HealthData(
       userId: profile.userId,
       age: profile.age,
@@ -58,7 +52,7 @@ class HealthService {
 
   double calculateBMI(double weight, double height) => health_utils.calculateBMI(weight, height);
   String getBMICategory(double bmi) => health_utils.getBMICategory(bmi);
-  int calculateBMR(double weight, double height, int age, String gender) =>health_utils.calculateBMR(weight, height, age, gender);
+  int calculateBMR(double weight, double height, int age, String gender) => health_utils.calculateBMR(weight, height, age, gender);
   int calculateTDEE(int bmr, String activityLevel) => health_utils.calculateTDEE(bmr, activityLevel);
   int calculateMaxHeartRate(int age) => health_utils.calculateMaxHeartRate(age);
   ({int min, int max}) calculateFatBurnZone(int maxHR) => health_utils.calculateFatBurnZone(maxHR);
