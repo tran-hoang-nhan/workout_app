@@ -169,28 +169,31 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   }
 
   Widget _buildHome(AsyncValue<bool> authState, AsyncValue<bool> hasHealthData) {
-    // 1. Kiểm tra xác thực (Auth)
-    // Chỉ hiện loading nếu thực sự lần đầu không có dữ liệu (hasValue == false)
     if (authState.isLoading && !authState.hasValue) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // .value trả về giá trị hiện tại (kể cả khi đang loading ngầm)
     final isAuthenticated = authState.value ?? false;
     if (!isAuthenticated) {
       return LoginScreen(
         onLoginSuccess: () async {
           ref.invalidate(healthDataProvider);
           ref.invalidate(hasHealthDataProvider);
+          await ref.read(hasHealthDataProvider.future);
+          logger.i('Login success and health data checked.');
         },
       );
     }
-
-    // 2. Kiểm tra dữ liệu sức khỏe (Health Data)
-    // Nhờ việc tách provider ở health_provider.dart, hasHealthData sẽ không bị refresh
-    // mỗi khi healthDataProvider thay đổi nữa.
-    if (hasHealthData.isLoading && !hasHealthData.hasValue) {
+    if (hasHealthData.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (hasHealthData.hasError) {
+      return HealthOnboardingScreen(
+        onComplete: () async {
+          ref.invalidate(healthDataProvider);
+          ref.invalidate(hasHealthDataProvider);
+        },
+      );
     }
 
     final hasData = hasHealthData.value ?? false;
