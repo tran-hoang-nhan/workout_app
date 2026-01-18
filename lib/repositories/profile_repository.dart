@@ -21,21 +21,18 @@ class ProfileRepository {
           .select('date_of_birth')
           .eq('id', userId)
           .maybeSingle();
-      if (profileData != null) {
-        if (profileData['date_of_birth'] != null) {
-          final dob = DateTime.parse(profileData['date_of_birth']);
-          tempAge = DateTime.now().year - dob.year;
-        }
+      if (profileData != null && profileData['date_of_birth'] != null) {
+        final dob = DateTime.parse(profileData['date_of_birth']);
+        tempAge = DateTime.now().year - dob.year;
       }
+
       final healthData = await _supabase
           .from('health')
           .select('weight')
           .eq('user_id', userId)
           .maybeSingle();
-      if (healthData != null) {
-        if (healthData['weight'] != null) {
-          tempWeight = (healthData['weight'] as num).toDouble();
-        }
+      if (healthData != null && healthData['weight'] != null) {
+        tempWeight = (healthData['weight'] as num).toDouble();
       }
     } catch (e, st) {
       throw handleException(e, st);
@@ -100,6 +97,7 @@ class ProfileRepository {
           .select('weight, height, age')
           .eq('user_id', userId)
           .maybeSingle();
+
       final userData = Map<String, dynamic>.from(profileResponse);
       if (healthResponse != null) {
         userData['weight'] = healthResponse['weight'];
