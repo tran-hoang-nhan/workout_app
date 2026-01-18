@@ -67,4 +67,27 @@ class LabelUtils {
         return dietType;
     }
   }
+
+  static String getWorkoutLevelLabel(String? level) {
+    if (level == null) return 'Chưa cập nhật';
+    switch (level.toLowerCase()) {
+      case 'beginner':
+      case 'easy':
+      case 'novice':
+      case 'dễ':
+        return 'Dễ';
+      case 'intermediate':
+      case 'medium':
+      case 'trung bình':
+        return 'Trung bình';
+      case 'advanced':
+      case 'hard':
+      case 'expert':
+      case 'khó':
+      case 'nâng cao':
+        return 'Nâng cao';
+      default:
+        return level;
+    }
+  }
 }

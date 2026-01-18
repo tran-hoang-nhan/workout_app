@@ -13,11 +13,11 @@ class HealthRepository {
     try {
       final healthResponse = await _supabase.from('health').select().eq('user_id', userId).maybeSingle();
       if (healthResponse == null) return null;
-      final profileResponse = await _supabase.from('profiles').select('height, gender').eq('id', userId).maybeSingle();
+      final profileResponse = await _supabase.from('profiles').select('gender').eq('id', userId).maybeSingle();
       return HealthData.fromJson(
         healthResponse,
         userId,
-        height: (profileResponse?['height'] as num?)?.toDouble(),
+        height: (healthResponse['height'] as num?)?.toDouble(),
         gender: profileResponse?['gender'] as String?,
       );
     } catch (e, st) {

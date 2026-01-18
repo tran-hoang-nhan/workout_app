@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../models/workout.dart';
+import '../../../utils/label_utils.dart';
 
 class WorkoutHeader extends StatelessWidget {
   final Workout workout;
@@ -68,7 +69,9 @@ class WorkoutHeader extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        workout.level!,
+                        LabelUtils.getWorkoutLevelLabel(
+                          workout.level,
+                        ).toUpperCase(),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -107,10 +110,18 @@ class WorkoutHeader extends StatelessWidget {
 
   Color _getDifficultyColor(String difficulty) {
     switch (difficulty.toLowerCase()) {
+      case 'beginner':
+      case 'easy':
+      case 'novice':
       case 'dễ':
         return Colors.green;
+      case 'intermediate':
+      case 'medium':
       case 'trung bình':
         return Colors.orange;
+      case 'advanced':
+      case 'hard':
+      case 'expert':
       case 'khó':
       case 'nâng cao':
         return Colors.red;
