@@ -60,6 +60,9 @@ class HealthUpdateParams {
   }
 
   Map<String, dynamic> toProfileMap() {
-    return {'gender': gender, 'goal': goal};
+    return {
+      'gender': gender,
+      'goal': goal,
+    };
   }
 }
