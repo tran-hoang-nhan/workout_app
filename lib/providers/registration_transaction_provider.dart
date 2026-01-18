@@ -23,20 +23,14 @@ class RegistrationTransactionController extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
-  /// Complete registration with transaction
-  Future<AppUser?> completeRegistration({
-    required SignUpParams signUpParams,
-    required HealthUpdateParams healthParams,
-  }) async {
+  Future<AppUser?> completeRegistration({required SignUpParams signUpParams, required HealthUpdateParams healthParams,}) async {
     state = const AsyncValue.loading();
-    
     try {
       final service = ref.read(registrationTransactionServiceProvider);
       final user = await service.completeRegistration(
         signUpParams: signUpParams,
         healthParams: healthParams,
       );
-      
       state = const AsyncValue.data(null);
       return user;
     } catch (e, st) {

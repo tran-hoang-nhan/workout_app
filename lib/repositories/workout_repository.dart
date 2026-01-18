@@ -18,7 +18,10 @@ class WorkoutRepository {
         '[WorkoutRepository] getAllWorkouts found: ${response.length} items',
       );
       return (response as List)
-          .map((json) => processWorkoutJson(_supabase, json))
+          .map(
+            (json) =>
+                processWorkoutJson(_supabase, json as Map<String, dynamic>),
+          )
           .toList();
     } catch (e, st) {
       throw handleException(e, st);

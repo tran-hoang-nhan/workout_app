@@ -1,24 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/auth.dart';
 import '../providers/auth_provider.dart';
 import '../providers/avatar_provider.dart';
+import '../providers/profile_provider.dart';
+import '../providers/health_provider.dart';
+import '../repositories/profile_repository.dart';
 import '../utils/app_error.dart';
 
 class ProfileService {
   final Ref _ref;
-
-  ProfileService(this._ref);
+  final ProfileRepository _profileRepo;
+  ProfileService(this._ref, this._profileRepo);
 
   Future<void> pickAndUploadAvatar() async {
     try {
       await _ref.read(avatarControllerProvider.notifier).pickAndUploadAvatar();
-      
       final state = _ref.read(avatarControllerProvider);
       if (state.hasError) {
         throw handleException(state.error!);
       }
-
-      // Refresh and wait for updated user data
       _ref.invalidate(currentUserProvider);
     } catch (e) {
       throw handleException(e);
@@ -38,30 +37,23 @@ class ProfileService {
     }
   }
 
-  Future<void> saveProfile({
-    required String userId,
-    required String fullName,
-    String? gender,
-    double? height,
-    String? goal,
-  }) async {
+  Future<void> saveProfile({required String userId, required String fullName, String? gender, String? goal, double? weight, int? age,}) async {
     if (fullName.isEmpty) {
       throw ValidationException('Vui lòng nhập tên');
     }
 
     try {
-      final params = UpdateProfileParams(
+      await _profileRepo.saveProfile(
         userId: userId,
         fullName: fullName,
         gender: gender,
-        height: height,
         goal: goal,
+        weight: weight,
+        age: age,
       );
-
-      await _ref.read(authControllerProvider.notifier).updateProfile(params);
-      
-      final authState = _ref.read(authControllerProvider);
-      if (authState.hasError) throw authState.error!;
+      _ref.invalidate(currentUserProvider);
+      _ref.invalidate(fullUserProfileProvider);
+      _ref.invalidate(healthDataProvider);
     } catch (e) {
       throw handleException(e);
     }
@@ -69,5 +61,6 @@ class ProfileService {
 }
 
 final profileServiceProvider = Provider<ProfileService>((ref) {
-  return ProfileService(ref);
+  final profileRepo = ref.watch(profileRepositoryProvider);
+  return ProfileService(ref, profileRepo);
 });

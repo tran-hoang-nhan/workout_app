@@ -5,7 +5,6 @@ import '../../../utils/label_utils.dart';
 
 class WorkoutHeader extends StatelessWidget {
   final Workout workout;
-
   const WorkoutHeader({super.key, required this.workout});
 
   @override
@@ -19,6 +18,7 @@ class WorkoutHeader extends StatelessWidget {
               bottomLeft: Radius.circular(16),
               bottomRight: Radius.circular(16),
             ),
+
             child: CachedNetworkImage(
               imageUrl: workout.thumbnailUrl!,
               width: double.infinity,
@@ -29,10 +29,9 @@ class WorkoutHeader extends StatelessWidget {
                 height: 250,
                 child: const Center(child: CircularProgressIndicator()),
               ),
+
               errorWidget: (context, url, error) {
-                debugPrint(
-                  '[WorkoutHeader] thumbnail load failed: title=${workout.title} url=$url error=$error',
-                );
+                debugPrint('[WorkoutHeader] thumbnail load failed: title=${workout.title} url=$url error=$error',);
                 return Container(
                   color: Colors.grey[200],
                   height: 250,
