@@ -32,12 +32,10 @@ final userHeightProvider = FutureProvider.autoDispose<double>((ref) async {
 final loadWeightDataProvider = FutureProvider.autoDispose<WeightData>((ref) async {
   final history = await ref.watch(weightHistoryProvider.future);
   final height = await ref.watch(userHeightProvider.future);
-  
   double currentWeight = 0;
   if (history.isNotEmpty) {
     currentWeight = history.first.weight;
   }
-
   return WeightData(
     weight: currentWeight,
     height: height,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'app_error.dart';
 
 extension ContextExtensions on BuildContext {
-  /// Hiển thị thông báo lỗi thân thiện lên UI
   void showError(dynamic error) {
     String message;
     if (error is AppError) {
@@ -12,7 +11,7 @@ extension ContextExtensions on BuildContext {
     } else {
       message = error.toString();
     }
-
+    
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
         content: Row(
@@ -36,7 +35,6 @@ extension ContextExtensions on BuildContext {
     );
   }
 
-  /// Hiển thị thông báo thành công
   void showSuccess(String message) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(

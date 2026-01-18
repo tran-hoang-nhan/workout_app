@@ -112,7 +112,7 @@ class ProfileHeaderCard extends StatelessWidget {
                             Text(
                               user.email,
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: 11,
                                 color: AppColors.grey.withValues(alpha: 0.6),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -139,7 +139,6 @@ class ProfileHeaderCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(child: _buildInfoTag('${user.height?.toStringAsFixed(0) ?? '0'} cm', 'Chiều cao')),
                       Expanded(child: _buildInfoTag(LabelUtils.getGoalLabel(user.goal), 'Mục tiêu')),
                       Expanded(child: _buildInfoTag(LabelUtils.getGenderLabel(user.gender), 'Giới tính')),
                     ],
@@ -157,11 +156,12 @@ class ProfileHeaderCard extends StatelessWidget {
     return Column(
       children: [
         Text(
-          value,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-            color: AppColors.black,
+          label.toUpperCase(),
+          style: TextStyle(
+            fontSize: 10,
+            color: AppColors.grey.withValues(alpha: 0.6),
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -169,12 +169,11 @@ class ProfileHeaderCard extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
-            color: AppColors.grey.withValues(alpha: 0.5),
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.black,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

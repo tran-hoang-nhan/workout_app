@@ -11,7 +11,6 @@ import '../../models/workout_item.dart';
 
 class WorkoutDetailScreen extends ConsumerStatefulWidget {
   final Workout workout;
-
   const WorkoutDetailScreen({super.key, required this.workout});
 
   @override
@@ -33,11 +32,7 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             WorkoutHeader(workout: widget.workout),
-
-            if (widget.workout.description != null)
-              WorkoutDescription(description: widget.workout.description!),
-
-            // Workout Items (Exercises)
+            if (widget.workout.description != null) WorkoutDescription(description: widget.workout.description!),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -54,11 +49,13 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                       final exMap = <int, Exercise>{
                         for (final e in exercises) e.id: e,
                       };
+
                       final pairs = <({WorkoutItem item, Exercise ex})>[];
                       for (final it in detail.items) {
                         final ex = exMap[it.exerciseId];
                         if (ex != null) pairs.add((item: it, ex: ex));
                       }
+
                       if (pairs.isEmpty) {
                         return const Center(
                           child: Padding(
@@ -81,9 +78,7 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                                     builder: (_) => WorkoutSessionScreen(
                                       workout: widget.workout,
                                       items: pairs.map((p) => p.item).toList(),
-                                      exercises: pairs
-                                          .map((p) => p.ex)
-                                          .toList(),
+                                      exercises: pairs.map((p) => p.ex).toList(),
                                     ),
                                   ),
                                 );
@@ -102,8 +97,7 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: pairs.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 16),
+                            separatorBuilder: (context, index) => const SizedBox(height: 16),
                             itemBuilder: (context, index) {
                               final workoutItem = pairs[index].item;
                               final exercise = pairs[index].ex;
@@ -118,8 +112,7 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                         ],
                       );
                     },
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
+                    loading: () => const Center(child: CircularProgressIndicator()),
                     error: (err, stack) {
                       return Center(
                         child: Column(

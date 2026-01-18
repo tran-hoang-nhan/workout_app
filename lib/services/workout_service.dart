@@ -24,13 +24,10 @@ class WorkoutService {
     final workoutData = await _workoutRepository.getWorkoutById(workoutId);
     final workout = Workout.fromJson(workoutData);
     final itemsData = await _workoutRepository.getWorkoutItems(workoutId);
-
     List<WorkoutItem> items = itemsData
         .map((data) => WorkoutItem.fromJson(data))
         .toList();
-    // Sort items by orderIndex
     items.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
-
     if (items.isEmpty) {
       return (
         workout: workout,
@@ -47,11 +44,9 @@ class WorkoutService {
     final exercisesData = await _workoutRepository.getExercisesByIds(
       exerciseIds,
     );
-
     final exercises = exercisesData
         .map((data) => Exercise.fromJson(data))
         .toList();
-
     return (workout: workout, items: items, exercises: exercises);
   }
 

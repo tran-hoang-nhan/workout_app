@@ -62,7 +62,7 @@ class AuthRepository {
         'email': params.email,
         'full_name': params.fullName,
         'avatar_url': params.avatarUrl,
-        'gender': params.gender ?? 'male', // Mặc định để pass database check, sẽ update ở onboarding
+        'gender': params.gender ?? 'male', 
         'date_of_birth': params.dateOfBirth?.toIso8601String().split('T')[0],
         'goal': params.goal ?? 'maintain',
         'created_at': DateTime.now().toIso8601String(),
@@ -138,7 +138,6 @@ class AuthRepository {
     return user?.emailConfirmedAt != null;
   }
 
-  // Transaction: Sign up with profile creation
   Future<AppUser?> signUpWithTransaction(SignUpParams params) async {
     User? createdUser;
     try {

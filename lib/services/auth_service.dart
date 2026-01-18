@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user.dart';
-import '../models/auth.dart'; // Import các class Params
+import '../models/auth.dart';
 import '../repositories/auth_repository.dart';
 
 class AuthService {
