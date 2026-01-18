@@ -19,7 +19,7 @@ class WeightRepository {
 
   Future<double?> getUserHeight(String userId) async {
     try {
-      final response = await _supabase.from('profiles').select('height').eq('id', userId).maybeSingle();
+      final response = await _supabase.from('health').select().eq('user_id', userId).maybeSingle();
       return (response?['height'] as num?)?.toDouble();
     } catch (e, st) {
       debugPrint('[WeightRepo] Error fetching height: $e');

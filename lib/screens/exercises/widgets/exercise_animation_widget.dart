@@ -16,10 +16,12 @@ class ExerciseAnimationWidget extends StatefulWidget {
   });
 
   @override
-  State<ExerciseAnimationWidget> createState() => _ExerciseAnimationWidgetState();
+  State<ExerciseAnimationWidget> createState() =>
+      _ExerciseAnimationWidgetState();
 }
 
-class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget> with SingleTickerProviderStateMixin {
+class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool _isPlaying = true;
   bool _hasError = false;
@@ -30,7 +32,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget> with 
     super.initState();
     _controller = AnimationController(vsync: this);
     _isPlaying = widget.autoPlay;
-    
+
     // Validate URL khi init
     if (widget.animationUrl.isEmpty) {
       _hasError = true;
@@ -42,6 +44,23 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget> with 
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant ExerciseAnimationWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.animationUrl != widget.animationUrl) {
+      _controller.stop();
+      _controller.reset();
+      _isPlaying = widget.autoPlay;
+      _hasError = false;
+      _errorMessage = null;
+      if (widget.animationUrl.isEmpty) {
+        _hasError = true;
+        _errorMessage = 'URL không hợp lệ';
+      }
+      setState(() {});
+    }
   }
 
   void _togglePlayPause() {
@@ -82,10 +101,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget> with 
             children: [
               Icon(Icons.error_outline, color: Colors.red[300], size: 48),
               const SizedBox(height: 8),
-              Text(
-                _errorMessage!,
-                style: const TextStyle(color: Colors.grey),
-              ),
+              Text(_errorMessage!, style: const TextStyle(color: Colors.grey)),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: _retryLoad,
@@ -110,6 +126,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget> with 
               borderRadius: BorderRadius.circular(16),
             ),
             child: Lottie.network(
+              key: ValueKey(widget.animationUrl),
               widget.animationUrl,
               controller: _controller,
               fit: BoxFit.contain,
@@ -132,7 +149,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget> with 
                 debugPrint('❌ Lỗi tải animation: $error');
                 debugPrint('📎 URL: ${widget.animationUrl}');
                 debugPrint('📚 StackTrace: $stackTrace');
-                
+
                 if (mounted) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     setState(() {
@@ -141,12 +158,16 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget> with 
                     });
                   });
                 }
-                
+
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error_outline, color: Colors.red[300], size: 48),
+                      Icon(
+                        Icons.error_outline,
+                        color: Colors.red[300],
+                        size: 48,
+                      ),
                       const SizedBox(height: 8),
                       const Text(
                         'Không thể tải animation',
@@ -178,9 +199,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget> with 
               },
               frameBuilder: (context, child, composition) {
                 if (composition == null) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
                 return child;
               },

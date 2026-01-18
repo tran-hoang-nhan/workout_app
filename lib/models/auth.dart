@@ -66,9 +66,6 @@ class UpdateProfileParams {
     if (dateOfBirth != null) {
       map['date_of_birth'] = dateOfBirth!.toIso8601String().split('T')[0];
     }
-    if (height != null) {
-      map['height'] = height;
-    }
     if (goal != null) {
       map['goal'] = goal;
     }

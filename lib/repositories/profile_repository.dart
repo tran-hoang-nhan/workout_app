@@ -16,21 +16,21 @@ class ProfileRepository {
     int tempAge = 0;
 
     try {
-      final profileData = await _supabase.from('profiles').select('height, date_of_birth').eq('id', userId).maybeSingle();
+      final profileData = await _supabase.from('profiles').select('date_of_birth').eq('id', userId).maybeSingle();
       if (profileData != null) {
-        if (profileData['height'] != null) {
-          tempHeight = (profileData['height'] as num).toDouble();
-        }
         if (profileData['date_of_birth'] != null) {
            final dob = DateTime.parse(profileData['date_of_birth']);
            tempAge = DateTime.now().year - dob.year;
         }
       }
 
-      final healthData = await _supabase.from('health').select('weight').eq('user_id', userId).maybeSingle();
+      final healthData = await _supabase.from('health').select().eq('user_id', userId).maybeSingle();
       if (healthData != null) {
         if (healthData['weight'] != null) {
            tempWeight = (healthData['weight'] as num).toDouble();
+        }
+        if (healthData['height'] != null) {
+          tempHeight = (healthData['height'] as num).toDouble();
         }
       }
     } catch (e, st) {
@@ -57,8 +57,10 @@ class ProfileRepository {
 
   Future<void> saveProfile(String userId, double weight, double height, int age) async {
     try {
-      await _supabase.from('health').upsert({'user_id': userId,'weight': weight,'age': age,}).eq('user_id', userId);
-      await _supabase.from('profiles').update({'height': height}).eq('id', userId);
+      await _supabase
+          .from('health')
+          .upsert({'user_id': userId, 'weight': weight, 'height': height, 'age': age})
+          .eq('user_id', userId);
     } catch (e, st) {
       throw handleException(e, st);
     }
