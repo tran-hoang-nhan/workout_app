@@ -74,24 +74,9 @@ class AuthRepository {
 
   Future<AppUser?> getUserProfile(String userId) async {
     try {
-      final profile = await _supabase
-          .from(SupabaseConfig.profilesTable)
-          .select()
-          .eq('id', userId)
-          .maybeSingle();
-      if (profile == null) return null;
-
-      final health = await _supabase
-          .from('health')
-          .select()
-          .eq('user_id', userId)
-          .maybeSingle();
-
-      final merged = Map<String, dynamic>.from(profile);
-      if (health != null && health['height'] != null) {
-        merged['height'] = (health['height'] as num).toDouble();
-      }
-      return AppUser.fromJson(merged);
+      final response = await _supabase.from(SupabaseConfig.profilesTable).select().eq('id', userId).maybeSingle();
+      if (response == null) return null;
+      return AppUser.fromJson(response);
      } catch (e, st) {
       throw handleException(e, st);
     }
@@ -99,19 +84,7 @@ class AuthRepository {
 
   Future<void> updateUserProfile(UpdateProfileParams params) async {
     try {
-      final map = params.toUpdateMap();
-      await _supabase
-          .from(SupabaseConfig.profilesTable)
-          .update(map)
-          .eq('id', params.userId);
-
-      if (params.height != null) {
-        await _supabase.from('health').upsert({
-          'user_id': params.userId,
-          'height': params.height,
-          'updated_at': DateTime.now().toIso8601String(),
-        });
-      }
+      await _supabase.from(SupabaseConfig.profilesTable).update(params.toUpdateMap()) .eq('id', params.userId);
     } catch (e, st) {
       throw handleException(e, st);
     }
