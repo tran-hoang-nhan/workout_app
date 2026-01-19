@@ -119,7 +119,17 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
   }
 
   Widget _buildCategoryChips() {
-    final categories = ['Tất cả', 'Cardio', 'Sức mạnh', 'Yoga', 'HIIT'];
+    final categories = [
+      'Tất cả',
+      'Toàn thân',
+      'Ngực',
+      'Lưng',
+      'Chân',
+      'Tay',
+      'Cardio',
+      'Yoga',
+      'HIIT',
+    ];
     return SizedBox(
       height: 38,
       child: ListView.separated(

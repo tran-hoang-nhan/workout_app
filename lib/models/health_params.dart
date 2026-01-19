@@ -15,7 +15,6 @@ class HealthUpdateParams {
   final bool? waterReminderEnabled;
   final int? waterReminderInterval;
 
-
   HealthUpdateParams({
     required this.userId,
     required this.age,

@@ -6,8 +6,8 @@ import '../repositories/workout_repository.dart';
 class WorkoutService {
   final WorkoutRepository _workoutRepository;
 
-  WorkoutService({WorkoutRepository? repository}): 
-    _workoutRepository = repository ?? WorkoutRepository();
+  WorkoutService({WorkoutRepository? repository})
+    : _workoutRepository = repository ?? WorkoutRepository();
 
   Future<List<Workout>> getAllWorkouts() async {
     final response = await _workoutRepository.getAllWorkouts();
@@ -24,7 +24,9 @@ class WorkoutService {
     final workoutData = await _workoutRepository.getWorkoutById(workoutId);
     final workout = Workout.fromJson(workoutData);
     final itemsData = await _workoutRepository.getWorkoutItems(workoutId);
-    List<WorkoutItem> items = itemsData.map((data) => WorkoutItem.fromJson(data)).toList();
+    List<WorkoutItem> items = itemsData
+        .map((data) => WorkoutItem.fromJson(data))
+        .toList();
     items.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
     if (items.isEmpty) {
       return (
@@ -42,7 +44,9 @@ class WorkoutService {
     final exercisesData = await _workoutRepository.getExercisesByIds(
       exerciseIds,
     );
-    final exercises = exercisesData.map((data) => Exercise.fromJson(data)).toList();
+    final exercises = exercisesData
+        .map((data) => Exercise.fromJson(data))
+        .toList();
     return (workout: workout, items: items, exercises: exercises);
   }
 
@@ -52,26 +56,63 @@ class WorkoutService {
   }
 
   Future<List<Workout>> getWorkoutsByCategory(String category) async {
-    final muscleGroup = _mapCategoryToMuscleGroup(category);
-    final exerciseIds = await _workoutRepository.getExerciseIdsByMuscleGroup(
-      muscleGroup,
-    );
-    if (exerciseIds.isEmpty) return [];
+    final key = category.trim().toLowerCase();
+    if (key == 'tất cả') return getAllWorkouts();
 
+    final (titleKeywords, muscleKeywords) = _mapFilterKeywords(category);
+
+    final resultsById = <int, Workout>{};
+
+    final byTitle = await _workoutRepository.getWorkoutsByTitleKeywords(
+      titleKeywords,
+    );
+    for (final data in byTitle) {
+      final workout = Workout.fromJson(data);
+      resultsById[workout.id] = workout;
+    }
+
+    final exerciseIds = await _workoutRepository
+        .getExerciseIdsByMuscleGroupKeywords(muscleKeywords);
     final workoutIds = await _workoutRepository.getWorkoutIdsByExerciseIds(
       exerciseIds,
     );
-    if (workoutIds.isEmpty) return [];
+    final byIds = await _workoutRepository.getWorkoutsByIds(workoutIds);
+    for (final data in byIds) {
+      final workout = Workout.fromJson(data);
+      resultsById[workout.id] = workout;
+    }
 
-    final workoutsData = await _workoutRepository.getWorkoutsByIds(workoutIds);
-    return workoutsData.map((data) => Workout.fromJson(data)).toList();
+    final merged = resultsById.values.toList()
+      ..sort((a, b) => a.id.compareTo(b.id));
+    return merged;
   }
 
-  String _mapCategoryToMuscleGroup(String category) => switch (category.trim().toLowerCase()) {
-    'sức mạnh' => 'strength',
-    'cardio'   => 'cardio',
-    'yoga'     => 'yoga',
-    'hiit'     => 'hiit',
-    _          => category.toLowerCase(),
-  };
+  (List<String> titleKeywords, List<String> muscleKeywords) _mapFilterKeywords(
+    String category,
+  ) {
+    final key = category.trim().toLowerCase();
+    switch (key) {
+      case 'toàn thân':
+        return (
+          ['toàn thân', 'toan than', 'full body'],
+          ['toàn thân', 'toan than', 'full body'],
+        );
+      case 'ngực':
+        return (['ngực', 'nguc', 'chest'], ['ngực', 'nguc', 'chest']);
+      case 'lưng':
+        return (['lưng', 'lung', 'back'], ['lưng', 'lung', 'back']);
+      case 'chân':
+        return (['chân', 'chan', 'legs'], ['chân', 'chan', 'legs']);
+      case 'tay':
+        return (['tay', 'arms', 'arm'], ['tay', 'arms', 'arm']);
+      case 'cardio':
+        return (['cardio'], ['cardio']);
+      case 'yoga':
+        return (['yoga'], ['yoga']);
+      case 'hiit':
+        return (['hiit'], ['hiit']);
+      default:
+        return ([key], [key]);
+    }
+  }
 }
