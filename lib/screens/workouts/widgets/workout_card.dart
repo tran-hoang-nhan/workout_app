@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../constants/app_constants.dart';
 import '../../../models/workout.dart';
+import '../../../utils/label_utils.dart';
 import '../../workout_detail/workout_detail_screen.dart';
 
 class WorkoutCard extends StatelessWidget {
@@ -139,7 +140,9 @@ class WorkoutCard extends StatelessWidget {
                               ],
                             ),
                             child: Text(
-                              workout.level!.toUpperCase(),
+                              LabelUtils.getWorkoutLevelLabel(
+                                workout.level,
+                              ).toUpperCase(),
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
