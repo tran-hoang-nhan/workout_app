@@ -5,8 +5,7 @@ import '../utils/app_error.dart';
 
 class ProgressRepository {
   final SupabaseClient _supabase;
-  ProgressRepository({SupabaseClient? supabase}): 
-    _supabase = supabase ?? Supabase.instance.client;
+  ProgressRepository({SupabaseClient? supabase}): _supabase = supabase ?? Supabase.instance.client;
     
   Future<List<WorkoutHistory>> getWorkoutHistory(String userId) async {
     try {

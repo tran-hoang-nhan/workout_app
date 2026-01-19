@@ -4,8 +4,7 @@ import '../utils/app_error.dart';
 
 class ProgressUserRepository {
   final SupabaseClient _supabase;
-  ProgressUserRepository({SupabaseClient? supabase}):
-    _supabase = supabase ?? Supabase.instance.client;
+  ProgressUserRepository({SupabaseClient? supabase}): _supabase = supabase ?? Supabase.instance.client;
     
   Future<ProgressUser?> getProgress(String userId, DateTime date) async {
     try {

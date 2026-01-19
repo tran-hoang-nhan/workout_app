@@ -5,8 +5,7 @@ import '../utils/app_error.dart';
 
 class ProfileRepository {
   final SupabaseClient _supabase;
-  ProfileRepository({SupabaseClient? supabase})
-    : _supabase = supabase ?? Supabase.instance.client;
+  ProfileRepository({SupabaseClient? supabase}): _supabase = supabase ?? Supabase.instance.client;
 
   Future<UserStats> loadUserHealthData(String userId) async {
     int tempTotalWorkouts = 0;
@@ -16,21 +15,13 @@ class ProfileRepository {
     double tempWeight = 0.0;
     int tempAge = 0;
     try {
-      final profileData = await _supabase
-          .from('profiles')
-          .select('date_of_birth')
-          .eq('id', userId)
-          .maybeSingle();
+      final profileData = await _supabase.from('profiles').select('date_of_birth').eq('id', userId).maybeSingle();
       if (profileData != null && profileData['date_of_birth'] != null) {
         final dob = DateTime.parse(profileData['date_of_birth']);
         tempAge = DateTime.now().year - dob.year;
       }
 
-      final healthData = await _supabase
-          .from('health')
-          .select('weight')
-          .eq('user_id', userId)
-          .maybeSingle();
+      final healthData = await _supabase.from('health').select('weight').eq('user_id', userId).maybeSingle();
       if (healthData != null && healthData['weight'] != null) {
         tempWeight = (healthData['weight'] as num).toDouble();
       }
@@ -49,10 +40,7 @@ class ProfileRepository {
 
   Future<void> updateWeight(String userId, double newWeight) async {
     try {
-      await _supabase
-          .from('health')
-          .update({'weight': newWeight})
-          .eq('user_id', userId);
+      await _supabase.from('health').update({'weight': newWeight}).eq('user_id', userId);
     } catch (e, st) {
       throw handleException(e, st);
     }
@@ -67,8 +55,7 @@ class ProfileRepository {
     String? goal,
   }) async {
     try {
-      await _supabase.rpc(
-        'update_profile_with_health',
+      await _supabase.rpc('update_profile_with_health',
         params: {
           'p_user_id': userId,
           'p_full_name': fullName,

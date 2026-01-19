@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
 import '../../../providers/health_provider.dart';
+import '../../heart_rate/heart_rate_detail_screen.dart';
 
 class HeartRateZones extends StatelessWidget {
   final HealthCalculations calculations;
@@ -11,92 +12,101 @@ class HeartRateZones extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.favorite_rounded, color: Colors.red, size: 20),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  const Text(
-                    'Vùng nhịp tim',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.black,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ],
-              ),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HeartRateDetailScreen()),
+        );
+      },
+      borderRadius: BorderRadius.circular(28),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
                   children: [
-                    Text(
-                      'MAX HR',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.grey.withValues(alpha: 0.5),
-                        letterSpacing: 1,
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
                       ),
+                      child: const Icon(Icons.favorite_rounded, color: Colors.red, size: 20),
                     ),
-                    Text(
-                      '${calculations.maxHeartRate.toStringAsFixed(0)} bpm',
-                      style: const TextStyle(
-                        fontSize: 11,
+                    const SizedBox(width: AppSpacing.sm),
+                    const Text(
+                      'Vùng nhịp tim',
+                      style: TextStyle(
+                        fontSize: 13,
                         fontWeight: FontWeight.w900,
                         color: AppColors.black,
+                        letterSpacing: -0.5,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          _buildHeartRateZoneRow(
-            'Nhịp tim Đốt mỡ',
-            '60-70%',
-            '${calculations.fatBurnZone.min}-${calculations.fatBurnZone.max} bpm',
-            const Color(0xFFF97316),
-            0.65,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _buildHeartRateZoneRow(
-            'Nhịp tim Cardio',
-            '70-85%',
-            '${calculations.cardioZone.min}-${calculations.cardioZone.max} bpm',
-            const Color(0xFFEF4444),
-            0.85,
-          ),
-        ],
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        'MAX HR',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.grey.withValues(alpha: 0.5),
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      Text(
+                        '${calculations.maxHeartRate.toStringAsFixed(0)} bpm',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.black,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            _buildHeartRateZoneRow(
+              'Nhịp tim Đốt mỡ',
+              '60-70%',
+              '${calculations.fatBurnZone.min}-${calculations.fatBurnZone.max} bpm',
+              const Color(0xFFF97316),
+              0.65,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            _buildHeartRateZoneRow(
+              'Nhịp tim Cardio',
+              '70-85%',
+              '${calculations.cardioZone.min}-${calculations.cardioZone.max} bpm',
+              const Color(0xFFEF4444),
+              0.85,
+            ),
+          ],
+        ),
       ),
     );
   }

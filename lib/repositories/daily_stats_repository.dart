@@ -4,8 +4,7 @@ import '../utils/app_error.dart';
 
 class DailyStatsRepository {
   final SupabaseClient _supabase;
-  DailyStatsRepository({SupabaseClient? supabase}): 
-    _supabase = supabase ?? Supabase.instance.client;
+  DailyStatsRepository({SupabaseClient? supabase}): _supabase = supabase ?? Supabase.instance.client;
 
   Future<DailyStats?> getDailyStats(String userId, DateTime date) async {
     try {
@@ -31,10 +30,7 @@ class DailyStatsRepository {
 
   Future<void> saveDailyStats(DailyStats stats) async {
     try {
-      await _supabase.from('daily_stats').upsert(
-            stats.toJson(),
-            onConflict: 'user_id, date',
-          );
+      await _supabase.from('daily_stats').upsert(stats.toJson(), onConflict: 'user_id, date',);
     } catch (e, st) {
       throw handleException(e, st);
     }
