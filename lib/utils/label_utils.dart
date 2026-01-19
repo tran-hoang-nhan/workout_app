@@ -1,30 +1,11 @@
+import '../models/profile_options.dart';
+
 class LabelUtils {
-  static String getGenderLabel(String? gender) =>
-      switch (gender?.toLowerCase()) {
-        'male' => 'Nam',
-        'female' => 'Nữ',
-        null => 'Chưa cập nhật',
-        _ => gender!,
-      };
+  static String getGenderLabel(String? gender) => Gender.fromValue(gender).label;
 
-  static String getGoalLabel(String? goal) => switch (goal?.toLowerCase()) {
-    'lose' || 'lose_weight' => 'Giảm cân',
-    'maintain' => 'Duy trì',
-    'gain' || 'gain_muscle' => 'Tăng cân',
-    null => 'Chưa cập nhật',
-    _ => goal!,
-  };
+  static String getGoalLabel(String? goal) => UserGoal.fromValue(goal).label;
 
-  static String getActivityLevelLabel(String? level) =>
-      switch (level?.toLowerCase()) {
-        'sedentary' => 'Ít vận động',
-        'lightly_active' => 'Vận động nhẹ',
-        'moderately_active' => 'Vận động trung bình',
-        'very_active' => 'Vận động nhiều',
-        'extremely_active' => 'Vận động cực nhiều',
-        null => 'Chưa cập nhật',
-        _ => level!,
-      };
+  static String getActivityLevelLabel(String? level) => ActivityLevel.fromValue(level).label;
 
   static String getDietTypeLabel(String? dietType) =>
       switch (dietType?.toLowerCase()) {

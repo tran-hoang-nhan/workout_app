@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/avatar_provider.dart';
 import '../../providers/profile_provider.dart';
-import '../../services/profile_service.dart';
 import '../../utils/ui_utils.dart';
 import '../../widgets/loading_animation.dart';
 import 'widgets/edit_profile_avatar.dart';
@@ -23,7 +22,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _ageController;
   late TextEditingController _goalController;
   String? _gender;
-  bool _isSaving = false;
   bool _isDataLoaded = false;
 
   @override
@@ -55,74 +53,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.dispose();
   }
 
-  Future<void> _pickAndUploadAvatar() async {
-    try {
-      await ref.read(profileServiceProvider).pickAndUploadAvatar();
-      if (!mounted) return;
-      context.showSuccess('Cập nhật avatar thành công!');
-    } catch (e) {
-      if (!mounted) return;
-      context.showError('Lỗi: $e');
-    }
-  }
 
-  Future<void> _removeAvatar() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Xóa avatar'),
-        content: const Text('Bạn có chắc muốn xóa avatar?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Hủy'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Xóa'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      try {
-        await ref.read(profileServiceProvider).removeAvatar();
-        if (!mounted) return;
-        context.showSuccess('Xóa avatar thành công!');
-      } catch (e) {
-        if (!mounted) return;
-        context.showError('Lỗi: $e');
-      }
-    }
-  }
-
-  Future<void> _saveProfile() async {
-    final user = ref.read(fullUserProfileProvider).value;
-    if (user == null) return;
-
-    setState(() => _isSaving = true);
-    
-    try {
-      await ref.read(profileServiceProvider).saveProfile(
-        userId: user.id,
-        fullName: _nameController.text,
-        gender: _gender,
-        age: int.tryParse(_ageController.text),
-        goal: _goalController.text,
-      );
-
-      if (!mounted) return;
-      context.showSuccess('Đã cập nhật hồ sơ thành công!');
-      ref.invalidate(fullUserProfileProvider);
-      Navigator.pop(context);
-    } catch (e) {
-      if (!mounted) return;
-      context.showError('Lỗi: $e');
-    } finally {
-      if (mounted) setState(() => _isSaving = false);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +73,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
 
     final avatarState = ref.watch(avatarControllerProvider);
+    final editState = ref.watch(editProfileControllerProvider);
     final isUploading = avatarState.isLoading;
+    final isSaving = editState.isLoading;
     final displayAvatarUrl = user?.avatarUrl ?? '';
 
     return Scaffold(
@@ -166,8 +99,50 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       EditProfileAvatar(
                         displayAvatarUrl: displayAvatarUrl,
                         isUploading: isUploading,
-                        onPickImage: _pickAndUploadAvatar,
-                        onRemoveImage: _removeAvatar,
+                        
+                        onPickImage: () async {
+                          final success = await ref.read(editProfileControllerProvider.notifier).updateAvatar();
+                          if (context.mounted) {
+                            if (success) {
+                              context.showSuccess('Cập nhật avatar thành công!');
+                              ref.invalidate(fullUserProfileProvider);
+                            } else {
+                              context.showError('Không thể cập nhật avatar');
+                            }
+                          }
+                        },
+
+                        onRemoveImage: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Xóa avatar'),
+                              content: const Text('Bạn có chắc muốn xóa avatar?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: const Text('Hủy'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text('Xóa'),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true && context.mounted) {
+                            final success = await ref.read(editProfileControllerProvider.notifier).removeAvatar();
+                            if (context.mounted) {
+                              if (success) {
+                                context.showSuccess('Xóa avatar thành công!');
+                                ref.invalidate(fullUserProfileProvider);
+                              } else {
+                                context.showError('Không thể xóa avatar');
+                              }
+                            }
+                          }
+                        },
                       ),
                       const SizedBox(height: 32),
                       
@@ -210,8 +185,29 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         },
       ),
       bottomNavigationBar: EditProfileBottomBar(
-        isSaving: _isSaving,
-        onSave: _saveProfile,
+        isSaving: isSaving,
+        onSave: () async {
+          final user = ref.read(fullUserProfileProvider).value;
+          if (user == null) return;
+
+          final success = await ref.read(editProfileControllerProvider.notifier).saveProfile(
+            userId: user.id,
+            fullName: _nameController.text,
+            gender: _gender,
+            age: int.tryParse(_ageController.text),
+            goal: _goalController.text,
+          );
+
+          if (context.mounted) {
+            if (success) {
+              context.showSuccess('Đã cập nhật hồ sơ thành công!');
+              ref.invalidate(fullUserProfileProvider);
+              Navigator.pop(context);
+            } else {
+              context.showError('Không thể lưu hồ sơ');
+            }
+          }
+        },
       ),
     );
   }

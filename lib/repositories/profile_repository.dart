@@ -46,14 +46,7 @@ class ProfileRepository {
     }
   }
 
-  Future<void> saveProfile({
-    required String userId,
-    required String fullName,
-    String? gender,
-    double? weight,
-    int? age,
-    String? goal,
-  }) async {
+  Future<void> saveProfile({required String userId, required String fullName, String? gender, double? weight, int? age, String? goal,}) async {
     try {
       await _supabase.rpc('update_profile_with_health',
         params: {
@@ -61,7 +54,6 @@ class ProfileRepository {
           'p_full_name': fullName,
           'p_gender': gender ?? '',
           'p_goal': goal ?? '',
-          'p_weight': weight ?? 0.0,
           'p_age': age ?? 0,
         },
       );
@@ -72,19 +64,10 @@ class ProfileRepository {
 
   Future<AppUser?> getFullUserProfile(String userId) async {
     try {
-      final profileResponse = await _supabase
-          .from(SupabaseConfig.profilesTable)
-          .select()
-          .eq('id', userId)
-          .maybeSingle();
+      final profileResponse = await _supabase.from(SupabaseConfig.profilesTable).select().eq('id', userId).maybeSingle();
       if (profileResponse == null) return null;
 
-      final healthResponse = await _supabase
-          .from('health')
-          .select('weight, height, age')
-          .eq('user_id', userId)
-          .maybeSingle();
-
+      final healthResponse = await _supabase.from('health').select('weight, height, age').eq('user_id', userId).maybeSingle();
       final userData = Map<String, dynamic>.from(profileResponse);
       if (healthResponse != null) {
         userData['weight'] = healthResponse['weight'];
