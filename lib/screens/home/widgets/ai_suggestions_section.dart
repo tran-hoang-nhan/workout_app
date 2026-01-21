@@ -1,52 +1,67 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
 
-class PlanSection extends StatelessWidget {
-  const PlanSection({super.key});
+class AISuggestionsSection extends StatelessWidget {
+  const AISuggestionsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Expanded(
-                child: Text(
-                  'Kế hoạch hôm nay',
-                  style: TextStyle(
-                    fontSize: AppFontSize.lg,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.black,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  const Text(
+                    'Gợi ý từ AI',
+                    style: TextStyle(
+                      fontSize: AppFontSize.lg,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: const Row(
-                  children: [
-                    Text(
-                      'Xem tất cả',
-                      style: TextStyle(
-                        fontSize: AppFontSize.sm,
-                        color: Color(0xFFFF7F00),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(width: AppSpacing.xs),
-                    Icon(
-                      Icons.chevron_right,
-                      color: Color(0xFFFF7F00),
+                  const SizedBox(width: AppSpacing.xs),
+                  ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      colors: [Color(0xFFFF7F00), Color(0xFFFFB347)],
+                    ).createShader(bounds),
+                    child: const Icon(
+                      Icons.auto_awesome,
                       size: 18,
+                      color: Colors.white,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            TextButton(
+              onPressed: () {},
+              child: const Row(
+                children: [
+                  Text(
+                    'Phân tích',
+                    style: TextStyle(
+                      fontSize: AppFontSize.sm,
+                      color: Color(0xFFFF7F00),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(width: AppSpacing.xs),
+                  Icon(
+                    Icons.insights,
+                    color: Color(0xFFFF7F00),
+                    size: 18,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: AppSpacing.md),
         Container(
           width: double.infinity,
@@ -58,7 +73,7 @@ class PlanSection extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFFF7F00).withValues(alpha: 0.3),
+                color: const Color(0xFFFF7F00).withValues(alpha: 0.25),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -70,9 +85,11 @@ class PlanSection extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppBorderRadius.xxl),
               gradient: LinearGradient(
                 begin: Alignment.bottomRight,
+                end: Alignment.topLeft,
                 colors: [
                   Colors.black.withValues(alpha: 0.9),
-                  Colors.black.withValues(alpha: 0.2),
+                  const Color(0xFFFF7F00).withValues(alpha: 0.3),
+                  Colors.black.withValues(alpha: 0.1),
                 ],
               ),
             ),
@@ -86,14 +103,20 @@ class PlanSection extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'BUỔI TẬP HÔM NAY',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.5,
-                              color: Color.fromARGB(255, 251, 251, 251), // Brighter, high-contrast orange
-                            ),
+                          Row(
+                            children: [
+                              Icon(Icons.psychology, color: Color(0xFFFF7F00), size: 14),
+                              SizedBox(width: 4),
+                              Text(
+                                'GỢI Ý CHO BẠN',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.2,
+                                  color: Color.fromARGB(255, 230, 230, 230),
+                                ),
+                              ),
+                            ],
                           ),
                           SizedBox(height: 8),
                           Text(
@@ -107,6 +130,15 @@ class PlanSection extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Dựa trên mục tiêu tăng cơ của bạn',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -114,10 +146,11 @@ class PlanSection extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Colors.white.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                       ),
-                      child: const Icon(Icons.bolt, color: Colors.white, size: 28),
+                      child: const Icon(Icons.bolt, color: Color(0xFFFF7F00), size: 28),
                     ),
                   ],
                 ),
@@ -127,17 +160,31 @@ class PlanSection extends StatelessWidget {
                     _buildInfoTag(Icons.schedule, '45 Min'),
                     const SizedBox(width: AppSpacing.md),
                     _buildInfoTag(Icons.local_fire_department, '350 kcal'),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF7F00).withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFFF7F00).withValues(alpha: 0.4)),
+                      ),
+                      child: const Text(
+                        'Độ khó: Vừa',
+                        style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
-                  height: 48,
+                  height: 52,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF7F00),
                       foregroundColor: Colors.white,
-                      elevation: 0,
+                      elevation: 8,
+                      shadowColor: const Color(0xFFFF7F00).withValues(alpha: 0.4),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -147,11 +194,11 @@ class PlanSection extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Bắt đầu ngay',
+                          'Bắt đầu buổi tập',
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(width: 8),
-                        Icon(Icons.play_circle_fill, size: 20),
+                        Icon(Icons.play_arrow_rounded, size: 24),
                       ],
                     ),
                   ),
@@ -166,16 +213,17 @@ class PlanSection extends StatelessWidget {
 
   Widget _buildInfoTag(IconData icon, String label) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Colors.white),
-          const SizedBox(width: 6),
+          Icon(icon, size: 14, color: const Color(0xFFFF7F00)),
+          const SizedBox(width: 4),
           Flexible(
             child: Text(
               label,
