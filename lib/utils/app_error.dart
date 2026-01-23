@@ -60,6 +60,14 @@ class UnauthorizedException extends AppError {
   String get userMessage => 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.';
 }
 
+class InvalidCredentialsException extends AppError {
+  InvalidCredentialsException({super.originalException}) 
+    : super('Email hoặc mật khẩu không chính xác', code: 'invalid_credentials');
+  
+  @override
+  String get userMessage => 'Email hoặc mật khẩu không chính xác.';
+}
+
 AppError handleException(Object error, [StackTrace? stackTrace]) {
   if (error is AppError) {
     return error; 
@@ -77,10 +85,13 @@ AppError handleException(Object error, [StackTrace? stackTrace]) {
   if (error is AuthException) {
     String? mappedCode;
     final msg = error.message.toLowerCase();
-    if (msg.contains('invalid login')) {
-      mappedCode = 'invalid_credentials';
+    
+    // Xử lý lỗi nhập sai mật khẩu/email
+    if (msg.contains('invalid login') || msg.contains('invalid credentials')) {
+      return InvalidCredentialsException(originalException: error);
     }
-    else if (msg.contains('user not found')) {
+    
+    if (msg.contains('user not found')) {
       mappedCode = 'user_not_found';
     }
     else if (msg.contains('email not confirmed')) {

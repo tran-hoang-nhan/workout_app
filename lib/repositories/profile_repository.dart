@@ -67,17 +67,32 @@ class ProfileRepository {
     String? goal,
   }) async {
     try {
-      await _supabase.rpc(
-        'update_profile_with_health',
-        params: {
-          'p_user_id': userId,
-          'p_full_name': fullName,
-          'p_gender': gender ?? '',
-          'p_goal': goal ?? '',
-          'p_weight': weight ?? 0.0,
-          'p_age': age ?? 0,
-        },
-      );
+      // 1. Update profiles table
+      final Map<String, dynamic> profileUpdates = {
+        'full_name': fullName,
+      };
+      if (gender != null) profileUpdates['gender'] = gender;
+      if (goal != null) profileUpdates['goal'] = goal;
+
+      await _supabase
+          .from('profiles')
+          .update(profileUpdates)
+          .eq('id', userId);
+
+      // 2. Update health table
+      final Map<String, dynamic> healthUpdates = {};
+      if (weight != null) healthUpdates['weight'] = weight;
+      if (age != null) healthUpdates['age'] = age;
+
+      if (healthUpdates.isNotEmpty) {
+        await _supabase
+            .from('health')
+            .upsert({
+              'user_id': userId,
+              ...healthUpdates,
+              'updated_at': DateTime.now().toIso8601String(),
+            }, onConflict: 'user_id');
+      }
     } catch (e, st) {
       throw handleException(e, st);
     }

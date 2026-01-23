@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/workout.dart';
@@ -19,6 +20,18 @@ class WorkoutDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    const encoder = JsonEncoder.withIndent('  ');
+    final prettyJson = encoder.convert(widget.workout.toJson());
+    
+    debugPrint('============ WORKOUT DETAIL SCREEN ============');
+    debugPrint('Received Workout JSON:');
+    debugPrint(prettyJson);
+    debugPrint('===============================================');
+  }
+
   @override
   Widget build(BuildContext context) {
     final workoutDetailAsync = ref.watch(
