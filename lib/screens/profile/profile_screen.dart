@@ -9,6 +9,7 @@ import 'widgets/profile_header_card.dart';
 import 'widgets/profile_stats_section.dart';
 import 'widgets/profile_menu_button.dart';
 import 'widgets/profile_logout_button.dart';
+import 'widgets/change_password_dialog.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -76,10 +77,10 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   ProfileMenuButton(
-                    title: 'Cài đặt tài khoản',
-                    description: 'Email, bảo mật và riêng tư',
-                    icon: Icons.settings_rounded,
-                    onTap: () {},
+                    title: 'Đổi mật khẩu',
+                    description: 'Cập nhật lại mật khẩu bảo mật',
+                    icon: Icons.lock_outline_rounded,
+                    onTap: () => _showChangePasswordDialog(context, ref),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   ProfileMenuButton(
@@ -120,6 +121,16 @@ class ProfileScreen extends ConsumerWidget {
           },
         ),
       ),
+    );
+  }
+
+  Future<void> _showChangePasswordDialog(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    return showDialog(
+      context: context,
+      builder: (context) => const ChangePasswordDialog(),
     );
   }
 }
