@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user.dart';
 import '../models/auth.dart';
@@ -49,14 +50,28 @@ class AuthService {
     );
   }
 
-  Future<void> updatePassword(String newPassword) async {
+  Future<void> updatePassword(
+    String newPassword, {
+    String? confirmPassword,
+  }) async {
+    debugPrint('[AuthService] Validating password update request...');
     if (newPassword.isEmpty) {
+      debugPrint('[AuthService] Validation failed: Password empty');
       throw ValidationException('Vui lòng nhập mật khẩu mới');
     }
     if (newPassword.length < 6) {
+      debugPrint('[AuthService] Validation failed: Password too short');
       throw ValidationException('Mật khẩu phải có ít nhất 6 ký tự');
     }
+
+    if (confirmPassword != null && newPassword != confirmPassword) {
+      debugPrint('[AuthService] Validation failed: Passwords do not match');
+      throw ValidationException('Mật khẩu xác nhận không khớp');
+    }
+
+    debugPrint('[AuthService] Passing request to repository...');
     await _repository.updatePassword(newPassword);
+    debugPrint('[AuthService] Password update flow completed in repository.');
   }
 
   Future<void> updateUserProfile(UpdateProfileParams params) async {

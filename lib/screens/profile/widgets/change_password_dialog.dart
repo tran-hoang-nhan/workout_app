@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
+import '../../../widgets/custom_text_field.dart';
 import '../../../providers/auth_provider.dart';
 
 class ChangePasswordDialog extends ConsumerStatefulWidget {
@@ -26,27 +27,30 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
     final password = passwordController.text;
     final confirm = confirmController.text;
 
-    if (password.isEmpty) return;
-    if (password != confirm) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mật khẩu xác nhận không khớp')),
-      );
-      return;
-    }
-
     try {
-      await ref.read(authControllerProvider.notifier).updatePassword(password);
+      debugPrint('[ChangePasswordDialog] Requesting update...');
+      await ref
+          .read(authControllerProvider.notifier)
+          .updatePassword(password, confirmPassword: confirm);
+      final authState = ref.read(authControllerProvider);
+
       if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đổi mật khẩu thành công!')),
-        );
+        if (authState.hasError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Lỗi: ${authState.error}')));
+        } else {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Đổi mật khẩu thành công!')),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+        ).showSnackBar(SnackBar(content: Text('Lỗi không xác định: $e')));
       }
     }
   }
@@ -55,29 +59,27 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Đổi mật khẩu'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text('Nhập mật khẩu mới của bạn.'),
-          const SizedBox(height: AppSpacing.md),
-          TextField(
-            controller: passwordController,
-            decoration: const InputDecoration(
-              labelText: 'Mật khẩu mới',
-              border: OutlineInputBorder(),
+      content: AutofillGroup(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Nhập mật khẩu mới của bạn.'),
+            const SizedBox(height: AppSpacing.md),
+            CustomTextField(
+              label: 'Mật khẩu mới',
+              controller: passwordController,
+              isPassword: true,
+              autofillHints: const [AutofillHints.newPassword],
             ),
-            obscureText: true,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          TextField(
-            controller: confirmController,
-            decoration: const InputDecoration(
-              labelText: 'Xác nhận mật khẩu',
-              border: OutlineInputBorder(),
+            const SizedBox(height: AppSpacing.sm),
+            CustomTextField(
+              label: 'Xác nhận mật khẩu',
+              controller: confirmController,
+              isPassword: true,
+              autofillHints: const [AutofillHints.newPassword],
             ),
-            obscureText: true,
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         TextButton(

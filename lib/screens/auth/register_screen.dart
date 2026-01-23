@@ -11,10 +11,7 @@ import 'email_confirmation_screen.dart';
 class RegisterScreen extends ConsumerStatefulWidget {
   final Future<void> Function() onSignupSuccess;
 
-  const RegisterScreen({
-    super.key,
-    required this.onSignupSuccess,
-  });
+  const RegisterScreen({super.key, required this.onSignupSuccess});
 
   @override
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
@@ -64,11 +61,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       );
 
       await ref.read(authControllerProvider.notifier).signUp(params);
-      
+
       final authState = ref.read(authControllerProvider);
       if (authState.hasError) {
         final error = authState.error;
-        setState(() => authError = error is AppError ? error.userMessage : error.toString());
+        setState(
+          () => authError = error is AppError
+              ? error.userMessage
+              : error.toString(),
+        );
         return;
       }
 
@@ -92,7 +93,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => authError = e is AppError ? e.userMessage : e.toString());
+        setState(
+          () => authError = e is AppError ? e.userMessage : e.toString(),
+        );
       }
     }
   }
@@ -141,9 +144,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               onSurface: AppColors.black,
             ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary,
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
           ),
           child: child!,
@@ -185,12 +186,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     maxWidth: 450,
-                    minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom - 40,
+                    minHeight:
+                        MediaQuery.of(context).size.height -
+                        MediaQuery.of(context).padding.top -
+                        MediaQuery.of(context).padding.bottom -
+                        40,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -293,10 +299,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: AppSpacing.xs),
             const Text(
               'Điền thông tin để bắt đầu hành trình tập luyện',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.grey,
-              ),
+              style: TextStyle(fontSize: 14, color: AppColors.grey),
             ),
             const SizedBox(height: AppSpacing.xl),
             // Form
@@ -319,52 +322,58 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Widget _buildForm() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildInputField(
-          label: 'Họ và tên',
-          icon: Icons.person,
-          controller: nameController,
-          placeholder: 'Nguyễn Văn A',
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        _buildDatePickerField(
-          label: 'Ngày sinh',
-          icon: Icons.calendar_today,
-          value: _selectedDate == null
-              ? ''
-              : '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}',
-          placeholder: 'DD/MM/YYYY',
-          onTap: _selectDate,
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        _buildInputField(
-          label: 'Email',
-          icon: Icons.mail_outline,
-          controller: emailController,
-          placeholder: 'email@example.com',
-          keyboardType: TextInputType.emailAddress,
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        _buildPasswordField(
-          label: 'Mật khẩu',
-          controller: passwordController,
-          showPassword: showPassword,
-          onToggle: () {
-            setState(() => showPassword = !showPassword);
-          },
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        _buildPasswordField(
-          label: 'Xác nhận mật khẩu',
-          controller: confirmPasswordController,
-          showPassword: showConfirmPassword,
-          onToggle: () {
-            setState(() => showConfirmPassword = !showConfirmPassword);
-          },
-        ),
-      ],
+    return AutofillGroup(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildInputField(
+            label: 'Họ và tên',
+            icon: Icons.person,
+            controller: nameController,
+            placeholder: 'Nguyễn Văn A',
+            autofillHints: const [AutofillHints.name],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _buildDatePickerField(
+            label: 'Ngày sinh',
+            icon: Icons.calendar_today,
+            value: _selectedDate == null
+                ? ''
+                : '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}',
+            placeholder: 'DD/MM/YYYY',
+            onTap: _selectDate,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _buildInputField(
+            label: 'Email',
+            icon: Icons.mail_outline,
+            controller: emailController,
+            placeholder: 'email@example.com',
+            keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _buildPasswordField(
+            label: 'Mật khẩu',
+            controller: passwordController,
+            showPassword: showPassword,
+            onToggle: () {
+              setState(() => showPassword = !showPassword);
+            },
+            autofillHints: const [AutofillHints.newPassword],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _buildPasswordField(
+            label: 'Xác nhận mật khẩu',
+            controller: confirmPasswordController,
+            showPassword: showConfirmPassword,
+            onToggle: () {
+              setState(() => showConfirmPassword = !showConfirmPassword);
+            },
+            autofillHints: const [AutofillHints.newPassword],
+          ),
+        ],
+      ),
     );
   }
 
@@ -374,6 +383,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     required TextEditingController controller,
     required String placeholder,
     TextInputType keyboardType = TextInputType.text,
+    Iterable<String>? autofillHints,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,15 +406,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
+            autofillHints: autofillHints,
             style: const TextStyle(color: AppColors.black, fontSize: 15),
             decoration: InputDecoration(
               hintText: placeholder,
               hintStyle: const TextStyle(color: AppColors.grey, fontSize: 15),
-              prefixIcon: Icon(
-                icon,
-                color: AppColors.grey,
-                size: 20,
-              ),
+              prefixIcon: Icon(icon, color: AppColors.grey, size: 20),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.md,
@@ -422,6 +429,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     required TextEditingController controller,
     required bool showPassword,
     required VoidCallback onToggle,
+    Iterable<String>? autofillHints,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -444,6 +452,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           child: TextField(
             controller: controller,
             obscureText: !showPassword,
+            autofillHints: autofillHints,
             style: const TextStyle(color: AppColors.black, fontSize: 15),
             decoration: InputDecoration(
               hintText: '••••••••',
@@ -477,18 +486,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.red.withValues(alpha: 0.1),
-        border: Border.all(
-          color: Colors.red.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Text(
         authError,
-        style: TextStyle(
-          color: Colors.red.shade400,
-          fontSize: 12,
-        ),
+        style: TextStyle(color: Colors.red.shade400, fontSize: 12),
       ),
     );
   }
@@ -521,10 +525,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         child: Center(
           child: isControllerLoading
-              ? const AppLoading(
-                  size: 24,
-                  color: Colors.white,
-                )
+              ? const AppLoading(size: 24, color: Colors.white)
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -558,18 +559,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           children: [
             const Text(
               'Đã có tài khoản? ',
-              style: TextStyle(
-                color: AppColors.grey,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: AppColors.grey, fontSize: 14),
             ),
             GestureDetector(
               onTap: () {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (_) => LoginScreen(
-                      onLoginSuccess: widget.onSignupSuccess,
-                    ),
+                    builder: (_) =>
+                        LoginScreen(onLoginSuccess: widget.onSignupSuccess),
                   ),
                 );
               },
@@ -621,11 +618,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
             child: Row(
               children: [
-                Icon(
-                  icon,
-                  color: AppColors.grey,
-                  size: 20,
-                ),
+                Icon(icon, color: AppColors.grey, size: 20),
                 const SizedBox(width: AppSpacing.md),
                 Text(
                   value.isEmpty ? placeholder : value,

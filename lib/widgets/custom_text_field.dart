@@ -12,6 +12,7 @@ class CustomTextField extends StatefulWidget {
   final IconData? suffixIcon;
   final void Function()? onSuffixIconPressed;
   final void Function(String)? onChanged;
+  final Iterable<String>? autofillHints;
 
   const CustomTextField({
     super.key,
@@ -25,6 +26,7 @@ class CustomTextField extends StatefulWidget {
     this.suffixIcon,
     this.onSuffixIconPressed,
     this.onChanged,
+    this.autofillHints,
   });
 
   @override
@@ -60,6 +62,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           obscureText: _obscureText,
           validator: widget.validator,
           onChanged: widget.onChanged,
+          autofillHints: widget.autofillHints,
           decoration: InputDecoration(
             hintText: widget.hintText,
             hintStyle: const TextStyle(color: AppColors.grey),
@@ -79,11 +82,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     },
                   )
                 : widget.suffixIcon != null
-                    ? IconButton(
-                        icon: Icon(widget.suffixIcon, color: AppColors.grey),
-                        onPressed: widget.onSuffixIconPressed,
-                      )
-                    : null,
+                ? IconButton(
+                    icon: Icon(widget.suffixIcon, color: AppColors.grey),
+                    onPressed: widget.onSuffixIconPressed,
+                  )
+                : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppBorderRadius.lg),
               borderSide: const BorderSide(color: AppColors.greyLight),
@@ -94,10 +97,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-              borderSide: const BorderSide(
-                color: AppColors.primary,
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppBorderRadius.lg),

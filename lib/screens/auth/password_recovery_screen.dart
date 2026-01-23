@@ -124,7 +124,7 @@ class _PasswordRecoveryScreenState
                 if (!_otpVerified)
                   _buildOtpSection(isLoading)
                 else
-                  _buildNewPasswordSection(isLoading),
+                  AutofillGroup(child: _buildNewPasswordSection(isLoading)),
               ],
             ),
           ),
@@ -209,7 +209,8 @@ class _PasswordRecoveryScreenState
           hintText: 'Ít nhất 6 ký tự',
           controller: _passwordController,
           prefixIcon: Icons.lock_outline,
-          obscureText: true,
+          isPassword: true,
+          autofillHints: const [AutofillHints.newPassword],
         ),
         const SizedBox(height: AppSpacing.md),
         CustomTextField(
@@ -217,7 +218,8 @@ class _PasswordRecoveryScreenState
           hintText: 'Nhập lại mật khẩu mới',
           controller: _confirmController,
           prefixIcon: Icons.lock_outline,
-          obscureText: true,
+          isPassword: true,
+          autofillHints: const [AutofillHints.newPassword],
         ),
         const SizedBox(height: AppSpacing.xl),
         CustomButton(
