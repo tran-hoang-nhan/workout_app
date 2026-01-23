@@ -65,12 +65,9 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
   Future<void> _handleValidationConfirm() async {
     _addUserMessage('Tôi đã xác nhận thông tin.');
     setState(() => _currentStep = AISuggestionStep.generating);
-
-    // Fetch real workouts to provide a valid target
     try {
       final workouts = await ref.read(workoutsProvider.future);
 
-      // Simulate AI Generation delay
       await Future.delayed(const Duration(seconds: 2));
 
       if (mounted) {
@@ -80,7 +77,6 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
         );
 
         if (workouts.isNotEmpty) {
-          // Pick a workout (ideally based on logic, but for now we pick the first or a relevant one)
           final suggestedWorkout = workouts.first;
           _addSystemMessage(
             'Tôi gợi ý bạn nên thực hiện bài tập: ${suggestedWorkout.title}. Đây là bài tập tối ưu nhất cho thể trạng hiện tại của bạn.',
