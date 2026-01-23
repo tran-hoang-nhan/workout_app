@@ -50,8 +50,17 @@ class AuthRepository {
 
   Future<void> updatePassword(String newPassword) async {
     try {
-      await _supabase.auth.updateUser(UserAttributes(password: newPassword));
+      debugPrint(
+        '[AuthRepository] Attempting password update for current user...',
+      );
+      final response = await _supabase.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+      debugPrint(
+        '[AuthRepository] Password update response: ${response.user != null ? "Success (User details returned)" : "Failure (No user returned in response)"}',
+      );
     } catch (e, st) {
+      debugPrint('[AuthRepository] Error updating password: $e');
       throw handleException(e, st);
     }
   }

@@ -247,34 +247,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildForm() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildInputField(
-          label: 'Email',
-          icon: Icons.mail_outline,
-          controller: emailController,
-          placeholder: 'email@example.com',
-          keyboardType: TextInputType.emailAddress,
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        _buildPasswordField(),
-        const SizedBox(height: AppSpacing.sm),
-        Align(
-          alignment: Alignment.centerRight,
-          child: GestureDetector(
-            onTap: _showForgotPasswordDialog,
-            child: const Text(
-              'Quên mật khẩu?',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+    return AutofillGroup(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildInputField(
+            label: 'Email',
+            icon: Icons.mail_outline,
+            controller: emailController,
+            placeholder: 'email@example.com',
+            keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _buildPasswordField(),
+          const SizedBox(height: AppSpacing.sm),
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: _showForgotPasswordDialog,
+              child: const Text(
+                'Quên mật khẩu?',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -292,6 +295,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     required TextEditingController controller,
     required String placeholder,
     TextInputType keyboardType = TextInputType.text,
+    Iterable<String>? autofillHints,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,6 +318,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
+            autofillHints: autofillHints,
             style: const TextStyle(color: AppColors.black, fontSize: 15),
             decoration: InputDecoration(
               hintText: placeholder,
@@ -353,6 +358,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: TextField(
             controller: passwordController,
             obscureText: !showPassword,
+            autofillHints: const [AutofillHints.password],
             style: const TextStyle(color: AppColors.black, fontSize: 15),
             decoration: InputDecoration(
               hintText: '••••••••',

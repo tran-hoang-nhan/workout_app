@@ -94,10 +94,25 @@ class AuthController extends AsyncNotifier<void> {
     return !result.hasError;
   }
 
-  Future<void> updatePassword(String newPassword) async {
+  Future<void> updatePassword(
+    String newPassword, {
+    String? confirmPassword,
+  }) async {
+    debugPrint('[AuthController] updatePassword starting...');
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(authServiceProvider).updatePassword(newPassword);
+      final authService = ref.read(authServiceProvider);
+      await authService.updatePassword(
+        newPassword,
+        confirmPassword: confirmPassword,
+      );
+      debugPrint('[AuthController] updatePassword completed successfully.');
     });
+
+    if (state.hasError) {
+      debugPrint(
+        '[AuthController] updatePassword failed with error: ${state.error}',
+      );
+    }
   }
 }
