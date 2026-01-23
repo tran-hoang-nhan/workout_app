@@ -48,7 +48,6 @@ class ProfileService {
         fullName: fullName,
         gender: gender,
         goal: goal,
-        weight: weight,
         age: age,
       );
       _ref.invalidate(currentUserProvider);

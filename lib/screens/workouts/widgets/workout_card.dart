@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
@@ -17,6 +18,18 @@ class WorkoutCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
+        const encoder = JsonEncoder.withIndent('  ');
+        final prettyJson = encoder.convert(workout.toJson());
+        
+        debugPrint('============ WORKOUT CLICKED ============');
+        debugPrint('Workout JSON:');
+        debugPrint(prettyJson);
+        debugPrint('Workout ID: ${workout.id}');
+        debugPrint('Workout Title: ${workout.title}');
+        debugPrint('Workout Category: ${workout.category}');
+        debugPrint('Workout Level: ${workout.level}');
+        debugPrint('========================================');
+        
         Navigator.push(
           context,
           MaterialPageRoute(

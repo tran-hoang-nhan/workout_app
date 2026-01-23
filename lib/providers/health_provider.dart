@@ -5,6 +5,7 @@ import '../models/health_data.dart';
 import '../models/health_params.dart';
 import '../utils/app_error.dart';
 import './auth_provider.dart';
+import './profile_provider.dart';
 import '../services/health_integration_service.dart';
 import '../services/notification_service.dart';
 
@@ -377,6 +378,11 @@ final saveHealthProfileProvider = FutureProvider.family<void, HealthProfileSaveP
     if (userId == null) {
       throw UnauthorizedException('Chưa đăng nhập');
     }
+    
+    // Get current user profile to preserve goal
+    final currentUser = await ref.read(fullUserProfileProvider.future);
+    final currentGoal = currentUser?.goal ?? 'maintain';
+    
     final form = ref.read(healthFormProvider);
     final updateParams = HealthUpdateParams(
       userId: userId,
@@ -385,7 +391,7 @@ final saveHealthProfileProvider = FutureProvider.family<void, HealthProfileSaveP
       height: params.height,
       gender: params.gender ?? form.gender,
       activityLevel: form.activityLevel,
-      goal: 'maintain', 
+      goal: currentGoal, // Use goal from user profile instead of hardcoding
       dietType: form.dietType,
       sleepHours: form.sleepHours.toInt(),
       waterIntake: form.waterIntake.toInt(),
