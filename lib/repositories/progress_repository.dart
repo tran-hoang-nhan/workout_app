@@ -5,13 +5,19 @@ import '../utils/app_error.dart';
 
 class ProgressRepository {
   final SupabaseClient _supabase;
-  ProgressRepository({SupabaseClient? supabase}): 
-    _supabase = supabase ?? Supabase.instance.client;
-    
+  ProgressRepository({SupabaseClient? supabase})
+    : _supabase = supabase ?? Supabase.instance.client;
+
   Future<List<WorkoutHistory>> getWorkoutHistory(String userId) async {
     try {
-      final response = await _supabase.from('workout_history').select().eq('user_id', userId).order('completed_at', ascending: false);
-      return (response as List).map((data) => WorkoutHistory.fromJson(data)).toList();
+      final response = await _supabase
+          .from('workout_history')
+          .select()
+          .eq('user_id', userId)
+          .order('completed_at', ascending: false);
+      return (response as List)
+          .map((data) => WorkoutHistory.fromJson(data))
+          .toList();
     } catch (e, st) {
       throw handleException(e, st);
     }
@@ -33,7 +39,7 @@ class ProgressRepository {
         0,
         (sum, item) => sum + (item.totalCaloriesBurned ?? 0),
       );
-      
+
       final totalDuration = history.fold<int>(
         0,
         (sum, item) => sum + (item.durationSeconds ?? 0),
@@ -45,6 +51,32 @@ class ProgressRepository {
         totalWorkouts: history.length,
         avgCaloriesPerSession: totalCalories / history.length,
       );
+    } catch (e, st) {
+      throw handleException(e, st);
+    }
+  }
+
+  Future<WorkoutHistory> recordWorkout({
+    required String userId,
+    required int? workoutId,
+    required String workoutTitle,
+    required double caloriesBurned,
+    required int durationSeconds,
+  }) async {
+    try {
+      final response = await _supabase
+          .from('workout_history')
+          .insert({
+            'user_id': userId,
+            'workout_id': workoutId,
+            'workout_title_snapshot': workoutTitle,
+            'total_calories_burned': caloriesBurned,
+            'duration_seconds': durationSeconds,
+            'completed_at': DateTime.now().toIso8601String(),
+          })
+          .select()
+          .single();
+      return WorkoutHistory.fromJson(response);
     } catch (e, st) {
       throw handleException(e, st);
     }
