@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/auth_service.dart';
 import '../models/user.dart';
-import '../models/auth.dart'; 
+import '../models/auth.dart';
 import '../repositories/auth_repository.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -28,7 +28,9 @@ final currentUserIdProvider = StreamProvider<String?>((ref) async* {
   yield authService.currentUser?.id;
   await for (final state in authService.authStateStream) {
     final userId = state.session?.user.id;
-    debugPrint('[currentUserIdProvider] Auth Event: ${state.event}, User: $userId');
+    debugPrint(
+      '[currentUserIdProvider] Auth Event: ${state.event}, User: $userId',
+    );
     yield userId;
   }
 });
@@ -46,8 +48,7 @@ final authControllerProvider = AsyncNotifierProvider<AuthController, void>(() {
 
 class AuthController extends AsyncNotifier<void> {
   @override
-  FutureOr<void> build() {
-  }
+  FutureOr<void> build() {}
 
   Future<void> signIn(SignInParams params) async {
     state = const AsyncValue.loading();
@@ -66,12 +67,37 @@ class AuthController extends AsyncNotifier<void> {
   Future<void> signOut() async {
     await ref.read(authServiceProvider).signOut();
   }
-  
+
   Future<void> updateProfile(UpdateProfileParams params) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await ref.read(authServiceProvider).updateUserProfile(params);
       ref.invalidate(currentUserProvider);
+    });
+  }
+
+  Future<void> resetPassword(String email) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      // In a real app, you might want to configure a proper redirect URL
+      // For now, we rely on the OTP flow primarily
+      await ref.read(authServiceProvider).resetPassword(email);
+    });
+  }
+
+  Future<bool> verifyRecoveryOTP(String email, String token) async {
+    state = const AsyncValue.loading();
+    final result = await AsyncValue.guard(() async {
+      await ref.read(authServiceProvider).verifyRecoveryOTP(email, token);
+    });
+    state = result;
+    return !result.hasError;
+  }
+
+  Future<void> updatePassword(String newPassword) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(authServiceProvider).updatePassword(newPassword);
     });
   }
 }

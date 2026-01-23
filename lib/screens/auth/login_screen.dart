@@ -6,14 +6,12 @@ import '../../providers/auth_provider.dart';
 import '../../models/auth.dart';
 import '../../utils/app_error.dart';
 import 'register_screen.dart';
+import 'widgets/forgot_password_dialog.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   final Future<void> Function() onLoginSuccess;
 
-  const LoginScreen({
-    super.key,
-    required this.onLoginSuccess,
-  });
+  const LoginScreen({super.key, required this.onLoginSuccess});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -53,11 +51,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
 
       await ref.read(authControllerProvider.notifier).signIn(params);
-      
+
       final authState = ref.read(authControllerProvider);
       if (authState.hasError) {
         final error = authState.error;
-        setState(() => authError = error is AppError ? error.userMessage : error.toString());
+        setState(
+          () => authError = error is AppError
+              ? error.userMessage
+              : error.toString(),
+        );
         return;
       }
 
@@ -66,7 +68,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => authError = e is AppError ? e.userMessage : e.toString());
+        setState(
+          () => authError = e is AppError ? e.userMessage : e.toString(),
+        );
       }
     }
   }
@@ -107,12 +111,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     maxWidth: 450,
-                    minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom - 40,
+                    minHeight:
+                        MediaQuery.of(context).size.height -
+                        MediaQuery.of(context).padding.top -
+                        MediaQuery.of(context).padding.bottom -
+                        40,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -215,10 +224,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             const SizedBox(height: AppSpacing.xs),
             const Text(
               'Đăng nhập để tiếp tục tập luyện',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.grey,
-              ),
+              style: TextStyle(fontSize: 14, color: AppColors.grey),
             ),
             const SizedBox(height: AppSpacing.xl),
             // Form
@@ -253,7 +259,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         const SizedBox(height: AppSpacing.lg),
         _buildPasswordField(),
+        const SizedBox(height: AppSpacing.sm),
+        Align(
+          alignment: Alignment.centerRight,
+          child: GestureDetector(
+            onTap: _showForgotPasswordDialog,
+            child: const Text(
+              'Quên mật khẩu?',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
       ],
+    );
+  }
+
+  Future<void> _showForgotPasswordDialog() async {
+    return showDialog(
+      context: context,
+      builder: (context) =>
+          ForgotPasswordDialog(initialEmail: emailController.text),
     );
   }
 
@@ -289,11 +318,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             decoration: InputDecoration(
               hintText: placeholder,
               hintStyle: const TextStyle(color: AppColors.grey, fontSize: 15),
-              prefixIcon: Icon(
-                icon,
-                color: AppColors.grey,
-                size: 20,
-              ),
+              prefixIcon: Icon(icon, color: AppColors.grey, size: 20),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.md,
@@ -363,18 +388,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.red.withValues(alpha: 0.1),
-        border: Border.all(
-          color: Colors.red.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Text(
         authError,
-        style: TextStyle(
-          color: Colors.red.shade400,
-          fontSize: 12,
-        ),
+        style: TextStyle(color: Colors.red.shade400, fontSize: 12),
       ),
     );
   }
@@ -448,18 +468,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           children: [
             const Text(
               'Chưa có tài khoản? ',
-              style: TextStyle(
-                color: AppColors.grey,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: AppColors.grey, fontSize: 14),
             ),
             GestureDetector(
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => RegisterScreen(
-                      onSignupSuccess: widget.onLoginSuccess,
-                    ),
+                    builder: (_) =>
+                        RegisterScreen(onSignupSuccess: widget.onLoginSuccess),
                   ),
                 );
               },
