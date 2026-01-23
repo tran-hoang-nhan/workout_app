@@ -4,14 +4,12 @@ import 'package:intl/intl.dart';
 import '../../../constants/app_constants.dart';
 import '../../../utils/app_error.dart';
 import '../../../widgets/loading_animation.dart';
+import '../../../models/workout_history.dart';
 
 class WorkoutHistoryList extends StatelessWidget {
   final AsyncValue<List<dynamic>> historyAsync;
 
-  const WorkoutHistoryList({
-    super.key,
-    required this.historyAsync,
-  });
+  const WorkoutHistoryList({super.key, required this.historyAsync});
 
   @override
   Widget build(BuildContext context) {
@@ -28,61 +26,82 @@ class WorkoutHistoryList extends StatelessWidget {
           );
         }
         return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final item = history[index];
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.fitness_center, color: AppColors.primary),
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final item = history[index];
+            final workoutName = item is WorkoutHistory
+                ? item.workoutName
+                : (item as dynamic).workoutName;
+            final completedAt = item is WorkoutHistory
+                ? item.completedAt
+                : (item as dynamic).completedAt;
+            final calories = item is WorkoutHistory
+                ? item.totalCaloriesBurned
+                : (item as dynamic).totalCaloriesBurned;
+            final duration = item is WorkoutHistory
+                ? item.durationSeconds
+                : (item as dynamic).durationSeconds;
+
+            return Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.xs,
+              ),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.workoutName ?? 'Bài tập',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            DateFormat('dd/MM/yyyy • HH:mm').format(item.completedAt),
-                            style: TextStyle(fontSize: 12, color: AppColors.grey),
-                          ),
-                        ],
-                      ),
+                    child: const Icon(
+                      Icons.fitness_center,
+                      color: AppColors.primary,
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${item.totalCaloriesBurned?.toInt() ?? 0} kcal',
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
+                          workoutName ?? 'Bài tập',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          '${(item.durationSeconds ?? 0) ~/ 60}p',
+                          DateFormat(
+                            'dd/MM/yyyy • HH:mm',
+                          ).format(completedAt ?? DateTime.now()),
                           style: TextStyle(fontSize: 12, color: AppColors.grey),
                         ),
                       ],
                     ),
-                  ],
-                ),
-              );
-            },
-            childCount: history.length,
-          ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '${calories?.toInt() ?? 0} kcal',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      Text(
+                        '${(duration ?? 0) ~/ 60}p',
+                        style: TextStyle(fontSize: 12, color: AppColors.grey),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }, childCount: history.length),
         );
       },
       loading: () => const SliverToBoxAdapter(
