@@ -11,6 +11,7 @@ class RegistrationTransactionService {
   final AuthRepository _authRepo;
   final HealthRepository _healthRepo;
   final SupabaseClient _supabase;
+  
   RegistrationTransactionService({ AuthRepository? authRepo, HealthRepository? healthRepo,}):
     _authRepo = authRepo ?? AuthRepository(),
     _healthRepo = healthRepo ?? HealthRepository(),

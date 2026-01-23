@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import 'widgets/stats_section.dart';
-import 'widgets/plan_section.dart';
+import 'widgets/ai_suggestions_section.dart';
 import 'widgets/quick_workout_section.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -174,8 +174,8 @@ class HomeScreen extends ConsumerWidget {
               const StatsSection(),
               const SizedBox(height: AppSpacing.md),
               
-              // Plan Section (includes next workout)
-              const PlanSection(),
+              // AI Suggestions Section
+              const AISuggestionsSection(),
               const SizedBox(height: AppSpacing.lg),
               
               // Quick Workout Section

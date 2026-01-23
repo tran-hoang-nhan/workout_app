@@ -21,9 +21,8 @@ class ProfileScreen extends ConsumerWidget {
       backgroundColor: AppColors.bgLight,
       body: SafeArea(
         child: userAsync.when(
-          loading: () => const Center(
-            child: AppLoading(message: 'Đang tải thông tin...'),
-          ),
+          loading: () =>
+              const Center(child: AppLoading(message: 'Đang tải thông tin...')),
           error: (e, st) => Center(
             child: Text(
               e is AppError ? e.userMessage : 'Lỗi: $e',
@@ -36,7 +35,12 @@ class ProfileScreen extends ConsumerWidget {
             }
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.xl, AppSpacing.lg, 120),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.xl,
+                AppSpacing.lg,
+                120,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -60,12 +64,7 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
-                  const ProfileStatsSection(
-                    totalWorkouts: '0',
-                    totalTime: '0h',
-                    caloriesBurned: '0k',
-                    streakDays: '0 ngày',
-                  ),
+                  const ProfileStatsSection(),
                   const SizedBox(height: 32),
                   const Text(
                     'Cài đặt & Hỗ trợ',
@@ -100,11 +99,15 @@ class ProfileScreen extends ConsumerWidget {
                   ProfileLogoutButton(
                     onLogoutConfirmed: () async {
                       try {
-                        await ref.read(authControllerProvider.notifier).signOut();
+                        await ref
+                            .read(authControllerProvider.notifier)
+                            .signOut();
                         if (context.mounted) {
                           ref.invalidate(currentUserIdProvider);
                           ref.invalidate(currentUserProvider);
-                          Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+                          Navigator.of(
+                            context,
+                          ).pushNamedAndRemoveUntil('/', (route) => false);
                         }
                       } catch (e) {
                         debugPrint('Logout error: $e');
