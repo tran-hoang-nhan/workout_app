@@ -83,20 +83,32 @@ class _PasswordRecoveryScreenState
     }
 
     try {
+      // Bước 1: Cập nhật mật khẩu
       await ref.read(authControllerProvider.notifier).updatePassword(password);
+      
+      // Bước 2: QUAN TRỌNG - Sign out để clear session cũ
+      await ref.read(authControllerProvider.notifier).signOut();
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Mật khẩu đã được cập nhật thành công!'),
+            content: Text('Mật khẩu đã được cập nhật thành công! Vui lòng đăng nhập lại.'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
           ),
         );
+        
+        // Bước 3: Quay về màn hình login và clear toàn bộ navigation stack
         Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+        ).showSnackBar(SnackBar(
+          content: Text('Lỗi: $e'),
+          backgroundColor: Colors.red,
+        ));
       }
     }
   }
@@ -160,7 +172,7 @@ class _PasswordRecoveryScreenState
         Text(
           _otpVerified
               ? 'Mật khẩu mới của bạn phải khác mật khẩu cũ.'
-              : 'Mã xác nhận đã được gửi đến:\n${widget.email}',
+              : 'Mã xác nhận đã được gửi đến:\n${widget.email}\n\nMã sẽ hết hạn sau 10 phút.',
           style: const TextStyle(color: AppColors.grey),
           textAlign: TextAlign.center,
         ),
@@ -173,7 +185,7 @@ class _PasswordRecoveryScreenState
       children: [
         CustomTextField(
           label: 'Mã OTP',
-          hintText: 'Nhập mã 6 chữ số',
+          hintText: 'Nhập mã 8 chữ số',
           controller: _otpController,
           prefixIcon: Icons.key_outlined,
           keyboardType: TextInputType.number,
@@ -190,9 +202,7 @@ class _PasswordRecoveryScreenState
         else
           TextButton(
             onPressed: () {
-              ref
-                  .read(authControllerProvider.notifier)
-                  .resetPassword(widget.email);
+              ref.read(authControllerProvider.notifier).resetPassword(widget.email);
               _startResendCountdown();
             },
             child: const Text('Gửi lại mã xác nhận'),

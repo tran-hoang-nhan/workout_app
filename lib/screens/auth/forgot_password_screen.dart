@@ -4,6 +4,8 @@ import '../../constants/app_constants.dart';
 import '../../utils/validation_utils.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_button.dart';
+import '../../providers/auth_provider.dart';
+import 'password_recovery_screen.dart';
 
 class ForgotPasswordScreen extends ConsumerWidget {
   const ForgotPasswordScreen({super.key});
@@ -12,6 +14,7 @@ class ForgotPasswordScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = GlobalKey<FormState>();
     final emailController = TextEditingController();
+    final authState = ref.watch(authControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +45,7 @@ class ForgotPasswordScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   const Text(
-                    'Nhập email của bạn và chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu.',
+                    'Nhập email của bạn và chúng tôi sẽ gửi mã xác nhận để đặt lại mật khẩu.',
                     style: TextStyle(
                       fontSize: AppFontSize.md,
                       color: AppColors.grey,
@@ -59,10 +62,37 @@ class ForgotPasswordScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   CustomButton(
-                    label: 'Gửi Hướng Dẫn Đặt Lại',
-                    onPressed: () {
+                    label: 'Gửi Mã Xác Nhận',
+                    isLoading: authState.isLoading,
+                    onPressed: () async {
                       if (formKey.currentState!.validate()) {
-                        // Call service via provider
+                        final email = emailController.text.trim();
+                        try {
+                          await ref.read(authControllerProvider.notifier).resetPassword(email);
+                          if (context.mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PasswordRecoveryScreen(email: email),
+                              ),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Mã xác nhận đã được gửi đến email của bạn!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Lỗi: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
                       }
                     },
                   ),
@@ -88,7 +118,7 @@ class ForgotPasswordScreen extends ConsumerWidget {
                         Text(
                           '• Kiểm tra thư mục Spam hoặc Promotions\n'
                           '• Email có thể mất vài phút để nhận\n'
-                          '• Link đặt lại sẽ hết hạn sau 1 giờ',
+                          '• Mã xác nhận sẽ hết hạn sau 10 phút',
                           style: TextStyle(
                             fontSize: AppFontSize.sm,
                             color: AppColors.grey,
