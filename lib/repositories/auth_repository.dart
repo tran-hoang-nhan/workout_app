@@ -42,7 +42,11 @@ class AuthRepository {
 
   Future<void> resetPassword(String email, {String? redirectTo}) async {
     try {
-      await _supabase.auth.resetPasswordForEmail(email, redirectTo: redirectTo);
+      // Gửi OTP thay vì link reset password
+      await _supabase.auth.resetPasswordForEmail(
+        email,
+        redirectTo: null, // Không cần redirect URL khi dùng OTP
+      );
     } catch (e, st) {
       throw handleException(e, st);
     }

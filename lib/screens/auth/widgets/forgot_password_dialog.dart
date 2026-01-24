@@ -33,13 +33,22 @@ class _ForgotPasswordDialogState extends ConsumerState<ForgotPasswordDialog> {
     if (email.isEmpty) return;
 
     try {
+      // Gửi mã OTP đến email
       await ref.read(authControllerProvider.notifier).resetPassword(email);
       if (mounted) {
         Navigator.pop(context); // Close dialog
+        // Chuyển trực tiếp đến màn hình nhập OTP
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => PasswordRecoveryScreen(email: email),
+          ),
+        );
+        // Hiển thị thông báo thành công
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Mã xác nhận đã được gửi đến email của bạn!'),
+            backgroundColor: Colors.green,
           ),
         );
       }
@@ -47,7 +56,10 @@ class _ForgotPasswordDialogState extends ConsumerState<ForgotPasswordDialog> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+        ).showSnackBar(SnackBar(
+          content: Text('Lỗi: $e'),
+          backgroundColor: Colors.red,
+        ));
       }
     }
   }
@@ -59,7 +71,7 @@ class _ForgotPasswordDialogState extends ConsumerState<ForgotPasswordDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('Nhập email của bạn để nhận liên kết đặt lại mật khẩu.'),
+          const Text('Nhập email của bạn để nhận mã xác nhận đặt lại mật khẩu.'),
           const SizedBox(height: AppSpacing.md),
           TextField(
             controller: emailController,
