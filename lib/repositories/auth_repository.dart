@@ -7,8 +7,7 @@ import '../utils/app_error.dart';
 
 class AuthRepository {
   final SupabaseClient _supabase;
-  AuthRepository({SupabaseClient? supabase})
-    : _supabase = supabase ?? Supabase.instance.client;
+  AuthRepository({SupabaseClient? supabase}): _supabase = supabase ?? Supabase.instance.client;
   Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
   User? get currentUser => _supabase.auth.currentUser;
   Session? get currentSession => _supabase.auth.currentSession;
@@ -42,11 +41,7 @@ class AuthRepository {
 
   Future<void> resetPassword(String email, {String? redirectTo}) async {
     try {
-      // Gửi OTP thay vì link reset password
-      await _supabase.auth.resetPasswordForEmail(
-        email,
-        redirectTo: null, // Không cần redirect URL khi dùng OTP
-      );
+      await _supabase.auth.resetPasswordForEmail(email, redirectTo: null,);
     } catch (e, st) {
       throw handleException(e, st);
     }
@@ -54,25 +49,16 @@ class AuthRepository {
 
   Future<void> updatePassword(String newPassword) async {
     try {
-      debugPrint(
-        '[AuthRepository] Attempting password update for current user...',
-      );
-      final response = await _supabase.auth.updateUser(
-        UserAttributes(password: newPassword),
-      );
-      debugPrint(
-        '[AuthRepository] Password update response: ${response.user != null ? "Success (User details returned)" : "Failure (No user returned in response)"}',
-      );
+      debugPrint('[AuthRepository] Attempting password update for current user...',);
+      final response = await _supabase.auth.updateUser(UserAttributes(password: newPassword),);
+      debugPrint('[AuthRepository] Password update response: ${response.user != null ? "Success (User details returned)" : "Failure (No user returned in response)"}',);
     } catch (e, st) {
       debugPrint('[AuthRepository] Error updating password: $e');
       throw handleException(e, st);
     }
   }
 
-  Future<void> createUserProfile({
-    required String id,
-    required SignUpParams params,
-  }) async {
+  Future<void> createUserProfile({required String id, required SignUpParams params,}) async {
     try {
       await _supabase.from(SupabaseConfig.profilesTable).insert({
         'id': id,
@@ -91,11 +77,7 @@ class AuthRepository {
 
   Future<AppUser?> getUserProfile(String userId) async {
     try {
-      final response = await _supabase
-          .from(SupabaseConfig.profilesTable)
-          .select()
-          .eq('id', userId)
-          .maybeSingle();
+      final response = await _supabase.from(SupabaseConfig.profilesTable).select().eq('id', userId).maybeSingle();
       if (response == null) return null;
       return AppUser.fromJson(response);
     } catch (e, st) {
@@ -105,20 +87,13 @@ class AuthRepository {
 
   Future<void> updateUserProfile(UpdateProfileParams params) async {
     try {
-      await _supabase
-          .from(SupabaseConfig.profilesTable)
-          .update(params.toUpdateMap())
-          .eq('id', params.userId);
+      await _supabase.from(SupabaseConfig.profilesTable).update(params.toUpdateMap()).eq('id', params.userId);
     } catch (e, st) {
       throw handleException(e, st);
     }
   }
 
-  Future<AuthResponse> verifyOTP({
-    required String email,
-    required String token,
-    required OtpType type,
-  }) async {
+  Future<AuthResponse> verifyOTP({required String email, required String token, required OtpType type,}) async {
     try {
       return await _supabase.auth.verifyOTP(
         email: email,
@@ -130,10 +105,7 @@ class AuthRepository {
     }
   }
 
-  Future<ResendResponse> resendOTP({
-    required String email,
-    required OtpType type,
-  }) async {
+  Future<ResendResponse> resendOTP({required String email, required OtpType type,}) async {
     try {
       return await _supabase.auth.resend(type: type, email: email);
     } catch (e, st) {
@@ -170,10 +142,7 @@ class AuthRepository {
 
   Future<void> _deleteAuthUser(String userId) async {
     try {
-      await _supabase
-          .from(SupabaseConfig.profilesTable)
-          .delete()
-          .eq('id', userId);
+      await _supabase.from(SupabaseConfig.profilesTable).delete().eq('id', userId);
     } catch (e, st) {
       throw handleException(e, st);
     }

@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
-import '../../../providers/health_provider.dart';
+import '../../../providers/progress_user_provider.dart';
 
 class WaterCard extends ConsumerWidget {
   final int currentCups;
+  final int waterGoal;
   final double height;
-  static const int waterGoal = 8;
 
   const WaterCard({
     super.key,
     required this.currentCups,
+    required this.waterGoal,
     required this.height,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progress = (currentCups / waterGoal).clamp(0.0, 1.0);
+    final isCompleted = waterGoal > 0 && currentCups >= waterGoal;
+    final progress = (waterGoal > 0)
+        ? (currentCups / waterGoal).clamp(0.0, 1.0)
+        : 0.0;
     final remaining = (waterGoal - currentCups).clamp(0, waterGoal);
 
     return Expanded(
@@ -65,11 +69,15 @@ class WaterCard extends ConsumerWidget {
                             ),
                           ),
                           Text(
-                            remaining > 0 ? 'Còn $remaining ly' : 'Đã hoàn thành!',
+                            isCompleted ? 'Hoàn thành!' : 'Còn $remaining ly',
                             style: TextStyle(
                               fontSize: 11,
-                              color: remaining > 0 ? AppColors.grey : Colors.green.shade600,
-                              fontWeight: remaining > 0 ? FontWeight.normal : FontWeight.bold,
+                              color: isCompleted
+                                  ? Colors.green.shade600
+                                  : AppColors.grey,
+                              fontWeight: isCompleted
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                             ),
                           ),
                         ],
@@ -81,12 +89,15 @@ class WaterCard extends ConsumerWidget {
                           width: 60,
                           height: 80,
                           child: TweenAnimationBuilder<double>(
-                            tween: Tween(begin: 0, end: progress),
+                            tween: Tween(begin: 0, end: progress.toDouble()),
                             duration: const Duration(milliseconds: 1000),
                             curve: Curves.easeInOutCubic,
                             builder: (context, value, child) {
                               return CustomPaint(
-                                painter: _WaterCupPainter(progress: value),
+                                painter: _WaterCupPainter(
+                                  progress: value,
+                                  isCompleted: isCompleted,
+                                ),
                               );
                             },
                           ),
@@ -99,9 +110,16 @@ class WaterCard extends ConsumerWidget {
             ),
             Row(
               children: [
-                _buildWaterButton(Icons.remove, () => _updateWaterCup(ref, -1)),
+                _buildWaterButton(
+                  Icons.remove,
+                  () => _updateWaterCup(context, ref, -1),
+                ),
                 const SizedBox(width: 8),
-                _buildWaterButton(Icons.add, () => _updateWaterCup(ref, 1), isPrimary: true),
+                _buildWaterButton(
+                  Icons.add,
+                  () => _updateWaterCup(context, ref, 1),
+                  isPrimary: true,
+                ),
               ],
             ),
           ],
@@ -110,11 +128,26 @@ class WaterCard extends ConsumerWidget {
     );
   }
 
-  void _updateWaterCup(WidgetRef ref, int delta) {
-    final currentState = ref.read(healthFormProvider);
-    final currentMl = currentState.waterIntake;
-    final newMl = (currentMl + (delta * 250)).clamp(0.0, 5000.0);
-    ref.read(healthFormProvider.notifier).setWaterIntake(newMl);
+  void _updateWaterCup(
+    BuildContext context,
+    WidgetRef ref,
+    int deltaCups,
+  ) async {
+    try {
+      final deltaMl = deltaCups * 250;
+      await ref
+          .read(progressUserControllerProvider.notifier)
+          .updateWater(deltaMl);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildIconBox(IconData icon, Color color) {
@@ -128,7 +161,11 @@ class WaterCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildWaterButton(IconData icon, VoidCallback onTap, {bool isPrimary = false}) {
+  Widget _buildWaterButton(
+    IconData icon,
+    VoidCallback onTap, {
+    bool isPrimary = false,
+  }) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -140,13 +177,15 @@ class WaterCard extends ConsumerWidget {
             border: Border.all(
               color: isPrimary ? Colors.blue.shade500 : Colors.blue.shade100,
             ),
-            boxShadow: isPrimary ? [
-              BoxShadow(
-                color: Colors.blue.shade500.withValues(alpha: 0.2),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              )
-            ] : null,
+            boxShadow: isPrimary
+                ? [
+                    BoxShadow(
+                      color: Colors.blue.shade500.withValues(alpha: 0.2),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
           ),
           child: Icon(
             icon,
@@ -176,8 +215,9 @@ class WaterCard extends ConsumerWidget {
 
 class _WaterCupPainter extends CustomPainter {
   final double progress;
+  final bool isCompleted;
 
-  _WaterCupPainter({required this.progress});
+  _WaterCupPainter({required this.progress, this.isCompleted = false});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -194,7 +234,9 @@ class _WaterCupPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment.bottomCenter,
         end: Alignment.topCenter,
-        colors: [Colors.blue.shade700, Colors.blue.shade400],
+        colors: isCompleted
+            ? [Colors.green.shade700, Colors.green.shade400]
+            : [Colors.blue.shade700, Colors.blue.shade400],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
     // Draw Cup Background
@@ -211,7 +253,7 @@ class _WaterCupPainter extends CustomPainter {
     if (progress > 0) {
       final liquidHeight = size.height * progress;
       final liquidTop = size.height - liquidHeight;
-      
+
       // Calculate liquid path based on progress (cup is wider at top)
       final liquidPath = Path()
         ..moveTo(size.width * (0.2 - (0.1 * progress)), liquidTop)
@@ -219,7 +261,7 @@ class _WaterCupPainter extends CustomPainter {
         ..lineTo(size.width * 0.8, size.height)
         ..lineTo(size.width * 0.2, size.height)
         ..close();
-      
+
       canvas.drawPath(liquidPath, liquidPaint);
 
       final surfacePaint = Paint()
@@ -238,6 +280,6 @@ class _WaterCupPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _WaterCupPainter oldDelegate) => 
+  bool shouldRepaint(covariant _WaterCupPainter oldDelegate) =>
       oldDelegate.progress != progress;
 }
