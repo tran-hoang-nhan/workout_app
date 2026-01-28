@@ -237,10 +237,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             // Submit Button
             const SizedBox(height: AppSpacing.xl),
             _buildSubmitButton(),
+            // Forgot Password Link
+            const SizedBox(height: AppSpacing.md),
+            _buildForgotPasswordLink(),
             // Toggle Mode Link
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.xl),
             _buildSignupLink(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildForgotPasswordLink() {
+    return Align(
+      alignment: Alignment.center,
+      child: GestureDetector(
+        onTap: _showForgotPasswordDialog,
+        child: const Text(
+          'Quên mật khẩu?',
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -261,21 +281,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           const SizedBox(height: AppSpacing.lg),
           _buildPasswordField(),
-          const SizedBox(height: AppSpacing.sm),
-          Align(
-            alignment: Alignment.centerRight,
-            child: GestureDetector(
-              onTap: _showForgotPasswordDialog,
-              child: const Text(
-                'Quên mật khẩu?',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );

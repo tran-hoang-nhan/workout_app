@@ -11,13 +11,18 @@ class RegistrationTransactionService {
   final AuthRepository _authRepo;
   final HealthRepository _healthRepo;
   final SupabaseClient _supabase;
-  
-  RegistrationTransactionService({ AuthRepository? authRepo, HealthRepository? healthRepo,}):
-    _authRepo = authRepo ?? AuthRepository(),
-    _healthRepo = healthRepo ?? HealthRepository(),
-    _supabase = Supabase.instance.client;
 
-  Future<AppUser?> completeRegistration({ required SignUpParams signUpParams, required HealthUpdateParams healthParams,}) async {
+  RegistrationTransactionService({
+    AuthRepository? authRepo,
+    HealthRepository? healthRepo,
+  }) : _authRepo = authRepo ?? AuthRepository(),
+       _healthRepo = healthRepo ?? HealthRepository(),
+       _supabase = Supabase.instance.client;
+
+  Future<AppUser?> completeRegistration({
+    required SignUpParams signUpParams,
+    required HealthUpdateParams healthParams,
+  }) async {
     String? createdUserId;
     bool profileCreated = false;
     try {
@@ -46,8 +51,8 @@ class RegistrationTransactionService {
         waterReminderEnabled: healthParams.waterReminderEnabled,
         waterReminderInterval: healthParams.waterReminderInterval,
       );
-      
-      await _healthRepo.saveHealthDataWithTransaction(healthParamsWithUserId);
+
+      await _healthRepo.updateFullProfile(healthParamsWithUserId);
       debugPrint('✅ Health data created');
       return user;
     } catch (e, st) {
