@@ -112,7 +112,9 @@ class InputSection extends ConsumerWidget {
 
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.primary),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
                     ),
@@ -145,7 +147,9 @@ class InputSection extends ConsumerWidget {
 
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.primary),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
                     ),
@@ -167,35 +171,47 @@ class InputSection extends ConsumerWidget {
                     }
                     if (weight != null || height != null) {
                       try {
-                        await ref.read(saveHealthProfileProvider(HealthProfileSaveParams(
-                          height: height ?? formState.height,
-                          gender: null,
-                        )).future);
+                        await ref
+                            .read(healthControllerProvider.notifier)
+                            .saveQuickMetrics(weight: weight, height: height);
+
+                        // Log weight history if provided
                         if (weight != null) {
                           try {
-                            final userId = ref.read(currentUserIdProvider).value;
+                            final userId = ref
+                                .read(currentUserIdProvider)
+                                .value;
                             if (userId != null) {
-                              final weightService = ref.read(weightServiceProvider);
-                              await weightService.logNewWeight(
-                                userId: userId,
-                                weight: weight,
+                              await ref
+                                  .read(weightServiceProvider)
+                                  .logNewWeight(userId: userId, weight: weight);
+                              debugPrint(
+                                '[InputSection] Weight saved to body_metrics',
                               );
-                              debugPrint('[InputSection] Weight saved to body_metrics');
                             }
                           } catch (e) {
-                            debugPrint('[InputSection] Warning: Could not save to body_metrics: $e');
+                            debugPrint(
+                              '[InputSection] Warning: Could not save to body_metrics: $e',
+                            );
                           }
                         }
-                        
+
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đã lưu cân nặng và chiều cao thành công!')),
+                            const SnackBar(
+                              content: Text(
+                                'Đã lưu cân nặng và chiều cao thành công!',
+                              ),
+                            ),
                           );
                         }
                       } catch (e) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Lỗi: ${e.toString()}')),
+                            SnackBar(
+                              content: Text('Lỗi: ${e.toString()}'),
+                              backgroundColor: Colors.red,
+                            ),
                           );
                         }
                       }
@@ -203,7 +219,9 @@ class InputSection extends ConsumerWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.md,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

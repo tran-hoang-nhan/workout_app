@@ -167,6 +167,8 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         onLoginSuccess: () async {
           ref.invalidate(healthDataProvider);
           ref.invalidate(hasHealthDataProvider);
+          // Preload health data để các màn hình khác sử dụng ngay
+          await ref.read(healthDataProvider.future);
           await ref.read(hasHealthDataProvider.future);
           logger.i('Login success and health data checked.');
         },
@@ -190,6 +192,8 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         onComplete: () async {
           ref.invalidate(healthDataProvider);
           ref.invalidate(hasHealthDataProvider);
+          // Preload health data sau khi hoàn thành onboarding
+          await ref.read(healthDataProvider.future);
         },
       );
     }
@@ -197,14 +201,24 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   }
 }
 
-class AppShell extends StatefulWidget {
+class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
   @override
-  State<AppShell> createState() => _AppShellState();
+  ConsumerState<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends ConsumerState<AppShell> {
   String _activeTab = 'home';
+  
+  @override
+  void initState() {
+    super.initState();
+    // Preload health data ngay khi vào app
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(healthDataProvider.future);
+    });
+  }
+  
   void _setActiveTab(String tabId) {
     setState(() => _activeTab = tabId);
   }

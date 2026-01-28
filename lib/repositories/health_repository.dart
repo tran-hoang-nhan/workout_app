@@ -33,43 +33,55 @@ class HealthRepository {
     }
   }
 
-  Future<void> saveHealthData(HealthUpdateParams params) async {
+  Future<void> updateQuickMetrics({
+    required String userId,
+    double? weight,
+    double? height,
+  }) async {
     try {
-      await _supabase
-          .from('health')
-          .upsert(params.toHealthMap(), onConflict: 'user_id');
-      await _supabase
-          .from('profiles')
-          .update(params.toProfileMap())
-          .eq('id', params.userId);
+      if (weight != null || height != null) {
+        final healthData = <String, dynamic>{
+          'user_id': userId,
+          'updated_at': DateTime.now().toIso8601String(),
+        };
+        if (weight != null) healthData['weight'] = weight;
+        if (height != null) healthData['height'] = height;
+        await _supabase
+            .from('health')
+            .upsert(healthData, onConflict: 'user_id');
+      }
     } catch (e, st) {
-      debugPrint('[HealthRepository] Error saving data: $e');
+      debugPrint('[HealthRepository] Error updating quick metrics: $e');
       throw handleException(e, st);
     }
   }
 
-  Future<void> saveHealthDataWithTransaction(HealthUpdateParams params) async {
-    bool healthCreated = false;
-    bool profileUpdated = false;
+  Future<void> updateFullProfile(HealthUpdateParams params) async {
     try {
-      await _supabase
-          .from('health')
-          .upsert(params.toHealthMap(), onConflict: 'user_id');
-      healthCreated = true;
-      await _supabase
-          .from('profiles')
-          .update(params.toProfileMap())
-          .eq('id', params.userId);
-      profileUpdated = true;
+      await _supabase.rpc(
+        'update_health_profile_and_log',
+        params: {
+          'p_user_id': params.userId,
+          'p_age': params.age,
+          'p_weight': params.weight,
+          'p_height': params.height,
+          'p_gender': params.gender,
+          'p_goal': params.goal,
+          'p_activity_level': params.activityLevel,
+          'p_diet_type': params.dietType,
+          'p_sleep_hours': params.sleepHours,
+          'p_water_intake': params.waterIntake,
+          'p_injuries': params.injuries,
+          'p_medical_conditions': params.medicalConditions,
+          'p_allergies': params.allergies,
+          'p_water_reminder_enabled': params.waterReminderEnabled,
+          'p_water_reminder_interval': params.waterReminderInterval,
+        },
+      );
     } catch (e, st) {
-      if (healthCreated && !profileUpdated) {
-        try {
-          await _supabase.from('health').delete().eq('user_id', params.userId);
-          debugPrint('✅ Rolled back health data');
-        } catch (rollbackError) {
-          debugPrint('⚠️ Failed to rollback health data: $rollbackError');
-        }
-      }
+      debugPrint(
+        '[HealthRepository] Error updating full profile with transaction: $e',
+      );
       throw handleException(e, st);
     }
   }

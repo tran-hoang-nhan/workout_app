@@ -1,22 +1,43 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../providers/progress_provider.dart';
 
-class ProfileStatsSection extends StatelessWidget {
-  final String totalWorkouts;
-  final String totalTime;
-  final String caloriesBurned;
-  final String streakDays;
-
-  const ProfileStatsSection({
-    super.key,
-    required this.totalWorkouts,
-    required this.totalTime,
-    required this.caloriesBurned,
-    required this.streakDays,
-  });
+class ProfileStatsSection extends ConsumerWidget {
+  const ProfileStatsSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.watch(progressStatsProvider);
+
+    return statsAsync.when(
+      data: (stats) => _buildContent(
+        totalWorkouts: stats.totalWorkouts.toString(),
+        totalTime: '${(stats.totalDuration / 3600).toStringAsFixed(1)}h',
+        caloriesBurned: '${(stats.totalCalories / 1000).toStringAsFixed(1)}k',
+        streakDays: '0 ngày',
+      ),
+      loading: () => _buildContent(
+        totalWorkouts: '...',
+        totalTime: '...',
+        caloriesBurned: '...',
+        streakDays: '...',
+      ),
+      error: (e, _) => _buildContent(
+        totalWorkouts: '!',
+        totalTime: '!',
+        caloriesBurned: '!',
+        streakDays: '!',
+      ),
+    );
+  }
+
+  Widget _buildContent({
+    required String totalWorkouts,
+    required String totalTime,
+    required String caloriesBurned,
+    required String streakDays,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,7 +52,6 @@ class ProfileStatsSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
         Row(
           children: [
-            // Large Streak Card
             Expanded(
               flex: 4,
               child: _buildBentoCard(
@@ -43,7 +63,6 @@ class ProfileStatsSection extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.md),
-            // Stacked smaller cards
             Expanded(
               flex: 6,
               child: Column(
