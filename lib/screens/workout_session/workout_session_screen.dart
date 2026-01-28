@@ -29,6 +29,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
   Timer? _timer;
   bool _inRest = false;
   bool _started = false;
+  final Stopwatch _sessionStopwatch = Stopwatch();
 
   WorkoutItem get _currentItem => widget.items[_currentIndex];
   Exercise get _currentExercise => widget.exercises[_currentIndex];
@@ -36,10 +37,14 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _sessionStopwatch.stop();
     super.dispose();
   }
 
   void _start() {
+    if (!_sessionStopwatch.isRunning) {
+      _sessionStopwatch.start();
+    }
     final item = _currentItem;
     if ((item.durationSeconds ?? 0) > 0) {
       setState(() {
@@ -144,18 +149,11 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     }
   }
 
-  int _plannedTotalSeconds() {
-    int total = 0;
-    for (final it in widget.items) {
-      total += (it.durationSeconds ?? 0);
-      total += (it.restSeconds ?? 0);
-    }
-    return total;
-  }
-
   void _showCompletion() {
     final totalItems = widget.items.length;
-    final totalSeconds = _plannedTotalSeconds();
+    _timer?.cancel();
+    _sessionStopwatch.stop();
+    final totalSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
     showWorkoutCompletionDialog(
       context,
       workoutTitle: widget.workout.title,

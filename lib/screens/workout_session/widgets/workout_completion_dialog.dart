@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 import 'workout_session_stat_chip.dart';
 
+String _formatDuration(int seconds) {
+  final clamped = seconds < 0 ? 0 : seconds;
+  final h = clamped ~/ 3600;
+  final m = (clamped % 3600) ~/ 60;
+  final s = clamped % 60;
+  if (h > 0) {
+    return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+  return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+}
+
 Future<void> showWorkoutCompletionDialog(
   BuildContext context, {
   required String workoutTitle,
@@ -62,7 +73,7 @@ Future<void> showWorkoutCompletionDialog(
                   WorkoutSessionStatChip(label: 'Bài', value: '$totalItems'),
                   WorkoutSessionStatChip(
                     label: 'Thời gian',
-                    value: '$totalSeconds giây',
+                    value: _formatDuration(totalSeconds),
                   ),
                 ],
               ),
