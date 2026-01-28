@@ -17,7 +17,6 @@ class SignUpParams {
   final String? goal;
 
   SignUpParams({
-  final double? height;
     required this.email,
     required this.password,
     required this.fullName,
@@ -27,7 +26,6 @@ class SignUpParams {
     this.goal,
   });
 }
-    this.height,
 
 // Dùng cho màn hình Cập nhật hồ sơ (Tất cả đều là optional vì user có thể chỉ sửa 1 trường)
 class UpdateProfileParams {
@@ -37,6 +35,7 @@ class UpdateProfileParams {
   final String? gender;
   final DateTime? dateOfBirth;
   final String? goal;
+  final double? height;
 
   UpdateProfileParams({
     required this.userId,
@@ -45,6 +44,7 @@ class UpdateProfileParams {
     this.gender,
     this.dateOfBirth,
     this.goal,
+    this.height,
   });
 
   Map<String, dynamic> toUpdateMap() {
@@ -64,9 +64,6 @@ class UpdateProfileParams {
       map['date_of_birth'] = dateOfBirth!.toIso8601String().split('T')[0];
     }
     if (goal != null) {
-    if (height != null) {
-      map['height'] = height;
-    }
       map['goal'] = goal;
     }
     return map;
