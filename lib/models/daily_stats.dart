@@ -4,11 +4,17 @@ class DailyStats {
   final DateTime date;
   final double? weight;
   final double? height;
-  final int caloriesBurned;
-  final int workoutDuration;
+  final double activeEnergyBurned;
+  final int activeMinutes;
   final int stepsCount;
-  final int waterIntake;
+  final double distanceMeters;
+  final int? avgHeartRate;
+  final int? minHeartRate;
+  final int? maxHeartRate;
+  final int? restingHeartRate;
+  final Map<String, dynamic>? heartRateZones;
   final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   DailyStats({
     this.id,
@@ -16,26 +22,41 @@ class DailyStats {
     required this.date,
     this.weight,
     this.height,
-    this.caloriesBurned = 0,
-    this.workoutDuration = 0,
+    this.activeEnergyBurned = 0,
+    this.activeMinutes = 0,
     this.stepsCount = 0,
-    this.waterIntake = 0,
+    this.distanceMeters = 0,
+    this.avgHeartRate,
+    this.minHeartRate,
+    this.maxHeartRate,
+    this.restingHeartRate,
+    this.heartRateZones,
     this.createdAt,
+    this.updatedAt,
   });
 
   factory DailyStats.fromJson(Map<String, dynamic> json) {
     return DailyStats(
-      id: json['id'] as String?,
+      id: json['id']?.toString(),
       userId: json['user_id'] as String,
       date: DateTime.parse(json['date'] as String),
       weight: (json['weight'] as num?)?.toDouble(),
       height: (json['height'] as num?)?.toDouble(),
-      caloriesBurned: json['calories_burned'] as int? ?? 0,
-      workoutDuration: json['workout_duration'] as int? ?? 0,
+      activeEnergyBurned:
+          (json['active_energy_burned'] as num?)?.toDouble() ?? 0,
+      activeMinutes: json['active_minutes'] as int? ?? 0,
       stepsCount: json['steps_count'] as int? ?? 0,
-      waterIntake: json['water_intake'] as int? ?? 0,
-      createdAt: json['created_at'] != null 
+      distanceMeters: (json['distance_meters'] as num?)?.toDouble() ?? 0,
+      avgHeartRate: json['avg_heart_rate'] as int?,
+      minHeartRate: json['min_heart_rate'] as int?,
+      maxHeartRate: json['max_heart_rate'] as int?,
+      restingHeartRate: json['resting_heart_rate'] as int?,
+      heartRateZones: json['heart_rate_zones'] as Map<String, dynamic>?,
+      createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
           : null,
     );
   }
@@ -47,10 +68,15 @@ class DailyStats {
       'date': date.toIso8601String().split('T')[0],
       'weight': weight,
       'height': height,
-      'calories_burned': caloriesBurned,
-      'workout_duration': workoutDuration,
+      'active_energy_burned': activeEnergyBurned,
+      'active_minutes': activeMinutes,
       'steps_count': stepsCount,
-      'water_intake': waterIntake,
+      'distance_meters': distanceMeters,
+      'avg_heart_rate': avgHeartRate,
+      'min_heart_rate': minHeartRate,
+      'max_heart_rate': maxHeartRate,
+      'resting_heart_rate': restingHeartRate,
+      'heart_rate_zones': heartRateZones,
     };
   }
 
@@ -60,11 +86,17 @@ class DailyStats {
     DateTime? date,
     double? weight,
     double? height,
-    int? caloriesBurned,
-    int? workoutDuration,
+    double? activeEnergyBurned,
+    int? activeMinutes,
     int? stepsCount,
-    int? waterIntake,
+    double? distanceMeters,
+    int? avgHeartRate,
+    int? minHeartRate,
+    int? maxHeartRate,
+    int? restingHeartRate,
+    Map<String, dynamic>? heartRateZones,
     DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return DailyStats(
       id: id ?? this.id,
@@ -72,11 +104,17 @@ class DailyStats {
       date: date ?? this.date,
       weight: weight ?? this.weight,
       height: height ?? this.height,
-      caloriesBurned: caloriesBurned ?? this.caloriesBurned,
-      workoutDuration: workoutDuration ?? this.workoutDuration,
+      activeEnergyBurned: activeEnergyBurned ?? this.activeEnergyBurned,
+      activeMinutes: activeMinutes ?? this.activeMinutes,
       stepsCount: stepsCount ?? this.stepsCount,
-      waterIntake: waterIntake ?? this.waterIntake,
+      distanceMeters: distanceMeters ?? this.distanceMeters,
+      avgHeartRate: avgHeartRate ?? this.avgHeartRate,
+      minHeartRate: minHeartRate ?? this.minHeartRate,
+      maxHeartRate: maxHeartRate ?? this.maxHeartRate,
+      restingHeartRate: restingHeartRate ?? this.restingHeartRate,
+      heartRateZones: heartRateZones ?? this.heartRateZones,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }

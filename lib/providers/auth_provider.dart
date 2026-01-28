@@ -79,8 +79,6 @@ class AuthController extends AsyncNotifier<void> {
   Future<void> resetPassword(String email) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      // In a real app, you might want to configure a proper redirect URL
-      // For now, we rely on the OTP flow primarily
       await ref.read(authServiceProvider).resetPassword(email);
     });
   }

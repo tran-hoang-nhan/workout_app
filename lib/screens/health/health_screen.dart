@@ -12,6 +12,7 @@ import 'widgets/water_card.dart';
 import 'widgets/water_intake_card.dart';
 import 'widgets/heart_rate_zones.dart';
 import 'widgets/calorie_goals.dart';
+import '../../providers/progress_user_provider.dart';
 import '../../utils/ui_utils.dart';
 import '../../widgets/loading_animation.dart';
 import '../../utils/app_error.dart';
@@ -42,11 +43,9 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
   }
 
   void _updateControllers(HealthFormState formState) {
-    // Update controllers từ formState
-    // Selection position sẽ được giữ nếu text không thay đổi
     final newWeight = formState.weight.toStringAsFixed(0);
     final newHeight = formState.height.toStringAsFixed(0);
-    
+
     if (_weightInput.text != newWeight) {
       _weightInput.text = newWeight;
     }
@@ -61,14 +60,29 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
   @override
   Widget build(BuildContext context) {
     final formState = ref.watch(healthFormProvider);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final todayProgressAsync = ref.watch(progressDailyProvider(today));
+
     final healthDataAsync = ref.watch(healthDataProvider);
     final calculations = ref.watch(healthCalculationsProvider);
-    final waterCups = (formState.waterIntake / 250).floor();
-    
+
+    final goalCups = (formState.waterIntake / 250).ceil();
+    final currentCups = todayProgressAsync.when(
+      data: (progress) => (progress?.waterMl ?? 0) ~/ 250,
+      loading: () => 0,
+      error: (_, _) => 0,
+    );
+
+    final steps = todayProgressAsync.when(
+      data: (progress) => progress?.steps ?? 0,
+      loading: () => 0,
+      error: (_, _) => 0,
+    );
+
     ref.watch(syncHealthProfileProvider);
     _updateControllers(formState);
 
-    // Calculate adaptive height based on screen size
     final screenWidth = MediaQuery.of(context).size.width;
     final cardHeight = (screenWidth < 360) ? 190.0 : 220.0;
 
@@ -85,9 +99,11 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               const SizedBox(height: AppSpacing.xl),
 
               // Health Alerts
-              if (formState.injuries.isNotEmpty || formState.medicalConditions.isNotEmpty)
+              if (formState.injuries.isNotEmpty ||
+                  formState.medicalConditions.isNotEmpty)
                 HealthAlerts(formState: formState),
-              if (formState.injuries.isNotEmpty || formState.medicalConditions.isNotEmpty)
+              if (formState.injuries.isNotEmpty ||
+                  formState.medicalConditions.isNotEmpty)
                 const SizedBox(height: AppSpacing.lg),
 
               // Input Section
@@ -106,15 +122,19 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               healthDataAsync.when(
                 loading: () => SizedBox(
                   height: cardHeight,
-                  child: const Center(child: AppLoading()), // Replaced CircularProgressIndicator with AppLoading
+                  child: const Center(
+                    child: AppLoading(),
+                  ), // Replaced CircularProgressIndicator with AppLoading
                 ),
-                error: (e, st) => Container( // Modified error handling
+                error: (e, st) => Container(
                   height: cardHeight,
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
                     color: AppColors.white,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5)),
+                    border: Border.all(
+                      color: AppColors.cardBorder.withValues(alpha: 0.5),
+                    ),
                   ),
                   child: Center(
                     child: Text(
@@ -124,11 +144,15 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                     ),
                   ),
                 ),
-                data: (data) => Row(
+                data: (_) => Row(
                   children: [
-                    StepCard(steps: data?.steps ?? 0, height: cardHeight),
+                    StepCard(steps: steps, height: cardHeight),
                     const SizedBox(width: AppSpacing.md),
-                    WaterCard(currentCups: waterCups, height: cardHeight),
+                    WaterCard(
+                      currentCups: currentCups,
+                      waterGoal: goalCups,
+                      height: cardHeight,
+                    ),
                   ],
                 ),
               ),
@@ -165,10 +189,12 @@ class _HealthEditModalContent extends ConsumerStatefulWidget {
   const _HealthEditModalContent();
 
   @override
-  ConsumerState<_HealthEditModalContent> createState() => _HealthEditModalContentState();
+  ConsumerState<_HealthEditModalContent> createState() =>
+      _HealthEditModalContentState();
 }
 
-class _HealthEditModalContentState extends ConsumerState<_HealthEditModalContent> {
+class _HealthEditModalContentState
+    extends ConsumerState<_HealthEditModalContent> {
   late TextEditingController injuryController;
   late TextEditingController conditionController;
   late TextEditingController allergyController;
@@ -223,44 +249,70 @@ class _HealthEditModalContentState extends ConsumerState<_HealthEditModalContent
           conditionController: conditionController,
           allergyController: allergyController,
           isSaving: false,
-          onAgeChanged: (value) => ref.read(healthFormProvider.notifier).setAge(value),
-          onWeightChanged: (value) => ref.read(healthFormProvider.notifier).setWeight(value),
-          onHeightChanged: (value) => ref.read(healthFormProvider.notifier).setHeight(value),
-          onGenderChanged: (value) => ref.read(healthFormProvider.notifier).setGender(value),
+          onAgeChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setAge(value),
+          onWeightChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setWeight(value),
+          onHeightChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setHeight(value),
+          onGenderChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setGender(value),
           onAddInjury: () {
             if (injuryController.text.trim().isNotEmpty) {
-              ref.read(healthFormProvider.notifier).addInjury(injuryController.text.trim());
+              ref
+                  .read(healthFormProvider.notifier)
+                  .addInjury(injuryController.text.trim());
               injuryController.clear();
             }
           },
-          onRemoveInjury: (index) => ref.read(healthFormProvider.notifier).removeInjury(index),
+          onRemoveInjury: (index) =>
+              ref.read(healthFormProvider.notifier).removeInjury(index),
           onAddCondition: () {
             if (conditionController.text.trim().isNotEmpty) {
-              ref.read(healthFormProvider.notifier).addCondition(conditionController.text.trim());
+              ref
+                  .read(healthFormProvider.notifier)
+                  .addCondition(conditionController.text.trim());
               conditionController.clear();
             }
           },
-          onRemoveCondition: (index) => ref.read(healthFormProvider.notifier).removeCondition(index),
+          onRemoveCondition: (index) =>
+              ref.read(healthFormProvider.notifier).removeCondition(index),
           onAddAllergy: () {
             if (allergyController.text.trim().isNotEmpty) {
-              ref.read(healthFormProvider.notifier).addAllergy(allergyController.text.trim());
+              ref
+                  .read(healthFormProvider.notifier)
+                  .addAllergy(allergyController.text.trim());
               allergyController.clear();
             }
           },
-          onRemoveAllergy: (index) => ref.read(healthFormProvider.notifier).removeAllergy(index),
-          onActivityLevelChanged: (value) => ref.read(healthFormProvider.notifier).setActivityLevel(value),
-          onSleepHoursChanged: (value) => ref.read(healthFormProvider.notifier).setSleepHours(value),
-          onWaterIntakeChanged: (value) => ref.read(healthFormProvider.notifier).setWaterIntake(value.toDouble()),
-          onDietTypeChanged: (value) => ref.read(healthFormProvider.notifier).setDietType(value),
-          onWaterReminderEnabledChanged: (value) => ref.read(healthFormProvider.notifier).setWaterReminderEnabled(value),
-          onWaterReminderIntervalChanged: (value) => ref.read(healthFormProvider.notifier).setWaterReminderInterval(value),
+          onRemoveAllergy: (index) =>
+              ref.read(healthFormProvider.notifier).removeAllergy(index),
+          onActivityLevelChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setActivityLevel(value),
+          onSleepHoursChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setSleepHours(value),
+          onWaterIntakeChanged: (value) => ref
+              .read(healthFormProvider.notifier)
+              .setWaterIntake(value.toDouble()),
+          onDietTypeChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setDietType(value),
+          onWaterReminderEnabledChanged: (value) => ref
+              .read(healthFormProvider.notifier)
+              .setWaterReminderEnabled(value),
+          onWaterReminderIntervalChanged: (value) => ref
+              .read(healthFormProvider.notifier)
+              .setWaterReminderInterval(value),
           onClose: () => Navigator.pop(context),
           onSave: () async {
             try {
-              await ref.read(saveHealthProfileProvider(HealthProfileSaveParams(
-                height: formState.height,
-                gender: null,
-              )).future);
+              await ref.read(
+                saveHealthProfileProvider(
+                  HealthProfileSaveParams(
+                    height: formState.height,
+                    gender: null,
+                  ),
+                ).future,
+              );
 
               if (context.mounted) {
                 context.showSuccess('Đã lưu thông tin sức khỏe thành công!');
@@ -277,4 +329,3 @@ class _HealthEditModalContentState extends ConsumerState<_HealthEditModalContent
     );
   }
 }
-
