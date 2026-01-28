@@ -7,6 +7,8 @@ class WorkoutHistory {
   final int? durationSeconds;
   final DateTime completedAt;
 
+  String? get workoutName => workoutTitleSnapshot;
+
   WorkoutHistory({
     required this.id,
     required this.userId,
@@ -24,7 +26,9 @@ class WorkoutHistory {
       workoutId: json['workout_id'],
       workoutTitleSnapshot: json['workout_title_snapshot'],
       totalCaloriesBurned: json['total_calories_burned']?.toDouble(),
-      durationSeconds: json['duration_seconds'],
+      durationSeconds: json['duration_seconds'] is int
+          ? json['duration_seconds']
+          : (json['duration_seconds'] as double?)?.toInt(),
       completedAt: json['completed_at'] != null
           ? DateTime.parse(json['completed_at'])
           : DateTime.now(),

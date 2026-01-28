@@ -34,7 +34,7 @@ lib/
 │   ├── home/           # Dashboard
 │   ├── profile/        # User profile
 │   ├── progress/       # Progress tracking
-│   └── workouts/       # Workout management
+│   └── workouts/|      # Workout management
 ├── services/           # Business logic services
 ├── utils/              # Utility functions
 ├── widgets/            # Reusable UI components
@@ -55,7 +55,7 @@ lib/
 ### 1. Clone repository
 
 ```bash
-git clone https://github.com/yourusername/workout_app.git
+git clone https://github.com/tran-hoang-nhan/workout_app.git
 cd workout_app
 ```
 
@@ -127,51 +127,6 @@ flutter build linux --release
 - Truy cập [supabase.com](https://supabase.com)
 - Tạo project mới
 - Lấy URL và anon key từ Settings > API
-
-### 2. Database Schema
-Tạo các bảng cần thiết trong Supabase SQL Editor:
-
-```sql
--- Users table (extends auth.users)
-CREATE TABLE public.profiles (
-  id UUID REFERENCES auth.users ON DELETE CASCADE,
-  email TEXT,
-  full_name TEXT,
-  avatar_url TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY (id)
-);
-
--- Workouts table
-CREATE TABLE public.workouts (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  description TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Exercises table
-CREATE TABLE public.exercises (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
-  muscle_group TEXT,
-  equipment TEXT,
-  instructions TEXT
-);
-
--- Workout items table
-CREATE TABLE public.workout_items (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  workout_id UUID REFERENCES public.workouts(id) ON DELETE CASCADE,
-  exercise_id UUID REFERENCES public.exercises(id),
-  sets INTEGER,
-  reps INTEGER,
-  weight DECIMAL,
-  rest_time INTEGER
-);
-```
 
 ## Scripts hữu ích
 

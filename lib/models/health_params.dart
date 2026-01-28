@@ -60,9 +60,43 @@ class HealthUpdateParams {
   }
 
   Map<String, dynamic> toProfileMap() {
-    return {
-      'gender': gender,
-      'goal': goal,
-    };
+    return {'gender': gender, 'goal': goal};
+  }
+
+  HealthUpdateParams copyWith({
+    String? userId,
+    int? age,
+    double? weight,
+    double? height,
+    String? gender,
+    String? activityLevel,
+    String? goal,
+    String? dietType,
+    int? sleepHours,
+    int? waterIntake,
+    List<String>? injuries,
+    List<String>? medicalConditions,
+    List<String>? allergies,
+    bool? waterReminderEnabled,
+    int? waterReminderInterval,
+  }) {
+    return HealthUpdateParams(
+      userId: userId ?? this.userId,
+      age: age ?? this.age,
+      weight: weight ?? this.weight,
+      height: height ?? this.height,
+      gender: gender ?? this.gender,
+      activityLevel: activityLevel ?? this.activityLevel,
+      goal: goal ?? this.goal,
+      dietType: dietType ?? this.dietType,
+      sleepHours: sleepHours ?? this.sleepHours,
+      waterIntake: waterIntake ?? this.waterIntake,
+      injuries: injuries ?? this.injuries,
+      medicalConditions: medicalConditions ?? this.medicalConditions,
+      allergies: allergies ?? this.allergies,
+      waterReminderEnabled: waterReminderEnabled ?? this.waterReminderEnabled,
+      waterReminderInterval:
+          waterReminderInterval ?? this.waterReminderInterval,
+    );
   }
 }

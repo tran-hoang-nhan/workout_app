@@ -5,17 +5,13 @@ enum WorkoutSessionNextActionType { enterRest, advance, complete }
 class WorkoutSessionNextAction {
   final WorkoutSessionNextActionType type;
   final int? restSeconds;
-
   const WorkoutSessionNextAction._(this.type, {this.restSeconds});
-
   const WorkoutSessionNextAction.enterRest(int seconds)
-      : this._(WorkoutSessionNextActionType.enterRest, restSeconds: seconds);
-
+    : this._(WorkoutSessionNextActionType.enterRest, restSeconds: seconds);
   const WorkoutSessionNextAction.advance()
-      : this._(WorkoutSessionNextActionType.advance);
-
+    : this._(WorkoutSessionNextActionType.advance);
   const WorkoutSessionNextAction.complete()
-      : this._(WorkoutSessionNextActionType.complete);
+    : this._(WorkoutSessionNextActionType.complete);
 }
 
 WorkoutSessionNextAction computeNextAction({
@@ -50,4 +46,3 @@ WorkoutSessionNextAction computeAfterTimerFinishedAction({
   }
   return const WorkoutSessionNextAction.complete();
 }
-

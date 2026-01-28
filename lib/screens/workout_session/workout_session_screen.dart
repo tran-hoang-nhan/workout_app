@@ -6,8 +6,11 @@ import '../../models/exercise.dart';
 import 'widgets/workout_completion_dialog.dart';
 import 'widgets/workout_exercise_card.dart';
 import 'workout_session_next_action.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/progress_provider.dart';
 
-class WorkoutSessionScreen extends StatefulWidget {
+class WorkoutSessionScreen extends ConsumerStatefulWidget {
   final Workout workout;
   final List<WorkoutItem> items;
   final List<Exercise> exercises;
@@ -20,10 +23,11 @@ class WorkoutSessionScreen extends StatefulWidget {
   });
 
   @override
-  State<WorkoutSessionScreen> createState() => _WorkoutSessionScreenState();
+  ConsumerState<WorkoutSessionScreen> createState() =>
+      _WorkoutSessionScreenState();
 }
 
-class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
+class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   int _currentIndex = 0;
   int _remainingSeconds = 0;
   Timer? _timer;
@@ -149,11 +153,42 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     }
   }
 
-  void _showCompletion() {
+  int _plannedTotalSeconds() {
+    int total = 0;
+    for (final it in widget.items) {
+      total += (it.durationSeconds ?? 0);
+      total += (it.restSeconds ?? 0);
+    }
+    return total;
+  }
+
+  Future<void> _showCompletion() async {
     final totalItems = widget.items.length;
     _timer?.cancel();
     _sessionStopwatch.stop();
-    final totalSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
+    final actualSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
+    final totalSeconds = actualSeconds > 0 ? actualSeconds : _plannedTotalSeconds();
+    try {
+      final userId = await ref.read(currentUserIdProvider.future);
+      if (userId != null) {
+        final calories = totalSeconds * 0.1;
+        await ref
+            .read(progressRepositoryProvider)
+            .recordWorkout(
+              userId: userId,
+              workoutId: widget.workout.id,
+              workoutTitle: widget.workout.title,
+              caloriesBurned: calories,
+              durationSeconds: totalSeconds,
+            );
+        ref.invalidate(progressStatsProvider);
+        ref.invalidate(workoutHistoryProvider);
+      }
+    } catch (e) {
+      debugPrint('Error recording workout: $e');
+    }
+
+    if (!mounted) return;
     showWorkoutCompletionDialog(
       context,
       workoutTitle: widget.workout.title,

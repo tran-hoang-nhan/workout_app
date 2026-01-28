@@ -260,7 +260,7 @@ class _EmailConfirmationScreenState
                         Text(
                           '• Kiểm tra thư mục Spam hoặc Promotions\n'
                           '• Có thể mất vài phút để nhận email\n'
-                          '• Link xác nhận sẽ hết hạn sau 24 giờ',
+                          '• Mã xác nhận sẽ hết hạn sau 10 phút',
                           style: TextStyle(
                             fontSize: AppFontSize.sm,
                             color: AppColors.grey,
@@ -289,10 +289,7 @@ class _EmailConfirmationScreenState
                       onPressed: isLoading
                           ? null
                           : () {
-                              ref
-                                  .read(resendEmailProvider(widget.email)
-                                      .notifier)
-                                  .resendEmail();
+                              ref.read(resendEmailProvider(widget.email).notifier).resendEmail();
                               _startResendCountdown();
                             },
                       child: const Text(

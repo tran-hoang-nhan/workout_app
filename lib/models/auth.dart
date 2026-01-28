@@ -3,7 +3,10 @@ class SignInParams {
   final String email;
   final String password;
 
-  SignInParams({required this.email, required this.password});
+  SignInParams({
+    required this.email,
+    required this.password,
+  });
 }
 
 // Dùng cho màn hình Đăng Ký (Chứa password và các thông tin profile ban đầu)
@@ -46,16 +49,14 @@ class UpdateProfileParams {
     this.goal,
     this.height,
   });
-
+  
   Map<String, dynamic> toUpdateMap() {
-    final map = <String, dynamic>{
-      'updated_at': DateTime.now().toIso8601String(),
-    };
+    final map = <String, dynamic>{ 'updated_at': DateTime.now().toIso8601String(),};
     if (fullName != null) {
-      map['full_name'] = fullName;
-    }
-    if (avatarUrl != null) {
-      map['avatar_url'] = avatarUrl;
+       map['full_name'] = fullName; 
+       }
+    if (avatarUrl != null) { 
+      map['avatar_url'] = avatarUrl; 
     }
     if (gender != null) {
       map['gender'] = gender;

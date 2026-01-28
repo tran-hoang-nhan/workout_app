@@ -7,7 +7,11 @@ final dailyStatsRepositoryProvider = Provider<DailyStatsRepository>((ref) {
   return DailyStatsRepository();
 });
 
-final dailyStatsProvider = FutureProvider.family<DailyStats?, DateTime>((ref, date) async {
+final dailyStatsProvider = FutureProvider.family<DailyStats?, DateTime>((
+  ref,
+  rawDate,
+) async {
+  final date = DateTime(rawDate.year, rawDate.month, rawDate.day);
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) return null;
   final repo = ref.watch(dailyStatsRepositoryProvider);
@@ -24,7 +28,10 @@ final weeklyStatsProvider = FutureProvider<List<DailyStats>>((ref) async {
   return await repo.getStatsRange(userId, startOfWeek, endOfWeek);
 });
 
-final monthStatsProvider = FutureProvider.family<List<DailyStats>, DateTime>((ref, month) async {
+final monthStatsProvider = FutureProvider.family<List<DailyStats>, DateTime>((
+  ref,
+  month,
+) async {
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) return [];
   final repo = ref.watch(dailyStatsRepositoryProvider);
