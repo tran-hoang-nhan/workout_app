@@ -49,13 +49,7 @@ class HealthService {
     }
   }
 
-  Future<void> updateQuickMetrics({
-    required String userId,
-    double? weight,
-    double? height,
-    String? gender,
-    String? goal,
-  }) async {
+  Future<void> updateQuickMetrics({required String userId, double? weight, double? height, String? gender, String? goal,}) async {
     await _repository.updateQuickMetrics(
       userId: userId,
       weight: weight,
@@ -74,22 +68,14 @@ class HealthService {
     }
   }
 
-  double calculateBMI(double weight, double height) =>
-      health_utils.calculateBMI(weight, height);
+  double calculateBMI(double weight, double height) => health_utils.calculateBMI(weight, height);
   String getBMICategory(double bmi) => health_utils.getBMICategory(bmi);
-  int calculateBMR(double weight, double height, int age, String gender) =>
-      health_utils.calculateBMR(weight, height, age, gender);
-  int calculateTDEE(int bmr, String activityLevel) =>
-      health_utils.calculateTDEE(bmr, activityLevel);
+  int calculateBMR(double weight, double height, int age, String gender) => health_utils.calculateBMR(weight, height, age, gender);
+  int calculateTDEE(int bmr, String activityLevel) => health_utils.calculateTDEE(bmr, activityLevel);
   int calculateMaxHeartRate(int age) => health_utils.calculateMaxHeartRate(age);
-  ({int min, int max}) calculateZone1(int maxHR) =>
-      health_utils.calculateZone1(maxHR);
-  ({int min, int max}) calculateZone2(int maxHR) =>
-      health_utils.calculateZone2(maxHR);
-  ({int min, int max}) calculateZone3(int maxHR) =>
-      health_utils.calculateZone3(maxHR);
-  ({int min, int max}) calculateZone4(int maxHR) =>
-      health_utils.calculateZone4(maxHR);
-  ({int min, int max}) calculateZone5(int maxHR) =>
-      health_utils.calculateZone5(maxHR);
+  ({int min, int max}) calculateZone1(int maxHR) => health_utils.calculateZone1(maxHR);
+  ({int min, int max}) calculateZone2(int maxHR) => health_utils.calculateZone2(maxHR);
+  ({int min, int max}) calculateZone3(int maxHR) => health_utils.calculateZone3(maxHR);
+  ({int min, int max}) calculateZone4(int maxHR) => health_utils.calculateZone4(maxHR);
+  ({int min, int max}) calculateZone5(int maxHR) => health_utils.calculateZone5(maxHR);
 }
