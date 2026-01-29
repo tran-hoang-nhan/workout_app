@@ -38,6 +38,7 @@ class UpdateProfileParams {
   final String? gender;
   final DateTime? dateOfBirth;
   final String? goal;
+  final double? height;
 
   UpdateProfileParams({
     required this.userId,
@@ -46,6 +47,7 @@ class UpdateProfileParams {
     this.gender,
     this.dateOfBirth,
     this.goal,
+    this.height,
   });
   
   Map<String, dynamic> toUpdateMap() {
