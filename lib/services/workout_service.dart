@@ -6,8 +6,7 @@ import '../repositories/workout_repository.dart';
 class WorkoutService {
   final WorkoutRepository _workoutRepository;
 
-  WorkoutService({WorkoutRepository? repository})
-    : _workoutRepository = repository ?? WorkoutRepository();
+  WorkoutService({WorkoutRepository? repository}): _workoutRepository = repository ?? WorkoutRepository();
 
   Future<List<Workout>> getAllWorkouts() async {
     final response = await _workoutRepository.getAllWorkouts();
@@ -55,6 +54,7 @@ class WorkoutService {
     final byTitle = await _workoutRepository.getWorkoutsByTitleKeywords(
       titleKeywords,
     );
+
     for (final data in byTitle) {
       final workout = Workout.fromJson(data);
       resultsById[workout.id] = workout;
@@ -72,9 +72,7 @@ class WorkoutService {
     return merged;
   }
 
-  (List<String> titleKeywords, List<String> muscleKeywords) _mapFilterKeywords(
-    String category,
-  ) {
+  (List<String> titleKeywords, List<String> muscleKeywords) _mapFilterKeywords(String category,) {
     final key = category.trim().toLowerCase();
     switch (key) {
       case 'toàn thân':

@@ -4,6 +4,7 @@ import '../utils/storage_utils.dart';
 
 class ExerciseRepository {
   final SupabaseClient _supabase = Supabase.instance.client;
+  
   Future<List<Exercise>> getExercises() async {
     try {
       final response = await _supabase.from('exercises').select().order('id', ascending: true);
