@@ -33,6 +33,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   Timer? _timer;
   bool _inRest = false;
   bool _started = false;
+  final Stopwatch _sessionStopwatch = Stopwatch();
 
   WorkoutItem get _currentItem => widget.items[_currentIndex];
   Exercise get _currentExercise => widget.exercises[_currentIndex];
@@ -40,10 +41,14 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _sessionStopwatch.stop();
     super.dispose();
   }
 
   void _start() {
+    if (!_sessionStopwatch.isRunning) {
+      _sessionStopwatch.start();
+    }
     final item = _currentItem;
     if ((item.durationSeconds ?? 0) > 0) {
       setState(() {
@@ -159,7 +164,10 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
 
   Future<void> _showCompletion() async {
     final totalItems = widget.items.length;
-    final totalSeconds = _plannedTotalSeconds();
+    _timer?.cancel();
+    _sessionStopwatch.stop();
+    final actualSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
+    final totalSeconds = actualSeconds > 0 ? actualSeconds : _plannedTotalSeconds();
     try {
       final userId = await ref.read(currentUserIdProvider.future);
       if (userId != null) {
