@@ -30,15 +30,32 @@ final userHeightProvider = FutureProvider.autoDispose<double>((ref) async {
 });
 
 final loadWeightDataProvider = FutureProvider.autoDispose<WeightData>((ref) async {
-  final history = await ref.watch(weightHistoryProvider.future);
-  final height = await ref.watch(userHeightProvider.future);
-  double currentWeight = 0;
+  final userId = await ref.watch(currentUserIdProvider.future);
+  if (userId == null) {
+     return WeightData(weight: 0, height: 0, weightHistory: []);
+  }
+
+  final service = ref.watch(weightServiceProvider);
+  final repo = ref.watch(weightRepositoryProvider);
+  
+  // Fetch history and health metrics in parallel
+  final results = await Future.wait([
+    service.loadHistory(userId),
+    repo.getLatestMetrics(userId),
+  ]);
+
+  final history = results[0] as List<BodyMetric>;
+  final healthMetrics = results[1] as ({double? weight, double? height});
+  
+  double currentWeight = healthMetrics.weight ?? 0.0;
+  // If there's history, the most recent entry from history is more "accurate" for the timeline
   if (history.isNotEmpty) {
     currentWeight = history.first.weight;
   }
+  
   return WeightData(
     weight: currentWeight,
-    height: height,
+    height: healthMetrics.height ?? 0.0,
     weightHistory: history,
   );
 });

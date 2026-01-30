@@ -10,6 +10,8 @@ class WorkoutService {
 
   Future<List<Workout>> getAllWorkouts() async {
     final response = await _workoutRepository.getAllWorkouts();
+    // ignore: avoid_print
+    print('[WorkoutService] getAllWorkouts returned ${response.length} items');
     return response.map((data) => Workout.fromJson(data)).toList();
   }
 
@@ -45,7 +47,7 @@ class WorkoutService {
 
   Future<List<Workout>> getWorkoutsByCategory(String category) async {
     final key = category.trim().toLowerCase();
-    if (key == 'tất cả') return getAllWorkouts();
+    if (key == 'tất cả' || key == 'all') return getAllWorkouts();
 
     final (titleKeywords, muscleKeywords) = _mapFilterKeywords(category);
 
