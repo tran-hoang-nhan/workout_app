@@ -12,12 +12,13 @@ class HealthFormUI extends StatelessWidget {
   final List<String> injuries;
   final List<String> medicalConditions;
   final String activityLevel;
-  final double sleepHours;
   final int waterIntake;
   final String dietType;
   final List<String> allergies;
   final bool waterReminderEnabled;
   final int waterReminderInterval;
+  final String wakeTime;
+  final String sleepTime;
 
 
   // Controllers
@@ -37,11 +38,12 @@ class HealthFormUI extends StatelessWidget {
   final VoidCallback onAddAllergy;
   final ValueChanged<int> onRemoveAllergy;
   final ValueChanged<String> onActivityLevelChanged;
-  final ValueChanged<double> onSleepHoursChanged;
   final ValueChanged<int> onWaterIntakeChanged;
   final ValueChanged<String> onDietTypeChanged;
   final ValueChanged<bool> onWaterReminderEnabledChanged;
   final ValueChanged<int> onWaterReminderIntervalChanged;
+  final ValueChanged<String> onWakeTimeChanged;
+  final ValueChanged<String> onSleepTimeChanged;
   final VoidCallback onSave;
   final VoidCallback? onClose;
 
@@ -57,7 +59,6 @@ class HealthFormUI extends StatelessWidget {
     required this.injuries,
     required this.medicalConditions,
     required this.activityLevel,
-    required this.sleepHours,
     required this.waterIntake,
     required this.dietType,
     required this.allergies,
@@ -77,11 +78,14 @@ class HealthFormUI extends StatelessWidget {
     required this.onAddAllergy,
     required this.onRemoveAllergy,
     required this.onActivityLevelChanged,
-    required this.onSleepHoursChanged,
     required this.onWaterIntakeChanged,
     required this.onDietTypeChanged,
     required this.onWaterReminderEnabledChanged,
     required this.onWaterReminderIntervalChanged,
+    required this.onWakeTimeChanged,
+    required this.onSleepTimeChanged,
+    required this.wakeTime,
+    required this.sleepTime,
     required this.onSave,
     this.onClose,
     this.isSaving = false,
@@ -263,21 +267,14 @@ class HealthFormUI extends StatelessWidget {
           _buildActivityLevelField(context),
           const SizedBox(height: AppSpacing.lg),
 
-          // Sleep Hours
-          _buildInputField(
-            'Giấc ngủ trung bình (giờ/ngày)',
-            sleepHours.toString(),
-            (value) => onSleepHoursChanged(double.tryParse(value) ?? sleepHours),
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-
           // Water Intake
           _buildWaterIntakeField(),
           const SizedBox(height: AppSpacing.lg),
 
+          const SizedBox(height: AppSpacing.lg),
+ 
           // Water Reminder
-          _buildWaterReminderField(),
+          _buildWaterReminderField(context),
           const SizedBox(height: AppSpacing.lg),
 
           // Diet Type
@@ -686,7 +683,7 @@ class HealthFormUI extends StatelessWidget {
     );
   }
 
-  Widget _buildWaterReminderField() {
+  Widget _buildWaterReminderField(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -753,9 +750,102 @@ class HealthFormUI extends StatelessWidget {
                 );
               }).toList(),
             ),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTimeSelector(
+                    context,
+                    'Giờ thức dậy',
+                    wakeTime,
+                    onWakeTimeChanged,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: _buildTimeSelector(
+                    context,
+                    'Giờ đi ngủ',
+                    sleepTime,
+                    onSleepTimeChanged,
+                  ),
+                ),
+              ],
+            ),
           ],
         ],
       ),
+    );
+  }
+
+  Widget _buildTimeSelector(
+    BuildContext context,
+    String label,
+    String currentTime,
+    ValueChanged<String> onChanged,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.grey,
+            fontSize: AppFontSize.sm,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        InkWell(
+          onTap: () async {
+            final parts = currentTime.split(':');
+            final time = TimeOfDay(
+              hour: int.parse(parts[0]),
+              minute: int.parse(parts[1]),
+            );
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: time,
+              builder: (context, child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: const ColorScheme.light(
+                      primary: AppColors.primary,
+                    ),
+                  ),
+                  child: child!,
+                );
+              },
+            );
+            if (picked != null) {
+              final formatted = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+              onChanged(formatted);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.cardBorder),
+              borderRadius: BorderRadius.circular(AppBorderRadius.md),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  currentTime,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
+                ),
+                const Icon(Icons.access_time, size: 18, color: AppColors.grey),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

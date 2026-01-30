@@ -53,13 +53,14 @@ class HealthRepository {
           'p_goal': params.goal,
           'p_activity_level': params.activityLevel,
           'p_diet_type': params.dietType,
-          'p_sleep_hours': params.sleepHours,
           'p_water_intake': params.waterIntake,
           'p_injuries': params.injuries,
           'p_medical_conditions': params.medicalConditions,
           'p_allergies': params.allergies,
           'p_water_reminder_enabled': params.waterReminderEnabled,
           'p_water_reminder_interval': params.waterReminderInterval,
+          'p_wake_time': params.wakeTime,
+          'p_sleep_time': params.sleepTime,
         },
       );
     } catch (e, st) {
