@@ -19,6 +19,9 @@ import 'widgets/bottom_nav.dart';
 import 'package:awesome_notifications/awesome_notifications.dart'; 
 import 'package:device_preview/device_preview.dart';
 import 'services/notification_service.dart';
+import 'repositories/progress_user_repository.dart';
+import 'providers/progress_user_provider.dart';
+import 'providers/app_state_provider.dart';
 
 final logger = Logger();
 
@@ -64,6 +67,12 @@ void main() async {
           playSound: true,
         )
       ],
+      channelGroups: [
+        NotificationChannelGroup(
+          channelGroupKey: NotificationService.waterChannelGroupKey,
+          channelGroupName: 'Nhắc nhở uống nước',
+        )
+      ],
       debug: true,
   );
 
@@ -77,11 +86,48 @@ void main() async {
   );
 }
 
+@pragma("vm:entry-point")
 class NotificationController {
+  // Callback to refresh UI
+  static Function(DateTime date)? onWaterAdded;
+
   @pragma("vm:entry-point")
   static Future <void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     if(receivedAction.buttonKeyPressed == 'DRANK_WATER'){
-        debugPrint("User đã bấm: Đã uống nước! (Logic update DB sẽ nằm ở đây)");
+        debugPrint("💧 User clicked 'Đã uống nước!'");
+        
+        try {
+           // 1. Get User ID
+           final supabase = Supabase.instance.client;
+           final session = supabase.auth.currentSession;
+           final userId = session?.user.id;
+           
+           if (userId != null) {
+             debugPrint("👤 Updating water for user: $userId");
+             // 2. Update DB
+             final repo = ProgressUserRepository(supabase: supabase);
+             final now = DateTime.now();
+             
+             // +250ml and +1 glass
+             await repo.updateActivityProgress(
+               userId: userId, 
+               date: DateTime(now.year, now.month, now.day),
+               addWaterMl: 250,
+               addWaterGlasses: 1
+             );
+             
+             debugPrint("✅ Database updated successfully!");
+
+             // 3. Trigger UI Refresh
+             if (onWaterAdded != null) {
+               onWaterAdded!(now);
+             }
+           } else {
+             debugPrint("⚠️ No user session found when handling notification action");
+           }
+        } catch (e) {
+          debugPrint("❌ Error handling water action: $e");
+        }
     }
   }
 
@@ -109,6 +155,9 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    
+    // Check for date change on startup
+    ref.read(currentDateProvider.notifier).updateDate();
 
     AwesomeNotifications().setListeners(
       onActionReceivedMethod:         NotificationController.onActionReceivedMethod,
@@ -116,12 +165,38 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       onNotificationDisplayedMethod:  NotificationController.onNotificationDisplayedMethod,
       onDismissActionReceivedMethod:  NotificationController.onDismissActionReceivedMethod
     );
+    
+    // Set up callback to refresh UI when water is added from notification
+    NotificationController.onWaterAdded = (date) {
+      debugPrint("🔄 Refreshing UI after water notification action");
+      // Must use same date format as provider (midnight)
+      final dateOnly = DateTime(date.year, date.month, date.day);
+      ref.invalidate(progressDailyProvider(dateOnly));
+      ref.invalidate(progressWeeklyProvider);
+      ref.invalidate(healthDataProvider); 
+    };
 
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
       if (!isAllowed) {
         AwesomeNotifications().requestPermissionToSendNotifications();
       }
     });
+    
+    // Trigger notification sync on app launch
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(initializeNotificationProvider.future);
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      debugPrint("📱 App resumed: checking for date change...");
+      ref.read(currentDateProvider.notifier).updateDate();
+      
+      // Also potentially re-check health data sync if needed
+      // ref.read(initializeNotificationProvider.future);
+    }
   }
 
   @override

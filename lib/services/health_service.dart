@@ -1,4 +1,5 @@
 import '../repositories/health_repository.dart';
+import 'package:flutter/material.dart';
 import '../models/health_data.dart';
 import '../models/health_params.dart';
 import '../utils/health_utils.dart' as health_utils;
@@ -30,7 +31,6 @@ class HealthService {
       injuries: profile.injuries,
       medicalConditions: profile.medicalConditions,
       activityLevel: profile.activityLevel,
-      sleepHours: profile.sleepHours,
       waterIntake: profile.waterIntake,
       dietType: profile.dietType,
       allergies: profile.allergies,
@@ -38,12 +38,19 @@ class HealthService {
       steps: steps,
       waterReminderEnabled: profile.waterReminderEnabled,
       waterReminderInterval: profile.waterReminderInterval,
+      wakeTime: profile.wakeTime,
+      sleepTime: profile.sleepTime,
     );
   }
 
-  Future<void> syncWaterReminders(bool enabled, int intervalHours) async {
+  Future<void> syncWaterReminders(bool enabled, int intervalHours, String wakeTime, String sleepTime) async {
+    debugPrint("🔔 Syncing water reminders: enabled=$enabled, interval=$intervalHours");
     if (enabled) {
-      await _notifications.scheduleWaterReminder(intervalHours: intervalHours);
+      await _notifications.scheduleWaterReminder(
+        intervalHours: intervalHours,
+        wakeTime: wakeTime,
+        sleepTime: sleepTime,
+      );
     } else {
       await _notifications.cancelAllReminders();
     }
@@ -64,6 +71,8 @@ class HealthService {
       await syncWaterReminders(
         params.waterReminderEnabled!,
         params.waterReminderInterval!,
+        params.wakeTime ?? '07:00',
+        params.sleepTime ?? '23:00',
       );
     }
   }

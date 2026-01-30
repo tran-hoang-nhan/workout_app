@@ -85,25 +85,50 @@ AppError handleException(Object error, [StackTrace? stackTrace]) {
   if (error is AuthException) {
     String? mappedCode;
     final msg = error.message.toLowerCase();
+    final errorCode = error.code?.toLowerCase() ?? '';
     
-    // Xử lý lỗi nhập sai mật khẩu/email
-    if (msg.contains('invalid login') || msg.contains('invalid credentials')) {
+    // 1. Kiểm tra theo mã lỗi (Ưu tiên)
+    if (errorCode == 'invalid_credentials' || errorCode == 'invalid_grant') {
       return InvalidCredentialsException(originalException: error);
     }
     
-    if (msg.contains('user not found')) {
+    if (errorCode == 'user_not_found') {
       mappedCode = 'user_not_found';
     }
-    else if (msg.contains('email not confirmed')) {
+    else if (errorCode == 'email_not_confirmed' || msg.contains('email not confirmed')) {
       mappedCode = 'email_not_confirmed';
     }
-    else if (msg.contains('already registered')) {
+    else if (errorCode == 'user_already_exists' || msg.contains('already registered') || msg.contains('already exists')) {
       mappedCode = 'user_already_exists';
     }
+    else if (errorCode == 'signup_disabled') {
+       return AppError('Đăng ký tạm thời bị vô hiệu hóa.', code: 'signup_disabled', originalException: error);
+    }
+    else if (errorCode == 'over_email_send_rate_limit') {
+      return AppError('Bạn đã yêu cầu gửi email quá nhanh. Vui lòng thử lại sau ít phút.', code: 'rate_limit', originalException: error);
+    }
 
-    return UnauthorizedException(
+    // 2. Nếu không có mã lỗi rõ ràng, kiểm tra theo message (Fallback)
+    if (mappedCode == null) {
+      if (msg.contains('invalid login') || msg.contains('invalid credentials')) {
+        return InvalidCredentialsException(originalException: error);
+      }
+    }
+
+    // Nếu là lỗi Auth thực sự liên quan đến Session/Token bị hết hạn hoặc không hợp lệ
+    if (errorCode == 'invalid_token' || errorCode == 'session_not_found' || msg.contains('session expired')) {
+       return UnauthorizedException(
+        error.message,
+        code: errorCode.isNotEmpty ? errorCode : 'unauthorized',
+        originalException: error,
+      );
+    }
+
+    // Mặc định cho các lỗi Auth khác (thường là lỗi đăng ký/đăng nhập)
+    // Tránh dùng UnauthorizedException vì nó show "Phiên hết hạn" gây hiểu lầm
+    return AppError(
       error.message,
-      code: mappedCode ?? error.statusCode, 
+      code: mappedCode ?? (errorCode.isNotEmpty ? errorCode : error.statusCode), 
       originalException: error,
     );
   }

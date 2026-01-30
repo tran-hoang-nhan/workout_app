@@ -1,4 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/material.dart';
 
 class NotificationService {
   static const String waterChannelKey = 'water_reminder';
@@ -11,9 +12,16 @@ class NotificationService {
     }
   }
 
-  Future<void> scheduleWaterReminder({required int intervalHours}) async {
+  Future<void> scheduleWaterReminder({
+    required int intervalHours,
+    String wakeTime = '07:00',
+    String sleepTime = '23:00',
+  }) async {
     String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
-    await AwesomeNotifications().createNotification(
+    debugPrint("🕒 Scheduling water reminder every $intervalHours hours (Timezone: $localTimeZone)");
+    debugPrint("💤 Active hours: $wakeTime - $sleepTime");
+
+    bool created = await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 10, 
         channelKey: waterChannelKey,
@@ -33,11 +41,28 @@ class NotificationService {
       ],
       
       schedule: NotificationInterval(
-        interval: Duration(seconds: 10), 
+        // Reverting to real interval
+        interval: Duration(hours: intervalHours), 
         timeZone: localTimeZone,
         repeats: true,
-        preciseAlarm: true, 
-        allowWhileIdle: true, 
+      ),
+    );
+    
+    if (created) {
+      debugPrint("✅ Water reminder scheduled successfully for every $intervalHours hours");
+    } else {
+      debugPrint("⚠️ Schedule returned false.");
+    }
+  }
+
+  Future<void> sendTestNotification() async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 11,
+        channelKey: waterChannelKey,
+        title: 'Test Notification',
+        body: 'This is a test notification to verify the channel.',
+        notificationLayout: NotificationLayout.Default,
       ),
     );
   }
