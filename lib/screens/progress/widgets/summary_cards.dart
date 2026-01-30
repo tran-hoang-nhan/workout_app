@@ -25,7 +25,7 @@ class ProgressSummaryCards extends StatelessWidget {
             crossAxisCount: 2,
             mainAxisSpacing: AppSpacing.md,
             crossAxisSpacing: AppSpacing.md,
-            childAspectRatio: 1.5,
+            childAspectRatio: 1.3,
             children: [
               _buildStatSquare(
                 'Calo',
@@ -110,6 +110,8 @@ class ProgressSummaryCards extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: AppColors.black,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               Text(
                 label,
@@ -117,6 +119,8 @@ class ProgressSummaryCards extends StatelessWidget {
                   fontSize: 12,
                   color: AppColors.grey.withValues(alpha: 0.8),
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

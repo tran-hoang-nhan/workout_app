@@ -38,7 +38,6 @@ class RegistrationTransactionService {
         activityLevel: healthParams.activityLevel,
         goal: healthParams.goal,
         dietType: healthParams.dietType,
-        sleepHours: healthParams.sleepHours,
         waterIntake: healthParams.waterIntake,
         injuries: healthParams.injuries,
         medicalConditions: healthParams.medicalConditions,

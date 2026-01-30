@@ -35,7 +35,6 @@ class _HealthOnboardingScreenState
 
   // Step 3: Lifestyle
   String dietType = 'normal';
-  int sleepHours = 7;
   int waterIntake = 2000;
 
   // Step 4: Health Conditions (simple text input)
@@ -218,14 +217,6 @@ class _HealthOnboardingScreenState
           onChanged: (val) => setState(() => dietType = val ?? dietType),
         ),
         const SizedBox(height: AppSpacing.lg),
-        SliderFieldWidget(
-          label: 'Giấc ngủ trung bình (giờ/ngày)',
-          value: sleepHours.toDouble(),
-          min: 4,
-          max: 12,
-          divisions: 8,
-          onChanged: (val) => setState(() => sleepHours = val.round()),
-        ),
         const SizedBox(height: AppSpacing.lg),
         SliderFieldWidget(
           label: 'Mục tiêu uống nước (ml/ngày)',
@@ -358,7 +349,7 @@ class _HealthOnboardingScreenState
       await ref.read(healthFormProvider.notifier).saveHealthOnboarding(
         userId: userId, age: age, weight: weight, height: height, gender: gender,
         activityLevel: activityLevel, goal: goal, 
-        dietType: dietType, sleepHours: sleepHours, waterIntake: waterIntake,
+        dietType: dietType, waterIntake: waterIntake,
         injuries: injuries, medicalConditions: medicalConditions,allergies: allergies,
       );
       
