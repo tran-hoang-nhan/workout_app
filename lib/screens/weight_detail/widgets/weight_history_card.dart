@@ -141,25 +141,29 @@ class WeightHistoryCard extends StatelessWidget {
                                   color: AppColors.black,
                                 ),
                               ),
-                              Row(
-                                children: [
-                                  Text(
-                                    'BMI: ${recordBMI.toStringAsFixed(1)}',
-                                    style: const TextStyle(fontSize: 12, color: AppColors.grey, fontWeight: FontWeight.w500),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                                    decoration: BoxDecoration(
-                                      color: (recordCategory['color'] as Color).withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(6),
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'BMI: ${recordBMI.toStringAsFixed(1)}',
+                                      style: const TextStyle(fontSize: 12, color: AppColors.grey, fontWeight: FontWeight.w500),
                                     ),
-                                    child: Text(
-                                      recordCategory['label'],
-                                      style: TextStyle(fontSize: 9, color: recordCategory['color'], fontWeight: FontWeight.bold),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                      decoration: BoxDecoration(
+                                        color: (recordCategory['color'] as Color).withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        recordCategory['label'],
+                                        style: TextStyle(fontSize: 9, color: recordCategory['color'], fontWeight: FontWeight.bold),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -178,6 +182,7 @@ class WeightHistoryCard extends StatelessWidget {
                             ),
                             if (change != null && change != 0)
                               Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
                                     change > 0 ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
