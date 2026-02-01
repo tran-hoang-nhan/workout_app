@@ -18,15 +18,22 @@ class NotificationService {
     String sleepTime = '23:00',
   }) async {
     String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
-    debugPrint("🕒 Scheduling water reminder every $intervalHours hours (Timezone: $localTimeZone)");
+    
+    // Safeguard to ensure interval is at least 1 hour and not 0
+    final safeInterval = intervalHours > 0 ? intervalHours : 2;
+    
+    debugPrint("🕒 Scheduling water reminder every $safeInterval hours (Requested: $intervalHours) (Timezone: $localTimeZone)");
     debugPrint("💤 Active hours: $wakeTime - $sleepTime");
+
+    // Cancel existing notification with the same ID to ensure clean schedule
+    await AwesomeNotifications().cancel(10);
 
     bool created = await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 10, 
         channelKey: waterChannelKey,
-        title: 'Thời gian uống nước!',
-        body: 'Đã đến lúc bổ sung nước cho cơ thể rồi bạn ơi. Cùng uống một cốc nước nhé!',
+        title: 'Thời gian uống nước! 💧',
+        body: 'Đã đến lúc bổ sung nước rồi. Hãy uống một cốc nước để cơ thể khỏe mạnh nhé!',
         notificationLayout: NotificationLayout.Default,
         category: NotificationCategory.Reminder,
         wakeUpScreen: true, 
@@ -41,15 +48,16 @@ class NotificationService {
       ],
       
       schedule: NotificationInterval(
-        // Reverting to real interval
-        interval: Duration(hours: intervalHours), 
+        // Use Duration for clarity, ensuring it's in hours
+        interval: Duration(hours: safeInterval), 
         timeZone: localTimeZone,
         repeats: true,
+        allowWhileIdle: true,
       ),
     );
     
     if (created) {
-      debugPrint("✅ Water reminder scheduled successfully for every $intervalHours hours");
+      debugPrint("✅ Water reminder scheduled successfully for every $safeInterval hours");
     } else {
       debugPrint("⚠️ Schedule returned false.");
     }
