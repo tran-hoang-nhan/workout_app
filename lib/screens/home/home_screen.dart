@@ -4,7 +4,9 @@ import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import 'widgets/stats_section.dart';
 import 'widgets/ai_suggestions_section.dart';
-import 'widgets/quick_workout_section.dart';
+
+import '../../providers/notification_provider.dart';
+import '../notification/notification_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -12,6 +14,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userAsync = ref.watch(currentUserProvider);
+    final unreadCount = ref.watch(unreadNotificationCountProvider);
     
     return Scaffold(
       backgroundColor: AppColors.bgLight,
@@ -147,23 +150,32 @@ class HomeScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Badge(
-                      label: Text('2', style: TextStyle(fontSize: 9)),
-                      child: Icon(Icons.notifications_outlined, color: AppColors.black, size: 22),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const NotificationScreen()),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Badge(
+                        isLabelVisible: unreadCount > 0,
+                        label: Text(unreadCount > 9 ? '9+' : unreadCount.toString(), style: const TextStyle(fontSize: 9)),
+                        child: const Icon(Icons.notifications_outlined, color: AppColors.black, size: 22),
+                      ),
                     ),
                   ),
                 ],
@@ -178,8 +190,7 @@ class HomeScreen extends ConsumerWidget {
               const AISuggestionsSection(),
               const SizedBox(height: AppSpacing.lg),
               
-              // Quick Workout Section
-              const QuickWorkoutSection(),
+
             ],
           ),
         ),
