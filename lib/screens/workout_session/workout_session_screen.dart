@@ -8,6 +8,7 @@ import 'widgets/workout_exercise_card.dart';
 import 'workout_session_next_action.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/health_provider.dart';
 import '../../providers/progress_provider.dart';
 
 class WorkoutSessionScreen extends ConsumerStatefulWidget {
@@ -33,6 +34,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   Timer? _timer;
   bool _inRest = false;
   bool _started = false;
+  bool _isCompleting = false;
   final Stopwatch _sessionStopwatch = Stopwatch();
 
   WorkoutItem get _currentItem => widget.items[_currentIndex];
@@ -162,16 +164,73 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     return total;
   }
 
+  int _plannedRestSeconds() {
+    int total = 0;
+    for (final it in widget.items) {
+      total += (it.restSeconds ?? 0);
+    }
+    return total;
+  }
+
+  double _fallbackCaloriesPerMinute(String? category) {
+    final c = (category ?? '').toLowerCase();
+    if (c.contains('hiit')) return 12;
+    if (c.contains('cardio')) return 10;
+    if (c.contains('yoga')) return 4;
+    return 8;
+  }
+
+  double _estimateCaloriesBurned({
+    required int totalSeconds,
+    required int plannedRestSeconds,
+    required double? userWeightKg,
+  }) {
+    final activeSeconds = (totalSeconds - plannedRestSeconds).clamp(
+      0,
+      totalSeconds,
+    );
+    if (activeSeconds <= 0) return 0;
+
+    final values = widget.exercises
+        .map((e) => e.caloriesPerMinute)
+        .whereType<double>()
+        .where((v) => v.isFinite && v > 0)
+        .toList();
+
+    final basePerMinute = values.isNotEmpty
+        ? values.reduce((a, b) => a + b) / values.length
+        : _fallbackCaloriesPerMinute(widget.workout.category);
+
+    final weightFactor =
+        (userWeightKg != null && userWeightKg > 0 && userWeightKg.isFinite)
+        ? (userWeightKg / 70).clamp(0.7, 1.6)
+        : 1.0;
+
+    final calories = (activeSeconds / 60.0) * basePerMinute * weightFactor;
+    if (!calories.isFinite || calories.isNaN) return 0;
+    return double.parse(calories.toStringAsFixed(1));
+  }
+
   Future<void> _showCompletion() async {
+    if (_isCompleting) return;
+    _isCompleting = true;
     final totalItems = widget.items.length;
     _timer?.cancel();
     _sessionStopwatch.stop();
-    final actualSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
-    final totalSeconds = actualSeconds > 0 ? actualSeconds : _plannedTotalSeconds();
+    final actualSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000)
+        .floor();
+    final totalSeconds = actualSeconds > 0
+        ? actualSeconds
+        : _plannedTotalSeconds();
     try {
       final userId = await ref.read(currentUserIdProvider.future);
       if (userId != null) {
-        final calories = totalSeconds * 0.1;
+        final weightKg = ref.read(healthFormProvider).weight;
+        final calories = _estimateCaloriesBurned(
+          totalSeconds: totalSeconds,
+          plannedRestSeconds: _plannedRestSeconds(),
+          userWeightKg: weightKg,
+        );
         await ref
             .read(progressRepositoryProvider)
             .recordWorkout(
