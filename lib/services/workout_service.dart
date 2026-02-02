@@ -2,6 +2,7 @@ import '../models/workout.dart';
 import '../models/workout_item.dart';
 import '../models/exercise.dart';
 import '../repositories/workout_repository.dart';
+import '../utils/logger.dart';
 
 class WorkoutService {
   final WorkoutRepository _workoutRepository;
@@ -11,6 +12,9 @@ class WorkoutService {
 
   Future<List<Workout>> getAllWorkouts() async {
     final response = await _workoutRepository.getAllWorkouts();
+    logger.i(
+      '[WorkoutService] getAllWorkouts returned ${response.length} items',
+    );
     return response.map((data) => Workout.fromJson(data)).toList();
   }
 
@@ -19,11 +23,14 @@ class WorkoutService {
     return response.map((data) => Workout.fromJson(data)).toList();
   }
 
-  Future<({Workout workout, List<WorkoutItem> items, List<Exercise> exercises})> getWorkoutDetail(int workoutId) async {
+  Future<({Workout workout, List<WorkoutItem> items, List<Exercise> exercises})>
+  getWorkoutDetail(int workoutId) async {
     final workoutData = await _workoutRepository.getWorkoutById(workoutId);
     final workout = Workout.fromJson(workoutData);
     final itemsData = await _workoutRepository.getWorkoutItems(workoutId);
-    List<WorkoutItem> items = itemsData.map((data) => WorkoutItem.fromJson(data)).toList();
+    List<WorkoutItem> items = itemsData
+        .map((data) => WorkoutItem.fromJson(data))
+        .toList();
     items.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
     if (items.isEmpty) {
       return (
@@ -33,9 +40,17 @@ class WorkoutService {
       );
     }
 
-    final exerciseIds = items.map((item) => item.exerciseId).where((id) => id > 0).toSet().toList();
-    final exercisesData = await _workoutRepository.getExercisesByIds(exerciseIds,);
-    final exercises = exercisesData.map((data) => Exercise.fromJson(data)).toList();
+    final exerciseIds = items
+        .map((item) => item.exerciseId)
+        .where((id) => id > 0)
+        .toSet()
+        .toList();
+    final exercisesData = await _workoutRepository.getExercisesByIds(
+      exerciseIds,
+    );
+    final exercises = exercisesData
+        .map((data) => Exercise.fromJson(data))
+        .toList();
     return (workout: workout, items: items, exercises: exercises);
   }
 
@@ -46,7 +61,7 @@ class WorkoutService {
 
   Future<List<Workout>> getWorkoutsByCategory(String category) async {
     final key = category.trim().toLowerCase();
-    if (key == 'tất cả') return getAllWorkouts();
+    if (key == 'tất cả' || key == 'all') return getAllWorkouts();
 
     final (titleKeywords, muscleKeywords) = _mapFilterKeywords(category);
 
@@ -55,20 +70,25 @@ class WorkoutService {
     final byTitle = await _workoutRepository.getWorkoutsByTitleKeywords(
       titleKeywords,
     );
+
     for (final data in byTitle) {
       final workout = Workout.fromJson(data);
       resultsById[workout.id] = workout;
     }
 
-    final exerciseIds = await _workoutRepository.getExerciseIdsByMuscleGroupKeywords(muscleKeywords);
-    final workoutIds = await _workoutRepository.getWorkoutIdsByExerciseIds(exerciseIds,);
+    final exerciseIds = await _workoutRepository
+        .getExerciseIdsByMuscleGroupKeywords(muscleKeywords);
+    final workoutIds = await _workoutRepository.getWorkoutIdsByExerciseIds(
+      exerciseIds,
+    );
     final byIds = await _workoutRepository.getWorkoutsByIds(workoutIds);
     for (final data in byIds) {
       final workout = Workout.fromJson(data);
       resultsById[workout.id] = workout;
     }
 
-    final merged = resultsById.values.toList()..sort((a, b) => a.id.compareTo(b.id));
+    final merged = resultsById.values.toList()
+      ..sort((a, b) => a.id.compareTo(b.id));
     return merged;
   }
 

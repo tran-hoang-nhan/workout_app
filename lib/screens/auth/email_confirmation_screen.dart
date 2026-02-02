@@ -21,7 +21,6 @@ class EmailConfirmationScreen extends ConsumerStatefulWidget {
 class _EmailConfirmationScreenState
     extends ConsumerState<EmailConfirmationScreen> {
   final _otpController = TextEditingController();
-  bool _showOtpInput = false;
   int _resendCountdown = 0;
 
   @override
@@ -54,10 +53,7 @@ class _EmailConfirmationScreenState
     }
 
     try {
-      final success = await ref
-          .read(verifyOTPProvider(widget.email).notifier)
-          .verifyOTP(_otpController.text.trim());
-      
+      final success = await ref.read(verifyOTPProvider(widget.email).notifier).verifyOTP(_otpController.text.trim());
       if (success && mounted) {
         // Hiển thị thông báo thành công
         ScaffoldMessenger.of(context).showSnackBar(
@@ -116,14 +112,14 @@ class _EmailConfirmationScreenState
                     borderRadius: BorderRadius.circular(AppBorderRadius.full),
                   ),
                   child: const Icon(
-                    Icons.mark_email_unread_outlined,
+                    Icons.security_outlined,
                     size: 60,
                     color: AppColors.primary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 const Text(
-                  'Xác Nhận Email',
+                  'Xác Thực Email',
                   style: TextStyle(
                     fontSize: AppFontSize.xxxl,
                     fontWeight: FontWeight.bold,
@@ -131,152 +127,101 @@ class _EmailConfirmationScreenState
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                Text(
-                  'Email xác nhận đã được gửi đến:\n${widget.email}',
-                  style: const TextStyle(
-                    fontSize: AppFontSize.md,
-                    color: AppColors.grey,
-                    height: 1.5,
-                  ),
+                RichText(
                   textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: AppFontSize.md,
+                      color: AppColors.grey,
+                      height: 1.5,
+                    ),
+                    children: [
+                      const TextSpan(text: 'Vui lòng nhập mã xác thực gồm 6 chữ số đã được gửi đến:\n'),
+                      TextSpan(
+                        text: widget.email,
+                        style: const TextStyle(
+                          color: AppColors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
+                
+                // OTP Input Section
                 SizedBox(
                   width: double.infinity,
                   child: Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
+                    padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
-                      color: AppColors.greyLight,
-                      borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                      border: Border.all(
-                          color: AppColors.grey.withValues(alpha: 0.3)),
-                    ),
-                    child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          '✅ Cách 1: Nhấp Link (Khuyến Nghị)',
-                          style: TextStyle(
-                            fontSize: AppFontSize.md,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.black,
-                          ),
-                          textAlign: TextAlign.center,
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(AppBorderRadius.xl),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                        SizedBox(height: AppSpacing.sm),
-                        Text(
-                          '1. Mở email từ Workout App\n'
-                          '2. Nhấp vào link "Confirm your email"\n'
-                          '3. Bạn sẽ tự động được đăng nhập',
-                          style: TextStyle(
-                            fontSize: AppFontSize.sm,
-                            color: AppColors.grey,
-                            height: 1.6,
-                          ),
-                          textAlign: TextAlign.center,
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        CustomTextField(
+                          label: 'Mã xác nhận',
+                          hintText: '00000000',
+                          controller: _otpController,
+                          prefixIcon: Icons.lock_outline,
+                          keyboardType: TextInputType.number,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        CustomButton(
+                          label: 'Xác Nhận',
+                          isLoading: isLoading,
+                          onPressed: () => _handleVerifyOTP(),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                if (_showOtpInput) ...[
-                  SizedBox(
-                    width: double.infinity,
-                    child: Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: AppColors.success.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                        border: Border.all(
-                            color: AppColors.success.withValues(alpha: 0.3)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Text(
-                            '🔐 Cách 2: Nhập Mã Xác Nhận',
-                            style: TextStyle(
-                              fontSize: AppFontSize.md,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.black,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          CustomTextField(
-                            label: 'Mã OTP',
-                            hintText: 'Nhập mã 6 chữ số từ email',
-                            controller: _otpController,
-                            prefixIcon: Icons.key_outlined,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          CustomButton(
-                            label: 'Xác Nhận Mã',
-                            isLoading: isLoading,
-                            onPressed: () => _handleVerifyOTP(),
-                          ),
-                        ],
-                      ),
-                    ),
+                
+                const SizedBox(height: AppSpacing.xl),
+                
+                // Help/Tips Section
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: AppColors.greyLight,
+                    borderRadius: BorderRadius.circular(AppBorderRadius.lg),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                ] else ...[
-                  Center(
-                    child: TextButton(
-                      onPressed: () => setState(() => _showOtpInput = true),
-                      child: const Text(
-                        'Hoặc nhập mã xác nhận từ email →',
+                  child: const Column(
+                    children: [
+                      Text(
+                        'Không nhận được mã?',
                         style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.black,
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                ],
-                SizedBox(
-                  width: double.infinity,
-                  child: Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: AppColors.warning.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-                    ),
-                    child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          '💡 Mẹo:',
-                          style: TextStyle(
-                            fontSize: AppFontSize.md,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.black,
-                          ),
-                          textAlign: TextAlign.center,
+                      SizedBox(height: AppSpacing.xs),
+                      Text(
+                        'Kiểm tra thư mục Spam hoặc thử gửi lại mã sau 60s.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: AppFontSize.sm,
+                          color: AppColors.grey,
                         ),
-                        SizedBox(height: AppSpacing.sm),
-                        Text(
-                          '• Kiểm tra thư mục Spam hoặc Promotions\n'
-                          '• Có thể mất vài phút để nhận email\n'
-                          '• Mã xác nhận sẽ hết hạn sau 10 phút',
-                          style: TextStyle(
-                            fontSize: AppFontSize.sm,
-                            color: AppColors.grey,
-                            height: 1.6,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
+                
                 const SizedBox(height: AppSpacing.xl),
+                
                 if (_resendCountdown > 0)
                   Center(
                     child: Text(
-                      'Gửi lại email trong ${_resendCountdown}s',
+                      'Gửi lại mã trong ${_resendCountdown}s',
                       style: const TextStyle(
                         fontSize: AppFontSize.sm,
                         color: AppColors.grey,
@@ -293,7 +238,7 @@ class _EmailConfirmationScreenState
                               _startResendCountdown();
                             },
                       child: const Text(
-                        'Gửi lại email xác nhận',
+                        'Gửi lại mã xác nhận',
                         style: TextStyle(
                           fontSize: AppFontSize.md,
                           color: AppColors.primary,

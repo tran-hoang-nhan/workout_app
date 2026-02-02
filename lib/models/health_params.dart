@@ -7,13 +7,14 @@ class HealthUpdateParams {
   final String activityLevel;
   final String goal;
   final String dietType;
-  final int sleepHours;
   final int waterIntake;
   final List<String> injuries;
   final List<String> medicalConditions;
   final List<String> allergies;
   final bool? waterReminderEnabled;
   final int? waterReminderInterval;
+  final String? wakeTime;
+  final String? sleepTime;
 
   HealthUpdateParams({
     required this.userId,
@@ -24,13 +25,14 @@ class HealthUpdateParams {
     required this.activityLevel,
     required this.goal,
     required this.dietType,
-    required this.sleepHours,
     required this.waterIntake,
     required this.injuries,
     required this.medicalConditions,
     required this.allergies,
     this.waterReminderEnabled,
     this.waterReminderInterval,
+    this.wakeTime,
+    this.sleepTime,
   });
 
   Map<String, dynamic> toHealthMap() {
@@ -41,7 +43,6 @@ class HealthUpdateParams {
       'height': height,
       'activity_level': activityLevel,
       'diet_type': dietType,
-      'sleep_hours_avg': sleepHours,
       'water_intake_goal': waterIntake,
       'injuries': injuries,
       'medical_conditions': medicalConditions,
@@ -54,6 +55,12 @@ class HealthUpdateParams {
     }
     if (waterReminderInterval != null) {
       map['water_reminder_interval'] = waterReminderInterval!;
+    }
+    if (wakeTime != null) {
+      map['wake_time'] = wakeTime!;
+    }
+    if (sleepTime != null) {
+      map['sleep_time'] = sleepTime!;
     }
 
     return map;
@@ -72,13 +79,14 @@ class HealthUpdateParams {
     String? activityLevel,
     String? goal,
     String? dietType,
-    int? sleepHours,
     int? waterIntake,
     List<String>? injuries,
     List<String>? medicalConditions,
     List<String>? allergies,
     bool? waterReminderEnabled,
     int? waterReminderInterval,
+    String? wakeTime,
+    String? sleepTime,
   }) {
     return HealthUpdateParams(
       userId: userId ?? this.userId,
@@ -89,7 +97,6 @@ class HealthUpdateParams {
       activityLevel: activityLevel ?? this.activityLevel,
       goal: goal ?? this.goal,
       dietType: dietType ?? this.dietType,
-      sleepHours: sleepHours ?? this.sleepHours,
       waterIntake: waterIntake ?? this.waterIntake,
       injuries: injuries ?? this.injuries,
       medicalConditions: medicalConditions ?? this.medicalConditions,
@@ -97,6 +104,8 @@ class HealthUpdateParams {
       waterReminderEnabled: waterReminderEnabled ?? this.waterReminderEnabled,
       waterReminderInterval:
           waterReminderInterval ?? this.waterReminderInterval,
+      wakeTime: wakeTime ?? this.wakeTime,
+      sleepTime: sleepTime ?? this.sleepTime,
     );
   }
 }

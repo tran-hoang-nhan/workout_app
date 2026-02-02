@@ -12,14 +12,14 @@ final dailyStatsProvider = FutureProvider.family<DailyStats?, DateTime>((
   rawDate,
 ) async {
   final date = DateTime(rawDate.year, rawDate.month, rawDate.day);
-  final userId = await ref.watch(currentUserIdProvider.future);
+  final userId = ref.watch(currentUserIdProvider).value;
   if (userId == null) return null;
   final repo = ref.watch(dailyStatsRepositoryProvider);
   return await repo.getDailyStats(userId, date);
 });
 
 final weeklyStatsProvider = FutureProvider<List<DailyStats>>((ref) async {
-  final userId = await ref.watch(currentUserIdProvider.future);
+  final userId = ref.watch(currentUserIdProvider).value;
   if (userId == null) return [];
   final repo = ref.watch(dailyStatsRepositoryProvider);
   final now = DateTime.now();
@@ -32,7 +32,7 @@ final monthStatsProvider = FutureProvider.family<List<DailyStats>, DateTime>((
   ref,
   month,
 ) async {
-  final userId = await ref.watch(currentUserIdProvider.future);
+  final userId = ref.watch(currentUserIdProvider).value;
   if (userId == null) return [];
   final repo = ref.watch(dailyStatsRepositoryProvider);
   final startOfMonth = DateTime(month.year, month.month, 1);

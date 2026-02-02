@@ -7,8 +7,7 @@ import '../utils/app_error.dart';
 
 class AuthService {
   final AuthRepository _repository;
-  AuthService({AuthRepository? repository})
-    : _repository = repository ?? AuthRepository();
+  AuthService({AuthRepository? repository}): _repository = repository ?? AuthRepository();
   Stream<AuthState> get authStateStream => _repository.authStateChanges;
   bool get isAuthenticated => _repository.currentSession != null;
   User? get currentUser => _repository.currentUser;
@@ -50,10 +49,7 @@ class AuthService {
     );
   }
 
-  Future<void> updatePassword(
-    String newPassword, {
-    String? confirmPassword,
-  }) async {
+  Future<void> updatePassword(String newPassword, { String? confirmPassword,}) async {
     debugPrint('[AuthService] Validating password update request...');
     if (newPassword.isEmpty) {
       debugPrint('[AuthService] Validation failed: Password empty');

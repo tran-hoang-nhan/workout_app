@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/progress_provider.dart';
-import '../../providers/progress_user_provider.dart';
 import 'widgets/history_list.dart';
 import 'widgets/progress_header.dart';
-import 'widgets/summary_cards.dart';
+import 'widgets/achievements_section.dart';
 import 'widgets/weekly_activity_slider.dart';
 import 'widgets/running_card.dart';
 
@@ -28,7 +27,6 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dailyStatsAsync = ref.watch(progressDailyProvider(_selectedDay));
     final historyAsync = ref.watch(workoutHistoryProvider);
 
     return Scaffold(
@@ -47,10 +45,25 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
               },
             ),
             const RunningCard(),
-            ProgressSummaryCards(statsAsync: dailyStatsAsync),
+
+            // Replaced Statistics with Achievements
+            historyAsync.when(
+              data: (history) =>
+                  AchievementsSection(totalWorkouts: history.length),
+              loading: () => const SliverToBoxAdapter(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (e, _) => SliverToBoxAdapter(
+                child: Center(child: Text('Lỗi tải thành tích: $e')),
+              ),
+            ),
+
             const SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
                 child: Text(
                   'Hoạt động gần đây',
                   style: TextStyle(
