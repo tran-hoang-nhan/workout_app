@@ -35,6 +35,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   bool _inRest = false;
   bool _started = false;
   bool _isCompleting = false;
+  int _restElapsedSeconds = 0;
   final Stopwatch _sessionStopwatch = Stopwatch();
 
   WorkoutItem get _currentItem => widget.items[_currentIndex];
@@ -49,6 +50,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
 
   void _start() {
     if (!_sessionStopwatch.isRunning) {
+      _restElapsedSeconds = 0;
       _sessionStopwatch.start();
     }
     final item = _currentItem;
@@ -114,6 +116,9 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
       if (_remainingSeconds > 0) {
         setState(() {
           _remainingSeconds--;
+          if (_inRest) {
+            _restElapsedSeconds++;
+          }
         });
       } else {
         t.cancel();
@@ -164,14 +169,6 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     return total;
   }
 
-  int _plannedRestSeconds() {
-    int total = 0;
-    for (final it in widget.items) {
-      total += (it.restSeconds ?? 0);
-    }
-    return total;
-  }
-
   double _fallbackCaloriesPerMinute(String? category) {
     final c = (category ?? '').toLowerCase();
     if (c.contains('hiit')) return 12;
@@ -182,10 +179,10 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
 
   double _estimateCaloriesBurned({
     required int totalSeconds,
-    required int plannedRestSeconds,
+    required int restElapsedSeconds,
     required double? userWeightKg,
   }) {
-    final activeSeconds = (totalSeconds - plannedRestSeconds).clamp(
+    final activeSeconds = (totalSeconds - restElapsedSeconds).clamp(
       0,
       totalSeconds,
     );
@@ -206,9 +203,10 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
         ? (userWeightKg / 70).clamp(0.7, 1.6)
         : 1.0;
 
-    final calories = (activeSeconds / 60.0) * basePerMinute * weightFactor;
+    final caloriesPerSecond = (basePerMinute / 60.0) * weightFactor;
+    final calories = caloriesPerSecond * activeSeconds;
     if (!calories.isFinite || calories.isNaN) return 0;
-    return double.parse(calories.toStringAsFixed(1));
+    return double.parse(calories.toStringAsFixed(2));
   }
 
   Future<void> _showCompletion() async {
@@ -228,7 +226,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
         final weightKg = ref.read(healthFormProvider).weight;
         final calories = _estimateCaloriesBurned(
           totalSeconds: totalSeconds,
-          plannedRestSeconds: _plannedRestSeconds(),
+          restElapsedSeconds: _restElapsedSeconds,
           userWeightKg: weightKg,
         );
         await ref
