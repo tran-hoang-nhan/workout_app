@@ -103,15 +103,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     setState(() => _isSaving = true);
 
     try {
-      await ref
-          .read(profileServiceProvider)
-          .saveProfile(
-            userId: user.id,
-            fullName: _nameController.text,
-            gender: _gender,
-            age: int.tryParse(_ageController.text),
-            goal: _goal,
-          );
+      await ref.read(profileServiceProvider).saveProfile(
+        userId: user.id,
+        fullName: _nameController.text,
+        gender: _gender,
+        age: int.tryParse(_ageController.text),
+        goal: _goal,
+      );
 
       if (!mounted) return;
       context.showSuccess('Đã cập nhật hồ sơ thành công!');
@@ -151,8 +149,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.bgLight,
       body: userAsync.when(
-        loading: () =>
-            const Center(child: AppLoading(message: 'Đang tải hồ sơ...')),
+        loading: () => const Center(child: AppLoading(message: 'Đang tải hồ sơ...')),
         error: (error, st) => Center(child: Text('Lỗi: $error')),
         data: (user) {
           if (user == null) {
