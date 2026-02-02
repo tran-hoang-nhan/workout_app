@@ -10,6 +10,7 @@ import 'widgets/edit_profile_avatar.dart';
 import 'widgets/edit_profile_bottom_bar.dart';
 import 'widgets/edit_profile_form_components.dart';
 import 'widgets/edit_profile_gender_selector.dart';
+import 'widgets/edit_profile_goal_selector.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -21,8 +22,8 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _ageController;
-  late TextEditingController _goalController;
   String? _gender;
+  String? _goal;
   bool _isSaving = false;
   bool _isDataLoaded = false;
 
@@ -31,7 +32,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.initState();
     _nameController = TextEditingController();
     _ageController = TextEditingController();
-    _goalController = TextEditingController();
   }
 
   void _loadUserData() {
@@ -40,7 +40,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       setState(() {
         _nameController.text = user.fullName ?? '';
         _ageController.text = user.age?.toString() ?? '';
-        _goalController.text = user.goal ?? '';
+        _goal = user.goal;
         _gender = user.gender;
         _isDataLoaded = true;
       });
@@ -51,7 +51,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void dispose() {
     _nameController.dispose();
     _ageController.dispose();
-    _goalController.dispose();
     super.dispose();
   }
 
@@ -102,15 +101,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (user == null) return;
 
     setState(() => _isSaving = true);
-    
+
     try {
-      await ref.read(profileServiceProvider).saveProfile(
-        userId: user.id,
-        fullName: _nameController.text,
-        gender: _gender,
-        age: int.tryParse(_ageController.text),
-        goal: _goalController.text,
-      );
+      await ref
+          .read(profileServiceProvider)
+          .saveProfile(
+            userId: user.id,
+            fullName: _nameController.text,
+            gender: _gender,
+            age: int.tryParse(_ageController.text),
+            goal: _goal,
+          );
 
       if (!mounted) return;
       context.showSuccess('Đã cập nhật hồ sơ thành công!');
@@ -128,17 +129,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Widget build(BuildContext context) {
     final userAsync = ref.watch(fullUserProfileProvider);
     final user = userAsync.value;
-    
+
     // Load data khi có sẵn
     if (user != null && !_isDataLoaded) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _loadUserData();
       });
     }
-    
+
     // Sync name controller if not focused
     if (user != null && !_nameController.selection.isValid) {
-      if (_nameController.text != user.fullName) _nameController.text = user.fullName ?? '';
+      if (_nameController.text != user.fullName) {
+        _nameController.text = user.fullName ?? '';
+      }
     }
 
     final avatarState = ref.watch(avatarControllerProvider);
@@ -148,19 +151,27 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.bgLight,
       body: userAsync.when(
-        loading: () => const Center(child: AppLoading(message: 'Đang tải hồ sơ...')),
+        loading: () =>
+            const Center(child: AppLoading(message: 'Đang tải hồ sơ...')),
         error: (error, st) => Center(child: Text('Lỗi: $error')),
         data: (user) {
-          if (user == null) return const Center(child: Text('Vui lòng đăng nhập'));
+          if (user == null) {
+            return const Center(child: Text('Vui lòng đăng nhập'));
+          }
 
           return Column(
             children: [
               _buildHeader(context),
-              
+
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, 100),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                    100,
+                  ),
                   child: Column(
                     children: [
                       EditProfileAvatar(
@@ -170,37 +181,48 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         onRemoveImage: _removeAvatar,
                       ),
                       const SizedBox(height: 32),
-                      
+
                       const EditProfileSectionTitle(title: 'Thông tin cơ bản'),
-                      EditProfileInfoCard(children: [
-                        EditProfileTextField(
-                          label: 'Họ và tên',
-                          controller: _nameController,
-                          icon: Icons.person_outline_rounded,
-                        ),
-                        const Divider(height: 32, color: AppColors.cardBorder),
-                        EditProfileGenderSelector(
-                          selectedGender: _gender,
-                          onGenderChanged: (value) => setState(() => _gender = value),
-                        ),
-                      ]),
-                      
+                      EditProfileInfoCard(
+                        children: [
+                          EditProfileTextField(
+                            label: 'Họ và tên',
+                            controller: _nameController,
+                            icon: Icons.person_outline_rounded,
+                          ),
+                          const Divider(
+                            height: 32,
+                            color: AppColors.cardBorder,
+                          ),
+                          EditProfileGenderSelector(
+                            selectedGender: _gender,
+                            onGenderChanged: (value) =>
+                                setState(() => _gender = value),
+                          ),
+                        ],
+                      ),
+
                       const SizedBox(height: 24),
                       const EditProfileSectionTitle(title: 'Thông tin cá nhân'),
-                      EditProfileInfoCard(children: [
-                        EditProfileTextField(
-                          label: 'Tuổi',
-                          controller: _ageController,
-                          icon: Icons.cake_rounded,
-                          keyboardType: TextInputType.number,
-                        ),
-                        const Divider(height: 32, color: AppColors.cardBorder),
-                        EditProfileTextField(
-                          label: 'Mục tiêu',
-                          controller: _goalController,
-                          icon: Icons.track_changes_rounded,
-                        ),
-                      ]),
+                      EditProfileInfoCard(
+                        children: [
+                          EditProfileTextField(
+                            label: 'Tuổi',
+                            controller: _ageController,
+                            icon: Icons.cake_rounded,
+                            keyboardType: TextInputType.number,
+                          ),
+                          const Divider(
+                            height: 32,
+                            color: AppColors.cardBorder,
+                          ),
+                          EditProfileGoalSelector(
+                            selectedGoal: _goal,
+                            onGoalChanged: (value) =>
+                                setState(() => _goal = value),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -218,7 +240,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 10, bottom: 10),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 10,
+        bottom: 10,
+      ),
       decoration: const BoxDecoration(color: AppColors.bgLight),
       child: Row(
         children: [
@@ -230,7 +255,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           const Expanded(
             child: Text(
               'Chỉnh sửa hồ sơ',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.black),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                color: AppColors.black,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
