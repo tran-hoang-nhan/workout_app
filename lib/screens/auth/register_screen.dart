@@ -75,14 +75,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
       final authService = ref.read(authServiceProvider);
       if (authService.isAuthenticated) {
-        // Nếu đã được xác thực (auto login sau khi đăng ký thành công)
         await widget.onSignupSuccess();
-        // Pop màn hình đăng ký để quay lại main shell/onboarding
         if (mounted) {
           Navigator.of(context).pop();
         }
       } else {
-        // Nếu chưa được xác thực (cần xác nhận email)
         if (mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(

@@ -11,12 +11,10 @@ class PasswordRecoveryScreen extends ConsumerStatefulWidget {
   const PasswordRecoveryScreen({super.key, required this.email});
 
   @override
-  ConsumerState<PasswordRecoveryScreen> createState() =>
-      _PasswordRecoveryScreenState();
+  ConsumerState<PasswordRecoveryScreen> createState() => _PasswordRecoveryScreenState();
 }
 
-class _PasswordRecoveryScreenState
-    extends ConsumerState<PasswordRecoveryScreen> {
+class _PasswordRecoveryScreenState extends ConsumerState<PasswordRecoveryScreen> {
   final _otpController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
@@ -55,9 +53,7 @@ class _PasswordRecoveryScreenState
       return;
     }
 
-    final success = await ref
-        .read(authControllerProvider.notifier)
-        .verifyRecoveryOTP(widget.email, otp);
+    final success = await ref.read(authControllerProvider.notifier).verifyRecoveryOTP(widget.email, otp);
     if (success) {
       setState(() => _otpVerified = true);
     } else {
@@ -83,10 +79,7 @@ class _PasswordRecoveryScreenState
     }
 
     try {
-      // Bước 1: Cập nhật mật khẩu
       await ref.read(authControllerProvider.notifier).updatePassword(password);
-      
-      // Bước 2: QUAN TRỌNG - Sign out để clear session cũ
       await ref.read(authControllerProvider.notifier).signOut();
       
       if (mounted) {
@@ -97,8 +90,6 @@ class _PasswordRecoveryScreenState
             duration: Duration(seconds: 3),
           ),
         );
-        
-        // Bước 3: Quay về màn hình login và clear toàn bộ navigation stack
         Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
       }
     } catch (e) {
