@@ -15,8 +15,7 @@ class AISuggestionsScreen extends ConsumerStatefulWidget {
   const AISuggestionsScreen({super.key});
 
   @override
-  ConsumerState<AISuggestionsScreen> createState() =>
-      _AISuggestionsScreenState();
+  ConsumerState<AISuggestionsScreen> createState() => _AISuggestionsScreenState();
 }
 
 class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {

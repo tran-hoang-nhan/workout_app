@@ -15,8 +15,7 @@ class WorkoutDetailScreen extends ConsumerStatefulWidget {
   const WorkoutDetailScreen({super.key, required this.workout});
 
   @override
-  ConsumerState<WorkoutDetailScreen> createState() =>
-      _WorkoutDetailScreenState();
+  ConsumerState<WorkoutDetailScreen> createState() => _WorkoutDetailScreenState();
 }
 
 class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
