@@ -46,8 +46,7 @@ class ProfileRepository {
     }
   }
 
-  Future<void> saveProfile({required String userId,required String fullName,String? gender,double? weight,int? age,String? goal,
-  }) async {
+  Future<void> saveProfile({required String userId,required String fullName,String? gender,double? weight,int? age,String? goal,}) async {
     try {
       // 1. Update profiles table
       final Map<String, dynamic> profileUpdates = {'full_name': fullName,};

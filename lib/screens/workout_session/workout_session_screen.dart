@@ -24,8 +24,7 @@ class WorkoutSessionScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<WorkoutSessionScreen> createState() =>
-      _WorkoutSessionScreenState();
+  ConsumerState<WorkoutSessionScreen> createState() => _WorkoutSessionScreenState();
 }
 
 class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {

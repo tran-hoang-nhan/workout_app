@@ -61,7 +61,6 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
   @override
   Widget build(BuildContext context) {
     final formState = ref.watch(healthFormProvider);
-    // Watch current date provider to rebuild on day change
     final today = ref.watch(currentDateProvider);
     final todayProgressAsync = ref.watch(progressDailyProvider(today));
 
