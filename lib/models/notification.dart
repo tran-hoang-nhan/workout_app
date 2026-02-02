@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum NotificationType {
-  workout,
-  reminder,
-  achievement,
-  system,
-  water
-}
+enum NotificationType { workout, reminder, achievement, system, water }
 
 class NotificationModel {
   final String id;
@@ -15,6 +9,7 @@ class NotificationModel {
   final DateTime createdAt;
   final NotificationType type;
   final bool isRead;
+  final DateTime? drankAt;
   final String? route;
   final Map<String, dynamic>? data;
 
@@ -25,6 +20,7 @@ class NotificationModel {
     required this.createdAt,
     required this.type,
     this.isRead = false,
+    this.drankAt,
     this.route,
     this.data,
   });
@@ -36,6 +32,7 @@ class NotificationModel {
     DateTime? createdAt,
     NotificationType? type,
     bool? isRead,
+    DateTime? drankAt,
     String? route,
     Map<String, dynamic>? data,
   }) {
@@ -46,6 +43,7 @@ class NotificationModel {
       createdAt: createdAt ?? this.createdAt,
       type: type ?? this.type,
       isRead: isRead ?? this.isRead,
+      drankAt: drankAt ?? this.drankAt,
       route: route ?? this.route,
       data: data ?? this.data,
     );

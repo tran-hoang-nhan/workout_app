@@ -31,7 +31,9 @@ class WorkoutHeader extends StatelessWidget {
               ),
 
               errorWidget: (context, url, error) {
-                debugPrint('[WorkoutHeader] thumbnail load failed: title=${workout.title} url=$url error=$error',);
+                debugPrint(
+                  '[WorkoutHeader] thumbnail load failed: title=${workout.title} url=$url error=$error',
+                );
                 return Container(
                   color: Colors.grey[200],
                   height: 250,
