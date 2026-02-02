@@ -82,3 +82,66 @@ Hình 3.15 – Giao diện Cân nặng chi tiết 2
 Màn hình này tập trung vào việc phân tích dữ liệu nhịp tim trong các phiên tập luyện. Người dùng có thể xem nhịp tim trung bình, nhịp tim nghỉ ngơi và biểu đồ phân bổ các vùng nhịp tim (Heart Rate Zones), từ đó điều chỉnh cường độ tập luyện để đạt hiệu quả cao nhất mà vẫn đảm bảo an toàn cho tim mạch.
 
 Hình 3.16 – Giao diện Nhịp tim chi tiết
+
+---
+
+### Xây dựng giao diện Bài tập chi tiết
+Giao diện Bài tập chi tiết được thiết kế để cung cấp cái nhìn sâu sắc và toàn diện về từng thực thể bài tập trong hệ thống. Màn hình này ưu tiên tính trực quan giúp người dùng nhanh chóng nhận diện kỹ thuật và mục tiêu của bài tập trước khi thực hiện.
+
+**Thông tin tổng quan:** Khu vực phía trên hiển thị hình ảnh minh họa lớn hoặc hoạt ảnh sinh động, đi kèm với các thẻ thông số như Nhóm cơ (Muscle Group), Độ khó (Difficulty) và lượng Calo tiêu thụ dự tính. Cách bố trí này thiết lập một hệ thống phân cấp thị giác rõ ràng, giúp người dùng đánh giá ngay tính phù hợp của bài tập với thể trạng và lộ trình cá nhân.
+
+**Hướng dẫn kỹ thuật:** Phần mô tả chi tiết được trình bày với phông chữ thoáng đãng, tập trung vào các bước thực hiện chuẩn xác, cách kiểm soát hơi thở và các lưu ý an toàn. Việc tách biệt các thông tin này giúp người dùng dễ dàng theo dõi và ghi nhớ, từ đó tối ưu hóa hiệu quả tập luyện và giảm thiểu tối đa nguy cơ chấn thương trong quá trình rèn luyện chuyên sâu.
+
+Hình 3.17 – Giao diện Bài tập chi tiết
+
+---
+
+### Xây dựng giao diện Hướng dẫn động tác
+Đây là giao diện đột phá sử dụng công nghệ hoạt ảnh chất lượng cao (Lottie) để trực quan hóa các động tác tập luyện. Thay vì các video hướng dẫn cồng kềnh, hoạt ảnh vector mang lại sự linh hoạt và độ sắc nét tuyệt đối trên mọi kích thước màn hình mà không tốn nhiều tài nguyên hệ thống.
+
+**Tính năng Hoạt ảnh mượt mà:** Người dùng có thể quan sát từng chuyển động nhỏ nhất của cơ thể thông qua các hành động lặp lại được mô phỏng sinh động. Giao diện được thiết kế tối giản trên nền trung tính, giúp tập trung hoàn toàn vào tư thế và kỹ thuật thực hiện động tác, loại bỏ các yếu tố gây xao nhãng thường thấy trong các video quay thực tế.
+
+**Bộ điều khiển tương tác:** Giao diện tích hợp các phím chức năng Phát, Tạm dừng và Làm mới trực quan ngay dưới khu vực hoạt ảnh. Người dùng có thể chủ động điều khiển quá trình quan sát, tạm dừng ở các tư thế khó hoặc xem lại nhiều lần cho đến khi nắm vững kỹ thuật, tạo ra một trải nghiệm tự học chuyên nghiệp, bài bản và đầy hứng khởi.
+
+Hình 3.18 – Giao diện Hướng dẫn động tác
+
+---
+
+### Xây dựng giao diện Thực hiện buổi tập
+Giao diện Thực hiện buổi tập là trung tâm của trải nghiệm rèn luyện, nơi người dùng tương tác trực tiếp với các bài tập trong một phiên tập trung. Màn hình được thiết kế để giảm thiểu sự phân tâm, giúp người dùng hoàn toàn tập trung vào động tác và thời gian.
+
+**Theo dõi tiến độ:** Một thanh trạng thái ở phía trên hiển thị số lượng bài tập đã hoàn thành trên tổng số bài tập của buổi. Trung tâm màn hình hiển thị thẻ bài tập hiện tại kèm theo bộ đếm ngược thời gian thực (Countdown Timer) hoặc số lần lặp (Reps) rõ rệt, giúp người dùng duy trì nhịp độ chuẩn xác mà không cần quan sát quá nhiều vào thiết bị.
+
+**Giao diện Nghỉ ngơi:** Giữa các bài tập, hệ thống tự động kích hoạt màn hình nghỉ ngơi với hiệu ứng màu sắc dịu nhẹ, cung cấp khoảng thời gian hồi phục cần thiết. Người dùng có thể chủ động bỏ qua hoặc điều chỉnh thời gian nghỉ để phù hợp với nhịp tim và thể lực thực tế, tạo nên một quy trình tập luyện khoa học và linh hoạt.
+
+Hình 3.19 – Giao diện Thực hiện buổi tập
+
+---
+
+### Xây dựng giao diện Gợi ý từ AI
+Giao diện Gợi ý từ AI mang phong cách hội thoại hiện đại, đóng vai trò như một huấn luyện viên cá nhân ảo thông minh. Hệ thống sử dụng ngôn ngữ tự nhiên để tương tác, tạo cảm giác gần gũi và nâng cao tính gắn kết của người dùng với ứng dụng.
+
+**Xác thực và Phân tích:** AI sẽ tiến hành xác nhận các chỉ số sinh lý hiện tại như cân nặng, chiều cao và mức độ vận động để đảm bảo dữ liệu đầu vào chính xác nhất. Quá trình phân tích được trực quan hóa bằng các hiệu ứng chuyển động sinh động, tạo niềm tin về sự kỹ lưỡng và chuyên sâu trong việc xử lý dữ liệu cá nhân của người dùng.
+
+**Kết quả cá nhân hóa:** Các hành động gợi ý như bài tập tối ưu trong ngày hay chế độ dinh dưỡng được trình bày dưới dạng các thẻ nội dung (Card) mượt mà trong luồng hội thoại. Người dùng có thể tương tác trực tiếp để xem chi tiết bài tập hoặc đặt thêm các câu hỏi hỗ trợ, biến việc luyện tập thành một hành trình được hướng dẫn bài bản và khoa học bởi trí tuệ nhân tạo.
+
+Hình 3.20 – Giao diện Gợi ý từ AI
+
+---
+
+### Xây dựng giao diện Thông báo và Nhắc nhở thông minh
+Giao diện Thông báo đóng vai trò là trung tâm cập nhật và tương tác giữa ứng dụng và người dùng. Các thông báo được thiết kế dưới dạng thẻ (Card) bo góc mềm mại, phân loại rõ ràng bằng biểu tượng màu sắc sinh động, giúp người dùng dễ dàng phân biệt giữa nhắc nhở tập luyện, dinh dưỡng hay thông báo hệ thống.
+
+**Nhắc nhở uống nước đa trạng thái:** Điểm nổi bật của hệ thống này là tính năng nhắc nước thông minh với hai giai đoạn tương tác. Ban đầu, thông báo hiển thị nút "Đã uống" để khuyến khích hành động tức thì. Ngay sau khi xác nhận, giao diện sẽ chuyển trạng thái sang bộ đếm ngược thời gian thực (Real-time Countdown), thông báo chính xác thời gian cho ly nước tiếp theo dựa trên cấu hình giãn cách của người dùng, tạo nên một vòng lặp thói quen tích cực và bền vững.
+
+Hình 3.21 – Giao diện Thông báo hệ thống
+Hình 3.22 – Giao diện Nhắc nhở nước và Đếm ngược
+
+---
+
+### Xây dựng giao diện Lịch sử hoạt động chi tiết
+Để giúp người dùng đánh giá sâu sát quá trình rèn luyện, giao diện Lịch sử hoạt động cung cấp một cái nhìn tổng thể về mọi phiên tập luyện đã diễn ra. Dữ liệu được sắp xếp theo trình tự thời gian đảo ngược, cho phép người dùng dễ dàng truy xuất thông tin về các buổi tập trong quá khứ.
+
+**Thống kê và Minh chứng:** Mỗi bản ghi trong lịch sử không chỉ hiển thị tên buổi tập mà còn đi kèm các chỉ số định lượng như tổng thời gian thực tế, lượng calo đã đốt cháy và số lượng bài tập đã hoàn thành. Sự minh bạch trong số liệu giúp người dùng tự đánh giá sự tiến bộ của bản thân qua từng ngày, từ đó điều chỉnh mục tiêu rèn luyện một cách khoa học và có căn cứ, đồng thời tạo nên một kho lưu trữ thành tích cá nhân đầy tự hào.
+
+Hình 3.23 – Giao diện Lịch sử hoạt động

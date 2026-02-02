@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/notification.dart';
 import './health_provider.dart';
 import './progress_user_provider.dart';
+import '../utils/logger.dart';
 
 final notificationProvider = NotifierProvider<NotificationNotifier, List<NotificationModel>>(() {
   return NotificationNotifier();
@@ -48,19 +49,26 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
   }
 
   Future<void> drinkWater(String id) async {
-    // 1. Mark notification as read
-    markAsRead(id);
-    
+    // 1. Mark notification as read with timestamp
+    final now = DateTime.now();
+    state = [
+      for (final notification in state)
+        if (notification.id == id)
+          notification.copyWith(isRead: true, drankAt: now)
+        else
+          notification,
+    ];
+
     // 2. Add water to health progress using ProgressUserController
     try {
       // Call the controller's updateWater method which handles user session, repo call and invalidation
       await ref.read(progressUserControllerProvider.notifier).updateWater(250);
-      
+
       // Additional refresh for related providers
       ref.invalidate(progressWeeklyProvider);
       ref.invalidate(healthDataProvider);
     } catch (e) {
-      print('Error updating water progress from notification: $e');
+      logger.e('Error updating water progress from notification: $e');
     }
   }
 
@@ -76,8 +84,7 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
 
   void markAllAsRead() {
     state = [
-      for (final notification in state)
-        notification.copyWith(isRead: true),
+      for (final notification in state) notification.copyWith(isRead: true),
     ];
   }
 

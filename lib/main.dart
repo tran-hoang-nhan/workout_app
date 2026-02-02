@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:logger/logger.dart';
 import 'dart:async';
 import 'config/supabase_config.dart';
 import 'constants/app_constants.dart';
@@ -16,14 +15,13 @@ import 'screens/profile/profile_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/health_provider.dart';
 import 'widgets/bottom_nav.dart';
-import 'package:awesome_notifications/awesome_notifications.dart'; 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:device_preview/device_preview.dart';
 import 'services/notification_service.dart';
 import 'repositories/progress_user_repository.dart';
 import 'providers/progress_user_provider.dart';
 import 'providers/app_state_provider.dart';
-
-final logger = Logger();
+import 'utils/logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,55 +31,54 @@ void main() async {
     logger.w('⚠️ Warning: .env file not found. Using fallback values.');
   }
   logger.i('Starting Workout App...');
-  
+
   if (!SupabaseConfig.isValid()) {
     logger.e('❌ Supabase config không hợp lệ!');
     return;
   }
-  
+
   try {
     await Supabase.initialize(
       url: SupabaseConfig.supabaseUrl,
       anonKey: SupabaseConfig.supabaseAnonKey,
     ).timeout(
       const Duration(seconds: 10),
-      onTimeout: () => throw TimeoutException('Supabase initialization timeout', null),
+      onTimeout: () =>
+          throw TimeoutException('Supabase initialization timeout', null),
     );
     logger.i('✅ Supabase initialized successfully');
   } catch (e) {
     logger.e('❌ Error initializing Supabase: $e');
   }
-  
+
   await AwesomeNotifications().initialize(
-      null, 
-      [
-        NotificationChannel(
-          channelGroupKey: NotificationService.waterChannelGroupKey,
-          channelKey: NotificationService.waterChannelKey, 
-          channelName: 'Nhắc nhở uống nước',
-          channelDescription: 'Thông báo nhắc bạn uống nước đều đặn',
-          defaultColor: const Color(0xFF9D50DD),
-          ledColor: Colors.white,
-          importance: NotificationImportance.High, 
-          channelShowBadge: true,
-          playSound: true,
-        )
-      ],
-      channelGroups: [
-        NotificationChannelGroup(
-          channelGroupKey: NotificationService.waterChannelGroupKey,
-          channelGroupName: 'Nhắc nhở uống nước',
-        )
-      ],
-      debug: true,
+    null,
+    [
+      NotificationChannel(
+        channelGroupKey: NotificationService.waterChannelGroupKey,
+        channelKey: NotificationService.waterChannelKey,
+        channelName: 'Nhắc nhở uống nước',
+        channelDescription: 'Thông báo nhắc bạn uống nước đều đặn',
+        defaultColor: const Color(0xFF9D50DD),
+        ledColor: Colors.white,
+        importance: NotificationImportance.High,
+        channelShowBadge: true,
+        playSound: true,
+      ),
+    ],
+    channelGroups: [
+      NotificationChannelGroup(
+        channelGroupKey: NotificationService.waterChannelGroupKey,
+        channelGroupName: 'Nhắc nhở uống nước',
+      ),
+    ],
+    debug: true,
   );
 
   runApp(
     DevicePreview(
-      enabled: true, 
-      builder: (context) => const ProviderScope(
-        child: MyApp(),
-      ),
+      enabled: true,
+      builder: (context) => const ProviderScope(child: MyApp()),
     ),
   );
 }
@@ -92,55 +89,71 @@ class NotificationController {
   static Function(DateTime date)? onWaterAdded;
 
   @pragma("vm:entry-point")
-  static Future <void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-    if(receivedAction.buttonKeyPressed == 'DRANK_WATER'){
-        debugPrint("💧 User clicked 'Đã uống nước!'");
-        
-        try {
-           // 1. Get User ID
-           final supabase = Supabase.instance.client;
-           final session = supabase.auth.currentSession;
-           final userId = session?.user.id;
-           
-           if (userId != null) {
-             debugPrint("👤 Updating water for user: $userId");
-             // 2. Update DB
-             final repo = ProgressUserRepository(supabase: supabase);
-             final now = DateTime.now();
-             
-             // +250ml and +1 glass
-             await repo.updateActivityProgress(
-               userId: userId, 
-               date: DateTime(now.year, now.month, now.day),
-               addWaterMl: 250,
-               addWaterGlasses: 1
-             );
-             
-             debugPrint("✅ Database updated successfully!");
+  static Future<void> onActionReceivedMethod(
+    ReceivedAction receivedAction,
+  ) async {
+    if (receivedAction.buttonKeyPressed == 'DRANK_WATER') {
+      debugPrint("💧 User clicked 'Đã uống nước!'");
 
-             // 3. Trigger UI Refresh
-             if (onWaterAdded != null) {
-               onWaterAdded!(now);
-             }
-           } else {
-             debugPrint("⚠️ No user session found when handling notification action");
-           }
-        } catch (e) {
-          debugPrint("❌ Error handling water action: $e");
+      try {
+        // 1. Get User ID
+        final supabase = Supabase.instance.client;
+        final session = supabase.auth.currentSession;
+        final userId = session?.user.id;
+
+        if (userId != null) {
+          debugPrint("👤 Updating water for user: $userId");
+          // 2. Update DB
+          final repo = ProgressUserRepository(supabase: supabase);
+          final now = DateTime.now();
+
+          // +250ml and +1 glass
+          await repo.updateActivityProgress(
+            userId: userId,
+            date: DateTime(now.year, now.month, now.day),
+            addWaterMl: 250,
+            addWaterGlasses: 1,
+          );
+
+          debugPrint("✅ Database updated successfully!");
+
+          // 3. Trigger UI Refresh
+          if (onWaterAdded != null) {
+            onWaterAdded!(now);
+          }
+        } else {
+          debugPrint(
+            "⚠️ No user session found when handling notification action",
+          );
         }
+      } catch (e) {
+        debugPrint("❌ Error handling water action: $e");
+      }
     }
   }
 
-  @pragma("vm:entry-point") 
-  static Future <void> onNotificationCreatedMethod(ReceivedNotification receivedNotification) async {
-    debugPrint("🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})");
+  @pragma("vm:entry-point")
+  static Future<void> onNotificationCreatedMethod(
+    ReceivedNotification receivedNotification,
+  ) async {
+    debugPrint(
+      "🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})",
+    );
   }
 
-  @pragma("vm:entry-point") 
-  static Future <void> onNotificationDisplayedMethod(ReceivedNotification receivedNotification) async {
-    debugPrint("📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})");
+  @pragma("vm:entry-point")
+  static Future<void> onNotificationDisplayedMethod(
+    ReceivedNotification receivedNotification,
+  ) async {
+    debugPrint(
+      "📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})",
+    );
   }
-  @pragma("vm:entry-point") static Future <void> onDismissActionReceivedMethod(ReceivedAction receivedAction) async {}
+
+  @pragma("vm:entry-point")
+  static Future<void> onDismissActionReceivedMethod(
+    ReceivedAction receivedAction,
+  ) async {}
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -155,17 +168,20 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
+
     // Check for date change on startup
     ref.read(currentDateProvider.notifier).updateDate();
 
     AwesomeNotifications().setListeners(
-      onActionReceivedMethod:         NotificationController.onActionReceivedMethod,
-      onNotificationCreatedMethod:    NotificationController.onNotificationCreatedMethod,
-      onNotificationDisplayedMethod:  NotificationController.onNotificationDisplayedMethod,
-      onDismissActionReceivedMethod:  NotificationController.onDismissActionReceivedMethod
+      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+      onNotificationCreatedMethod:
+          NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod:
+          NotificationController.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod:
+          NotificationController.onDismissActionReceivedMethod,
     );
-    
+
     // Set up callback to refresh UI when water is added from notification
     NotificationController.onWaterAdded = (date) {
       debugPrint("🔄 Refreshing UI after water notification action");
@@ -173,7 +189,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       final dateOnly = DateTime(date.year, date.month, date.day);
       ref.invalidate(progressDailyProvider(dateOnly));
       ref.invalidate(progressWeeklyProvider);
-      ref.invalidate(healthDataProvider); 
+      ref.invalidate(healthDataProvider);
     };
 
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
@@ -181,7 +197,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         AwesomeNotifications().requestPermissionToSendNotifications();
       }
     });
-    
+
     // Trigger notification sync on app launch
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(initializeNotificationProvider.future);
@@ -193,7 +209,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       debugPrint("📱 App resumed: checking for date change...");
       ref.read(currentDateProvider.notifier).updateDate();
-      
+
       // Also potentially re-check health data sync if needed
       // ref.read(initializeNotificationProvider.future);
     }
@@ -232,7 +248,10 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildHome(AsyncValue<bool> authState, AsyncValue<bool> hasHealthData) {
+  Widget _buildHome(
+    AsyncValue<bool> authState,
+    AsyncValue<bool> hasHealthData,
+  ) {
     if (authState.isLoading && !authState.hasValue) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -284,7 +303,7 @@ class AppShell extends ConsumerStatefulWidget {
 
 class _AppShellState extends ConsumerState<AppShell> {
   String _activeTab = 'home';
-  
+
   @override
   void initState() {
     super.initState();
@@ -293,19 +312,25 @@ class _AppShellState extends ConsumerState<AppShell> {
       ref.read(healthDataProvider.future);
     });
   }
-  
+
   void _setActiveTab(String tabId) {
     setState(() => _activeTab = tabId);
   }
 
   Widget _buildScreen(String tabId) {
     switch (tabId) {
-      case 'home': return const HomeScreen();
-      case 'workouts': return const WorkoutsScreen();
-      case 'progress': return const ProgressScreen();
-      case 'health': return const HealthScreen();
-      case 'profile': return const ProfileScreen();
-      default: return const HomeScreen();
+      case 'home':
+        return const HomeScreen();
+      case 'workouts':
+        return const WorkoutsScreen();
+      case 'progress':
+        return const ProgressScreen();
+      case 'health':
+        return const HealthScreen();
+      case 'profile':
+        return const ProfileScreen();
+      default:
+        return const HomeScreen();
     }
   }
 
@@ -314,15 +339,8 @@ class _AppShellState extends ConsumerState<AppShell> {
     return Scaffold(
       body: Stack(
         children: [
-          Column(
-            children: [
-              Expanded(child: _buildScreen(_activeTab)),
-            ],
-          ),
-          BottomNav(
-            activeTab: _activeTab,
-            setActiveTab: _setActiveTab,
-          ),
+          Column(children: [Expanded(child: _buildScreen(_activeTab))]),
+          BottomNav(activeTab: _activeTab, setActiveTab: _setActiveTab),
         ],
       ),
     );

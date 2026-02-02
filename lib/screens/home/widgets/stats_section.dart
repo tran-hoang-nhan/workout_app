@@ -82,7 +82,7 @@ class StatsSection extends ConsumerWidget {
             );
           },
           loading: () => _buildLoadingState(),
-          error: (_, __) => _buildErrorState(),
+          error: (_, _) => _buildErrorState(),
         ),
       ],
     );

@@ -18,25 +18,35 @@ class NotificationService {
     String sleepTime = '23:00',
   }) async {
     String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
-    
-    // Safeguard to ensure interval is at least 1 hour and not 0
+
     final safeInterval = intervalHours > 0 ? intervalHours : 2;
-    
-    debugPrint("🕒 Scheduling water reminder every $safeInterval hours (Requested: $intervalHours) (Timezone: $localTimeZone)");
+    debugPrint("🕒 Scheduling water reminder every $safeInterval hours (Requested: $intervalHours) (Timezone: $localTimeZone)",);
     debugPrint("💤 Active hours: $wakeTime - $sleepTime");
 
-    // Cancel existing notification with the same ID to ensure clean schedule
     await AwesomeNotifications().cancel(10);
+
+    final wakeHour = int.tryParse(wakeTime.split(':')[0]) ?? 7;
+    final sleepHour = int.tryParse(sleepTime.split(':')[0]) ?? 23;
+    final nowHour = DateTime.now().hour;
+    final isActive = nowHour >= wakeHour && nowHour < sleepHour;
+
+    if (!isActive) {
+      debugPrint(
+        "💤 Outside active hours ($wakeTime - $sleepTime). Skipping immediate schedule.",
+      );
+      return;
+    }
 
     bool created = await AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: 10, 
+        id: 10,
         channelKey: waterChannelKey,
         title: 'Thời gian uống nước! 💧',
-        body: 'Đã đến lúc bổ sung nước rồi. Hãy uống một cốc nước để cơ thể khỏe mạnh nhé!',
+        body:
+            'Đã đến lúc bổ sung nước rồi. Hãy uống một cốc nước để cơ thể khỏe mạnh nhé!',
         notificationLayout: NotificationLayout.Default,
         category: NotificationCategory.Reminder,
-        wakeUpScreen: true, 
+        wakeUpScreen: true,
       ),
 
       actionButtons: [
@@ -46,18 +56,19 @@ class NotificationService {
           actionType: ActionType.SilentAction,
         ),
       ],
-      
+
       schedule: NotificationInterval(
-        // Use Duration for clarity, ensuring it's in hours
-        interval: Duration(hours: safeInterval), 
+        interval: Duration(hours: safeInterval),
         timeZone: localTimeZone,
         repeats: true,
         allowWhileIdle: true,
       ),
     );
-    
+
     if (created) {
-      debugPrint("✅ Water reminder scheduled successfully for every $safeInterval hours");
+      debugPrint(
+        "✅ Water reminder scheduled successfully for every $safeInterval hours",
+      );
     } else {
       debugPrint("⚠️ Schedule returned false.");
     }

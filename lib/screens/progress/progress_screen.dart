@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/progress_provider.dart';
-import '../../providers/progress_user_provider.dart';
 import 'widgets/history_list.dart';
 import 'widgets/progress_header.dart';
 import 'widgets/achievements_section.dart';
@@ -46,10 +45,11 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
               },
             ),
             const RunningCard(),
-            
+
             // Replaced Statistics with Achievements
             historyAsync.when(
-              data: (history) => AchievementsSection(totalWorkouts: history.length),
+              data: (history) =>
+                  AchievementsSection(totalWorkouts: history.length),
               loading: () => const SliverToBoxAdapter(
                 child: Center(child: CircularProgressIndicator()),
               ),
@@ -60,7 +60,10 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
 
             const SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
                 child: Text(
                   'Hoạt động gần đây',
                   style: TextStyle(
