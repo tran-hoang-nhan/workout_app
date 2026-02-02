@@ -31,10 +31,8 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
 
     if (_searchQuery.isNotEmpty) {
       workoutsAsync = ref.watch(searchWorkoutsProvider(_searchQuery));
-    } else if (_selectedCategory != 'Tất cả') {
-      workoutsAsync = ref.watch(workoutsByCategoryProvider(_selectedCategory));
     } else {
-      workoutsAsync = ref.watch(workoutsProvider);
+      workoutsAsync = ref.watch(workoutsByCategoryProvider(_selectedCategory));
     }
 
     return Scaffold(

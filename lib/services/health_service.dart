@@ -1,4 +1,5 @@
 import '../repositories/health_repository.dart';
+import 'package:flutter/material.dart';
 import '../models/health_data.dart';
 import '../models/health_params.dart';
 import '../utils/health_utils.dart' as health_utils;
@@ -30,7 +31,6 @@ class HealthService {
       injuries: profile.injuries,
       medicalConditions: profile.medicalConditions,
       activityLevel: profile.activityLevel,
-      sleepHours: profile.sleepHours,
       waterIntake: profile.waterIntake,
       dietType: profile.dietType,
       allergies: profile.allergies,
@@ -38,24 +38,25 @@ class HealthService {
       steps: steps,
       waterReminderEnabled: profile.waterReminderEnabled,
       waterReminderInterval: profile.waterReminderInterval,
+      wakeTime: profile.wakeTime,
+      sleepTime: profile.sleepTime,
     );
   }
 
-  Future<void> syncWaterReminders(bool enabled, int intervalHours) async {
+  Future<void> syncWaterReminders(bool enabled, int intervalHours, String wakeTime, String sleepTime) async {
+    debugPrint("🔔 Syncing water reminders: enabled=$enabled, interval=$intervalHours");
     if (enabled) {
-      await _notifications.scheduleWaterReminder(intervalHours: intervalHours);
+      await _notifications.scheduleWaterReminder(
+        intervalHours: intervalHours,
+        wakeTime: wakeTime,
+        sleepTime: sleepTime,
+      );
     } else {
       await _notifications.cancelAllReminders();
     }
   }
 
-  Future<void> updateQuickMetrics({
-    required String userId,
-    double? weight,
-    double? height,
-    String? gender,
-    String? goal,
-  }) async {
+  Future<void> updateQuickMetrics({required String userId, double? weight, double? height, String? gender, String? goal,}) async {
     await _repository.updateQuickMetrics(
       userId: userId,
       weight: weight,
@@ -70,26 +71,20 @@ class HealthService {
       await syncWaterReminders(
         params.waterReminderEnabled!,
         params.waterReminderInterval!,
+        params.wakeTime ?? '07:00',
+        params.sleepTime ?? '23:00',
       );
     }
   }
 
-  double calculateBMI(double weight, double height) =>
-      health_utils.calculateBMI(weight, height);
+  double calculateBMI(double weight, double height) => health_utils.calculateBMI(weight, height);
   String getBMICategory(double bmi) => health_utils.getBMICategory(bmi);
-  int calculateBMR(double weight, double height, int age, String gender) =>
-      health_utils.calculateBMR(weight, height, age, gender);
-  int calculateTDEE(int bmr, String activityLevel) =>
-      health_utils.calculateTDEE(bmr, activityLevel);
+  int calculateBMR(double weight, double height, int age, String gender) => health_utils.calculateBMR(weight, height, age, gender);
+  int calculateTDEE(int bmr, String activityLevel) => health_utils.calculateTDEE(bmr, activityLevel);
   int calculateMaxHeartRate(int age) => health_utils.calculateMaxHeartRate(age);
-  ({int min, int max}) calculateZone1(int maxHR) =>
-      health_utils.calculateZone1(maxHR);
-  ({int min, int max}) calculateZone2(int maxHR) =>
-      health_utils.calculateZone2(maxHR);
-  ({int min, int max}) calculateZone3(int maxHR) =>
-      health_utils.calculateZone3(maxHR);
-  ({int min, int max}) calculateZone4(int maxHR) =>
-      health_utils.calculateZone4(maxHR);
-  ({int min, int max}) calculateZone5(int maxHR) =>
-      health_utils.calculateZone5(maxHR);
+  ({int min, int max}) calculateZone1(int maxHR) => health_utils.calculateZone1(maxHR);
+  ({int min, int max}) calculateZone2(int maxHR) => health_utils.calculateZone2(maxHR);
+  ({int min, int max}) calculateZone3(int maxHR) => health_utils.calculateZone3(maxHR);
+  ({int min, int max}) calculateZone4(int maxHR) => health_utils.calculateZone4(maxHR);
+  ({int min, int max}) calculateZone5(int maxHR) => health_utils.calculateZone5(maxHR);
 }

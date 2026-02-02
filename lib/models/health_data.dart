@@ -6,7 +6,6 @@ class HealthData {
   final List<String> injuries;
   final List<String> medicalConditions;
   final String activityLevel;
-  final int sleepHours;
   final int waterIntake;
   final String dietType;
   final List<String> allergies;
@@ -14,6 +13,8 @@ class HealthData {
   final int steps;
   final bool waterReminderEnabled;
   final int waterReminderInterval;
+  final String wakeTime;
+  final String sleepTime;
 
 
   HealthData({
@@ -24,7 +25,6 @@ class HealthData {
     required this.injuries,
     required this.medicalConditions,
     required this.activityLevel,
-    required this.sleepHours,
     required this.waterIntake,
     required this.dietType,
     required this.allergies,
@@ -32,6 +32,8 @@ class HealthData {
     this.steps = 0,
     this.waterReminderEnabled = false,
     this.waterReminderInterval = 2,
+    this.wakeTime = '07:00',
+    this.sleepTime = '23:00',
   });
 
   factory HealthData.fromJson(Map<String, dynamic> json, String userId, {String? gender}) {
@@ -43,7 +45,6 @@ class HealthData {
       injuries: List<String>.from(json['injuries'] ?? []),
       medicalConditions: List<String>.from(json['medical_conditions'] ?? []),
       activityLevel: json['activity_level'] as String? ?? 'moderately_active',
-      sleepHours: json['sleep_hours_avg'] as int? ?? 7,
       waterIntake: json['water_intake_goal'] as int? ?? 2000,
       dietType: json['diet_type'] as String? ?? 'normal',
       allergies: List<String>.from(json['allergies'] ?? []),
@@ -51,6 +52,8 @@ class HealthData {
       steps: json['steps'] as int? ?? 0,
       waterReminderEnabled: json['water_reminder_enabled'] as bool? ?? false,
       waterReminderInterval: json['water_reminder_interval'] as int? ?? 2,
+      wakeTime: json['wake_time'] as String? ?? '07:00',
+      sleepTime: json['sleep_time'] as String? ?? '23:00',
     );
   }
 }
