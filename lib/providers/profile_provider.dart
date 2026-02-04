@@ -17,34 +17,25 @@ final fullUserProfileProvider = FutureProvider<AppUser?>((ref) async {
   return await profileRepo.getFullUserProfile(userIdAsync);
 });
 
-final editProfileControllerProvider =
-    AsyncNotifierProvider<EditProfileController, void>(() {
-      return EditProfileController();
-    });
+final editProfileControllerProvider = AsyncNotifierProvider<EditProfileController, void>(() {
+  return EditProfileController();
+});
 
 class EditProfileController extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
-  Future<bool> saveProfile({
-    required String userId,
-    required String fullName,
-    String? gender,
-    DateTime? dateOfBirth,
-    String? goal,
-  }) async {
+  Future<bool> saveProfile({required String userId, required String fullName, String? gender, DateTime? dateOfBirth, String? goal,}) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       try {
-        await ref
-            .read(profileServiceProvider)
-            .saveProfile(
-              userId: userId,
-              fullName: fullName,
-              gender: gender,
-              dateOfBirth: dateOfBirth,
-              goal: goal,
-            );
+        await ref.read(profileServiceProvider).saveProfile(
+          userId: userId,
+          fullName: fullName,
+          gender: gender,
+          dateOfBirth: dateOfBirth,
+          goal: goal,
+        );
       } catch (e, st) {
         throw handleException(e, st);
       }

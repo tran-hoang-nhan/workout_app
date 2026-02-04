@@ -102,15 +102,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     setState(() => _isSaving = true);
 
     try {
-      await ref
-          .read(profileServiceProvider)
-          .saveProfile(
-            userId: user.id,
-            fullName: _nameController.text,
-            gender: _gender,
-            dateOfBirth: _birthDate,
-            goal: _goal,
-          );
+      await ref.read(profileServiceProvider).saveProfile(
+        userId: user.id,
+        fullName: _nameController.text,
+        gender: _gender,
+        dateOfBirth: _birthDate,
+        goal: _goal,
+      );
 
       if (!mounted) return;
       context.showSuccess('Đã cập nhật hồ sơ thành công!');
