@@ -27,7 +27,7 @@ class ProfileService {
   Future<void> removeAvatar() async {
     try {
       await _ref.read(avatarControllerProvider.notifier).removeAvatar();
-      
+
       final state = _ref.read(avatarControllerProvider);
       if (state.hasError) {
         throw handleException(state.error!);
@@ -37,7 +37,14 @@ class ProfileService {
     }
   }
 
-  Future<void> saveProfile({required String userId, required String fullName, String? gender, String? goal, double? weight, int? age,}) async {
+  Future<void> saveProfile({
+    required String userId,
+    required String fullName,
+    String? gender,
+    String? goal,
+    double? weight,
+    DateTime? dateOfBirth,
+  }) async {
     if (fullName.isEmpty) {
       throw ValidationException('Vui lòng nhập tên');
     }
@@ -48,7 +55,7 @@ class ProfileService {
         fullName: fullName,
         gender: gender,
         goal: goal,
-        age: age,
+        dateOfBirth: dateOfBirth,
       );
       _ref.invalidate(currentUserProvider);
       _ref.invalidate(fullUserProfileProvider);

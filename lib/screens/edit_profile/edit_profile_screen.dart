@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/avatar_provider.dart';
@@ -21,7 +22,7 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _nameController;
-  late TextEditingController _ageController;
+  DateTime? _birthDate;
   String? _gender;
   String? _goal;
   bool _isSaving = false;
@@ -31,7 +32,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController();
-    _ageController = TextEditingController();
   }
 
   void _loadUserData() {
@@ -39,7 +39,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (user != null && !_isDataLoaded) {
       setState(() {
         _nameController.text = user.fullName ?? '';
-        _ageController.text = user.age?.toString() ?? '';
+        _birthDate = user.dateOfBirth;
         _goal = user.goal;
         _gender = user.gender;
         _isDataLoaded = true;
@@ -50,7 +50,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _ageController.dispose();
     super.dispose();
   }
 
@@ -103,13 +102,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     setState(() => _isSaving = true);
 
     try {
-      await ref.read(profileServiceProvider).saveProfile(
-        userId: user.id,
-        fullName: _nameController.text,
-        gender: _gender,
-        age: int.tryParse(_ageController.text),
-        goal: _goal,
-      );
+      await ref
+          .read(profileServiceProvider)
+          .saveProfile(
+            userId: user.id,
+            fullName: _nameController.text,
+            gender: _gender,
+            dateOfBirth: _birthDate,
+            goal: _goal,
+          );
 
       if (!mounted) return;
       context.showSuccess('Đã cập nhật hồ sơ thành công!');
@@ -120,6 +121,32 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       context.showError('Lỗi: $e');
     } finally {
       if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _birthDate ?? DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColors.primary,
+              onPrimary: AppColors.white,
+              onSurface: AppColors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _birthDate) {
+      setState(() {
+        _birthDate = picked;
+      });
     }
   }
 
@@ -149,7 +176,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.bgLight,
       body: userAsync.when(
-        loading: () => const Center(child: AppLoading(message: 'Đang tải hồ sơ...')),
+        loading: () =>
+            const Center(child: AppLoading(message: 'Đang tải hồ sơ...')),
         error: (error, st) => Center(child: Text('Lỗi: $error')),
         data: (user) {
           if (user == null) {
@@ -203,12 +231,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       const EditProfileSectionTitle(title: 'Thông tin cá nhân'),
                       EditProfileInfoCard(
                         children: [
-                          EditProfileTextField(
-                            label: 'Tuổi',
-                            controller: _ageController,
-                            icon: Icons.cake_rounded,
-                            keyboardType: TextInputType.number,
-                          ),
+                          _buildDatePicker(),
                           const Divider(
                             height: 32,
                             color: AppColors.cardBorder,
@@ -262,6 +285,51 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(width: 48),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDatePicker() {
+    String dateText = 'Chưa cập nhật';
+    if (_birthDate != null) {
+      dateText = DateFormat('dd/MM/yyyy').format(_birthDate!);
+      final age = DateTime.now().year - _birthDate!.year;
+      dateText += ' ($age tuổi)';
+    }
+
+    return InkWell(
+      onTap: () => _selectDate(context),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.cake_rounded, size: 18, color: AppColors.primary),
+                SizedBox(width: 8),
+                Text(
+                  'Ngày sinh',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.black,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              dateText,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: _birthDate == null ? AppColors.grey : AppColors.black,
+              ),
+            ),
+            const SizedBox(height: 4),
+          ],
+        ),
       ),
     );
   }
