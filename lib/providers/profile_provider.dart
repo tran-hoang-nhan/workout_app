@@ -12,30 +12,39 @@ final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
 final fullUserProfileProvider = FutureProvider<AppUser?>((ref) async {
   final userIdAsync = await ref.watch(currentUserIdProvider.future);
   if (userIdAsync == null) return null;
-  
+
   final profileRepo = ref.read(profileRepositoryProvider);
   return await profileRepo.getFullUserProfile(userIdAsync);
 });
 
-final editProfileControllerProvider = AsyncNotifierProvider<EditProfileController, void>(() {
-  return EditProfileController();
-});
+final editProfileControllerProvider =
+    AsyncNotifierProvider<EditProfileController, void>(() {
+      return EditProfileController();
+    });
 
 class EditProfileController extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
-  
-  Future<bool> saveProfile({required String userId, required String fullName, String? gender, int? age, String? goal,}) async {
+
+  Future<bool> saveProfile({
+    required String userId,
+    required String fullName,
+    String? gender,
+    DateTime? dateOfBirth,
+    String? goal,
+  }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       try {
-        await ref.read(profileServiceProvider).saveProfile(
-          userId: userId,
-          fullName: fullName,
-          gender: gender,
-          age: age,
-          goal: goal,
-        );
+        await ref
+            .read(profileServiceProvider)
+            .saveProfile(
+              userId: userId,
+              fullName: fullName,
+              gender: gender,
+              dateOfBirth: dateOfBirth,
+              goal: goal,
+            );
       } catch (e, st) {
         throw handleException(e, st);
       }
@@ -67,4 +76,3 @@ class EditProfileController extends AsyncNotifier<void> {
     return !state.hasError;
   }
 }
-

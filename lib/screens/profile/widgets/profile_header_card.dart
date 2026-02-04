@@ -61,7 +61,9 @@ class ProfileHeaderCard extends StatelessWidget {
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.2),
+                          ),
                         ),
                         child: Container(
                           width: 72,
@@ -70,28 +72,46 @@ class ProfileHeaderCard extends StatelessWidget {
                             shape: BoxShape.circle,
                             color: AppColors.primary.withValues(alpha: 0.1),
                           ),
-                          child: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
+                          child:
+                              user.avatarUrl != null &&
+                                  user.avatarUrl!.isNotEmpty
                               ? ClipOval(
                                   child: Image.network(
                                     user.avatarUrl!,
                                     fit: BoxFit.cover,
-                                    loadingBuilder: (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress.expectedTotalBytes != null
-                                              ? loadingProgress.cumulativeBytesLoaded /
-                                                  loadingProgress.expectedTotalBytes!
-                                              : null,
-                                          strokeWidth: 2,
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        const Icon(Icons.person, size: 36, color: AppColors.primary),
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                          if (loadingProgress == null)
+                                            return child;
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              value:
+                                                  loadingProgress
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
+                                                  : null,
+                                              strokeWidth: 2,
+                                            ),
+                                          );
+                                        },
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(
+                                              Icons.person,
+                                              size: 36,
+                                              color: AppColors.primary,
+                                            ),
                                   ),
                                 )
-                              : const Icon(Icons.person, size: 36, color: AppColors.primary),
+                              : const Icon(
+                                  Icons.person,
+                                  size: 36,
+                                  color: AppColors.primary,
+                                ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.lg),
@@ -129,7 +149,11 @@ class ProfileHeaderCard extends StatelessWidget {
                             color: AppColors.primary.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.edit_rounded, size: 18, color: AppColors.primary),
+                          child: const Icon(
+                            Icons.edit_rounded,
+                            size: 18,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
                     ],
@@ -139,8 +163,26 @@ class ProfileHeaderCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(child: _buildInfoTag(LabelUtils.getGoalLabel(user.goal), 'Mục tiêu')),
-                      Expanded(child: _buildInfoTag(LabelUtils.getGenderLabel(user.gender), 'Giới tính')),
+                      Expanded(
+                        child: _buildInfoTag(
+                          LabelUtils.getGoalLabel(user.goal),
+                          'Mục tiêu',
+                        ),
+                      ),
+                      Expanded(
+                        child: _buildInfoTag(
+                          user.dateOfBirth != null
+                              ? '${DateTime.now().year - user.dateOfBirth!.year} tuổi'
+                              : (user.age != null ? '${user.age} tuổi' : 'N/A'),
+                          'Tuổi',
+                        ),
+                      ),
+                      Expanded(
+                        child: _buildInfoTag(
+                          LabelUtils.getGenderLabel(user.gender),
+                          'Giới tính',
+                        ),
+                      ),
                     ],
                   ),
                 ],
