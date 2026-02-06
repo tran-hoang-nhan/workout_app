@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-import '../../../providers/health_provider.dart';
+import '../../../models/health_params.dart';
 
 class HealthValidationCard extends StatelessWidget {
-  final HealthFormState healthData;
+  final HealthUpdateParams healthData;
   final VoidCallback onConfirm;
   final VoidCallback onEdit;
 
@@ -42,7 +42,11 @@ class HealthValidationCard extends StatelessWidget {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.health_and_safety, color: AppColors.primary, size: 20),
+                child: const Icon(
+                  Icons.health_and_safety,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
               const Text(
@@ -61,7 +65,10 @@ class HealthValidationCard extends StatelessWidget {
           _buildInfoRow('Chiều cao', '${healthData.height} cm'),
           _buildInfoRow('Chế độ ăn', _mapDietType(healthData.dietType)),
           if (healthData.medicalConditions.isNotEmpty)
-            _buildInfoRow('Tình trạng', healthData.medicalConditions.join(', ')),
+            _buildInfoRow(
+              'Tình trạng',
+              healthData.medicalConditions.join(', '),
+            ),
           const SizedBox(height: AppSpacing.xl),
           Row(
             children: [
@@ -71,9 +78,14 @@ class HealthValidationCard extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     side: const BorderSide(color: AppColors.primary),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  child: const Text('Chỉnh sửa', style: TextStyle(color: AppColors.primary)),
+                  child: const Text(
+                    'Chỉnh sửa',
+                    style: TextStyle(color: AppColors.primary),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -83,10 +95,18 @@ class HealthValidationCard extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     elevation: 0,
                   ),
-                  child: const Text('Xác nhận', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'Xác nhận',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -102,22 +122,30 @@ class HealthValidationCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.grey, fontSize: 13)),
-          Text(value, style: const TextStyle(color: AppColors.black, fontWeight: FontWeight.w600, fontSize: 13)),
+          Text(
+            label,
+            style: const TextStyle(color: AppColors.grey, fontSize: 13),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              color: AppColors.black,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  String _mapDietType(String type) {
-    switch (type) {
-      case 'normal': return 'Bình thường';
-      case 'vegan': return 'Thuần chay';
-      case 'vegetarian': return 'Ăn chay';
-      case 'keto': return 'Keto';
-      case 'paleo': return 'Paleo';
-      case 'low_carb': return 'Low Carb';
-      default: return type;
-    }
-  }
+  String _mapDietType(String type) => switch (type) {
+    'normal'     => 'Bình thường',
+    'vegan'      => 'Thuần chay',
+    'vegetarian' => 'Ăn chay',
+    'keto'       => 'Keto',
+    'paleo'      => 'Paleo',
+    'low_carb'   => 'Low Carb',
+    _            => type,
+  };
 }

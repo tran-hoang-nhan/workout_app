@@ -11,10 +11,10 @@ class HealthUpdateParams {
   final List<String> injuries;
   final List<String> medicalConditions;
   final List<String> allergies;
-  final bool? waterReminderEnabled;
-  final int? waterReminderInterval;
-  final String? wakeTime;
-  final String? sleepTime;
+  final bool waterReminderEnabled;
+  final int waterReminderInterval;
+  final String wakeTime;
+  final String sleepTime;
 
   HealthUpdateParams({
     required this.userId,
@@ -29,11 +29,32 @@ class HealthUpdateParams {
     required this.injuries,
     required this.medicalConditions,
     required this.allergies,
-    this.waterReminderEnabled,
-    this.waterReminderInterval,
-    this.wakeTime,
-    this.sleepTime,
+    this.waterReminderEnabled = false,
+    this.waterReminderInterval = 2,
+    this.wakeTime = '07:00',
+    this.sleepTime = '23:00',
   });
+
+  factory HealthUpdateParams.initial() {
+    return HealthUpdateParams(
+      userId: '',
+      age: 25,
+      weight: 70,
+      height: 170,
+      gender: 'male',
+      activityLevel: 'moderately_active',
+      goal: 'maintain',
+      dietType: 'normal',
+      waterIntake: 2000,
+      injuries: [],
+      medicalConditions: [],
+      allergies: [],
+      waterReminderEnabled: false,
+      waterReminderInterval: 2,
+      wakeTime: '07:00',
+      sleepTime: '23:00',
+    );
+  }
 
   Map<String, dynamic> toHealthMap() {
     final map = {
@@ -50,18 +71,10 @@ class HealthUpdateParams {
       'updated_at': DateTime.now().toIso8601String(),
     };
 
-    if (waterReminderEnabled != null) {
-      map['water_reminder_enabled'] = waterReminderEnabled!;
-    }
-    if (waterReminderInterval != null) {
-      map['water_reminder_interval'] = waterReminderInterval!;
-    }
-    if (wakeTime != null) {
-      map['wake_time'] = wakeTime!;
-    }
-    if (sleepTime != null) {
-      map['sleep_time'] = sleepTime!;
-    }
+    map['water_reminder_enabled'] = waterReminderEnabled;
+    map['water_reminder_interval'] = waterReminderInterval;
+    map['wake_time'] = wakeTime;
+    map['sleep_time'] = sleepTime;
 
     return map;
   }

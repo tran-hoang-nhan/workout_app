@@ -34,13 +34,8 @@ int calculateTDEE(int bmr, String activityLevel) {
 
 int calculateMaxHeartRate(int age) => 220 - age;
 
-({int min, int max}) calculateZone1(int maxHR) =>
-    (min: (maxHR * 0.5).toInt(), max: (maxHR * 0.6).toInt());
-({int min, int max}) calculateZone2(int maxHR) =>
-    (min: (maxHR * 0.6).toInt(), max: (maxHR * 0.7).toInt());
-({int min, int max}) calculateZone3(int maxHR) =>
-    (min: (maxHR * 0.7).toInt(), max: (maxHR * 0.8).toInt());
-({int min, int max}) calculateZone4(int maxHR) =>
-    (min: (maxHR * 0.8).toInt(), max: (maxHR * 0.9).toInt());
-({int min, int max}) calculateZone5(int maxHR) =>
-    (min: (maxHR * 0.9).toInt(), max: maxHR);
+({int min, int max}) calculateZone1(int maxHR) => (min: (maxHR * 0.5).toInt(), max: (maxHR * 0.6).toInt());
+({int min, int max}) calculateZone2(int maxHR) => (min: (maxHR * 0.6).toInt(), max: (maxHR * 0.7).toInt());
+({int min, int max}) calculateZone3(int maxHR) => (min: (maxHR * 0.7).toInt(), max: (maxHR * 0.8).toInt());
+({int min, int max}) calculateZone4(int maxHR) => (min: (maxHR * 0.8).toInt(), max: (maxHR * 0.9).toInt());
+({int min, int max}) calculateZone5(int maxHR) => (min: (maxHR * 0.9).toInt(), max: maxHR);

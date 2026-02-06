@@ -4,14 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
 import '../../../providers/health_provider.dart';
 
+import '../../../models/health_params.dart';
 
 class WaterIntakeCard extends StatelessWidget {
-  final HealthFormState formState;
+  final HealthUpdateParams formState;
 
-  const WaterIntakeCard({
-    super.key,
-    required this.formState,
-  });
+  const WaterIntakeCard({super.key, required this.formState});
 
   @override
   Widget build(BuildContext context) {
@@ -68,14 +66,20 @@ class WaterIntakeCard extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.water_drop_outlined,
-                    color: Colors.white, size: 32),
+                child: const Icon(
+                  Icons.water_drop_outlined,
+                  color: Colors.white,
+                  size: 32,
+                ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 4,
+            ),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
@@ -86,17 +90,23 @@ class WaterIntakeCard extends StatelessWidget {
                   contentPadding: EdgeInsets.zero,
                   value: formState.waterReminderEnabled,
                   onChanged: (value) async {
-                    ref.read(healthFormProvider.notifier).setWaterReminderEnabled(value);
+                    ref
+                        .read(healthFormProvider.notifier)
+                        .setWaterReminderEnabled(value);
                     // Automatic save and sync
                     try {
-                      await ref.read(saveHealthProfileProvider(HealthProfileSaveParams(
-                        height: formState.height,
-                        gender: null,
-                      )).future);
+                      await ref.read(
+                        saveHealthProfileProvider((
+                          height: formState.height,
+                          gender: null,
+                        )).future,
+                      );
                     } catch (e) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Không thể cập nhật cài đặt: $e')),
+                          SnackBar(
+                            content: Text('Không thể cập nhật cài đặt: $e'),
+                          ),
                         );
                       }
                     }
@@ -111,10 +121,7 @@ class WaterIntakeCard extends StatelessWidget {
                   ),
                   subtitle: Text(
                     'Nhắc mỗi ${formState.waterReminderInterval} giờ',
-                    style: TextStyle(
-                      color: Colors.cyan.shade100,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.cyan.shade100, fontSize: 12),
                   ),
                   activeThumbColor: Colors.white,
                   activeTrackColor: Colors.cyan.shade200,
@@ -134,7 +141,9 @@ class WaterIntakeCard extends StatelessWidget {
                         'Thức dậy',
                         formState.wakeTime,
                         (newTime) async {
-                          ref.read(healthFormProvider.notifier).setWakeTime(newTime);
+                          ref
+                              .read(healthFormProvider.notifier)
+                              .setWakeTime(newTime);
                           await _saveSettings(ref);
                         },
                       ),
@@ -146,7 +155,9 @@ class WaterIntakeCard extends StatelessWidget {
                         'Đi ngủ',
                         formState.sleepTime,
                         (newTime) async {
-                          ref.read(healthFormProvider.notifier).setSleepTime(newTime);
+                          ref
+                              .read(healthFormProvider.notifier)
+                              .setSleepTime(newTime);
                           await _saveSettings(ref);
                         },
                       ),
@@ -163,17 +174,24 @@ class WaterIntakeCard extends StatelessWidget {
 
   Future<void> _saveSettings(WidgetRef ref) async {
     try {
-      await ref.read(saveHealthProfileProvider(HealthProfileSaveParams(
-        height: formState.height,
-        gender: null,
-      )).future);
+      await ref.read(
+        saveHealthProfileProvider((
+          height: formState.height,
+          gender: null,
+        )).future,
+      );
     } catch (e) {
       // Error handling is managed by the provider/ui usually
       debugPrint('Error saving water times: $e');
     }
   }
 
-  Widget _buildTimeSelector(BuildContext context, String label, String currentTime, Function(String) onChanged,) {
+  Widget _buildTimeSelector(
+    BuildContext context,
+    String label,
+    String currentTime,
+    Function(String) onChanged,
+  ) {
     return InkWell(
       onTap: () async {
         final parts = currentTime.split(':');
@@ -201,7 +219,8 @@ class WaterIntakeCard extends StatelessWidget {
         );
 
         if (picked != null) {
-          final formattedTime = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+          final formattedTime =
+              '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
           onChanged(formattedTime);
         }
       },
@@ -219,10 +238,7 @@ class WaterIntakeCard extends StatelessWidget {
           children: [
             Text(
               label,
-              style: TextStyle(
-                color: Colors.cyan.shade100,
-                fontSize: 10,
-              ),
+              style: TextStyle(color: Colors.cyan.shade100, fontSize: 10),
             ),
             const SizedBox(height: 4),
             Row(

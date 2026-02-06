@@ -8,6 +8,7 @@ import 'widgets/health_validation_card.dart';
 import 'widgets/health_edit_form.dart';
 import 'widgets/chat_message_bubble.dart';
 import 'widgets/workout_suggestion_card.dart';
+import '../../models/health_params.dart';
 
 enum AISuggestionStep { validating, editing, generating, results }
 
@@ -15,7 +16,8 @@ class AISuggestionsScreen extends ConsumerStatefulWidget {
   const AISuggestionsScreen({super.key});
 
   @override
-  ConsumerState<AISuggestionsScreen> createState() => _AISuggestionsScreenState();
+  ConsumerState<AISuggestionsScreen> createState() =>
+      _AISuggestionsScreenState();
 }
 
 class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
@@ -106,7 +108,7 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
     setState(() => _currentStep = AISuggestionStep.editing);
   }
 
-  void _handleEditSave(HealthFormState newState) {
+  void _handleEditSave(HealthUpdateParams newState) {
     ref.read(healthFormProvider.notifier).setAge(newState.age);
     ref.read(healthFormProvider.notifier).setWeight(newState.weight);
     ref.read(healthFormProvider.notifier).setHeight(newState.height);
@@ -205,7 +207,7 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
     );
   }
 
-  Widget _buildInteractiveStep(HealthFormState healthState) {
+  Widget _buildInteractiveStep(HealthUpdateParams healthState) {
     switch (_currentStep) {
       case AISuggestionStep.validating:
         return HealthValidationCard(
@@ -282,7 +284,6 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
               child: IconButton(
                 icon: const Icon(Icons.send, color: Colors.white, size: 20),
                 onPressed: () {
-                  // Logic to send custom chat queries
                 },
               ),
             ),
