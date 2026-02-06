@@ -24,7 +24,6 @@ class ProgressUserController extends AsyncNotifier<void> {
       final deltaGlasses = (deltaMl / 250).round();
 
       await repo.updateActivityProgress(userId: userId, date: now, addWaterMl: deltaMl, addWaterGlasses: deltaGlasses);
-
       ref.invalidate(progressDailyProvider(now));
 
       try {
@@ -56,7 +55,6 @@ class ProgressUserController extends AsyncNotifier<void> {
     state = await AsyncValue.guard(() async {
       final userId = await ref.read(currentUserIdProvider.future);
       if (userId == null) throw UnauthorizedException('Chưa đăng nhập');
-
       final repo = ref.read(progressUserRepositoryProvider);
       final rawNow = DateTime.now();
       final now = DateTime(rawNow.year, rawNow.month, rawNow.day);
