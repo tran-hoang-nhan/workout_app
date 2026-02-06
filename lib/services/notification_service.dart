@@ -12,11 +12,7 @@ class NotificationService {
     }
   }
 
-  Future<void> scheduleWaterReminder({
-    required int intervalHours,
-    String wakeTime = '07:00',
-    String sleepTime = '23:00',
-  }) async {
+  Future<void> scheduleWaterReminder({required int intervalHours, String wakeTime = '07:00', String sleepTime = '23:00',}) async {
     String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
 
     final safeInterval = intervalHours > 0 ? intervalHours : 2;
@@ -31,9 +27,7 @@ class NotificationService {
     final isActive = nowHour >= wakeHour && nowHour < sleepHour;
 
     if (!isActive) {
-      debugPrint(
-        "💤 Outside active hours ($wakeTime - $sleepTime). Skipping immediate schedule.",
-      );
+      debugPrint("💤 Outside active hours ($wakeTime - $sleepTime). Skipping immediate schedule.",);
       return;
     }
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/health_provider.dart';
+import '../../models/health_params.dart';
+
 import 'health_form.dart';
 import 'widgets/health_header.dart';
 import 'widgets/health_alerts.dart';
@@ -43,7 +45,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     super.dispose();
   }
 
-  void _updateControllers(HealthFormState formState) {
+  void _updateControllers(HealthUpdateParams formState) {
     final newWeight = formState.weight.toStringAsFixed(0);
     final newHeight = formState.height.toStringAsFixed(0);
 
@@ -250,13 +252,19 @@ class _HealthEditModalContentState
           conditionController: conditionController,
           allergyController: allergyController,
           isSaving: false,
-          onAgeChanged: (value) => ref.read(healthFormProvider.notifier).setAge(value),
-          onWeightChanged: (value) => ref.read(healthFormProvider.notifier).setWeight(value),
-          onHeightChanged: (value) => ref.read(healthFormProvider.notifier).setHeight(value),
-          onGenderChanged: (value) => ref.read(healthFormProvider.notifier).setGender(value),
+          onAgeChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setAge(value),
+          onWeightChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setWeight(value),
+          onHeightChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setHeight(value),
+          onGenderChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setGender(value),
           onAddInjury: () {
             if (injuryController.text.trim().isNotEmpty) {
-              ref.read(healthFormProvider.notifier).addInjury(injuryController.text.trim());
+              ref
+                  .read(healthFormProvider.notifier)
+                  .addInjury(injuryController.text.trim());
               injuryController.clear();
             }
           },
@@ -264,7 +272,9 @@ class _HealthEditModalContentState
               ref.read(healthFormProvider.notifier).removeInjury(index),
           onAddCondition: () {
             if (conditionController.text.trim().isNotEmpty) {
-              ref.read(healthFormProvider.notifier).addCondition(conditionController.text.trim());
+              ref
+                  .read(healthFormProvider.notifier)
+                  .addCondition(conditionController.text.trim());
               conditionController.clear();
             }
           },
@@ -272,28 +282,39 @@ class _HealthEditModalContentState
               ref.read(healthFormProvider.notifier).removeCondition(index),
           onAddAllergy: () {
             if (allergyController.text.trim().isNotEmpty) {
-              ref.read(healthFormProvider.notifier).addAllergy(allergyController.text.trim());
+              ref
+                  .read(healthFormProvider.notifier)
+                  .addAllergy(allergyController.text.trim());
               allergyController.clear();
             }
           },
-          onRemoveAllergy: (index) => ref.read(healthFormProvider.notifier).removeAllergy(index),
-          onActivityLevelChanged: (value) => ref.read(healthFormProvider.notifier).setActivityLevel(value),
-          onWaterIntakeChanged: (value) => ref.read(healthFormProvider.notifier).setWaterIntake(value.toDouble()),
-          onDietTypeChanged: (value) => ref.read(healthFormProvider.notifier).setDietType(value),
-          onWaterReminderEnabledChanged: (value) => ref.read(healthFormProvider.notifier).setWaterReminderEnabled(value),
-          onWaterReminderIntervalChanged: (value) => ref.read(healthFormProvider.notifier).setWaterReminderInterval(value),
-          onWakeTimeChanged: (value) => ref.read(healthFormProvider.notifier).setWakeTime(value),
-          onSleepTimeChanged: (value) => ref.read(healthFormProvider.notifier).setSleepTime(value),
+          onRemoveAllergy: (index) =>
+              ref.read(healthFormProvider.notifier).removeAllergy(index),
+          onActivityLevelChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setActivityLevel(value),
+          onWaterIntakeChanged: (value) => ref
+              .read(healthFormProvider.notifier)
+              .setWaterIntake(value.toDouble()),
+          onDietTypeChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setDietType(value),
+          onWaterReminderEnabledChanged: (value) => ref
+              .read(healthFormProvider.notifier)
+              .setWaterReminderEnabled(value),
+          onWaterReminderIntervalChanged: (value) => ref
+              .read(healthFormProvider.notifier)
+              .setWaterReminderInterval(value),
+          onWakeTimeChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setWakeTime(value),
+          onSleepTimeChanged: (value) =>
+              ref.read(healthFormProvider.notifier).setSleepTime(value),
           onClose: () => Navigator.pop(context),
           onSave: () async {
             try {
               await ref.read(
-                saveHealthProfileProvider(
-                  HealthProfileSaveParams(
-                    height: formState.height,
-                    gender: null,
-                  ),
-                ).future,
+                saveHealthProfileProvider((
+                  height: formState.height,
+                  gender: null,
+                )).future,
               );
 
               if (context.mounted) {

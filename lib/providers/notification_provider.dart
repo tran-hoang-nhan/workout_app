@@ -49,7 +49,6 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
   }
 
   Future<void> drinkWater(String id) async {
-    // 1. Mark notification as read with timestamp
     final now = DateTime.now();
     state = [
       for (final notification in state)
@@ -59,12 +58,8 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
           notification,
     ];
 
-    // 2. Add water to health progress using ProgressUserController
     try {
-      // Call the controller's updateWater method which handles user session, repo call and invalidation
       await ref.read(progressUserControllerProvider.notifier).updateWater(250);
-
-      // Additional refresh for related providers
       ref.invalidate(progressWeeklyProvider);
       ref.invalidate(healthDataProvider);
     } catch (e) {
@@ -83,9 +78,7 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
   }
 
   void markAllAsRead() {
-    state = [
-      for (final notification in state) notification.copyWith(isRead: true),
-    ];
+    state = [for (final notification in state) notification.copyWith(isRead: true)];
   }
 
   void addNotification(NotificationModel notification) {

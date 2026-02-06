@@ -7,10 +7,7 @@ final dailyStatsRepositoryProvider = Provider<DailyStatsRepository>((ref) {
   return DailyStatsRepository();
 });
 
-final dailyStatsProvider = FutureProvider.family<DailyStats?, DateTime>((
-  ref,
-  rawDate,
-) async {
+final dailyStatsProvider = FutureProvider.family<DailyStats?, DateTime>((ref, rawDate) async {
   final date = DateTime(rawDate.year, rawDate.month, rawDate.day);
   final userId = ref.watch(currentUserIdProvider).value;
   if (userId == null) return null;
