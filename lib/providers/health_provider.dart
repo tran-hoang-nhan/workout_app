@@ -15,9 +15,7 @@ final healthRepositoryProvider = Provider<HealthRepository>((ref) {
   return HealthRepository();
 });
 
-final healthIntegrationServiceProvider = Provider<HealthIntegrationService>((
-  ref,
-) {
+final healthIntegrationServiceProvider = Provider<HealthIntegrationService>((ref,) {
   return HealthIntegrationService();
 });
 

@@ -57,7 +57,6 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
         else
           notification,
     ];
-
     try {
       await ref.read(progressUserControllerProvider.notifier).updateWater(250);
       ref.invalidate(progressWeeklyProvider);

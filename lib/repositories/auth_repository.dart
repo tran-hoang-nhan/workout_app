@@ -25,11 +25,7 @@ class AuthRepository {
 
   Future<AuthResponse> signUp(SignUpParams params) async {
     try {
-      return await _supabase.auth.signUp(
-        email: params.email,
-        password: params.password,
-        data: {'full_name': params.fullName},
-      );
+      return await _supabase.auth.signUp(email: params.email, password: params.password, data: {'full_name': params.fullName});
     } catch (e, st) {
       throw handleException(e, st);
     }
