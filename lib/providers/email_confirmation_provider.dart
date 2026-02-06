@@ -21,11 +21,7 @@ class OTPNotifier extends Notifier<bool> {
   Future<bool> verifyOTP(String token) async {
     state = true;
     try { 
-      await _service.verifyOTP (
-        email: email,
-        token: token,
-        type: OtpType.signup,
-      );
+      await _service.verifyOTP(email: email, token: token, type: OtpType.signup);
       state = false;
       return true; 
     } catch (e) {

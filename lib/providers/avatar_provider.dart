@@ -35,18 +35,10 @@ class AvatarController extends AsyncNotifier<void> {
     state = await AsyncValue.guard(() async {
       final user = await ref.read(currentUserProvider.future);
       if (user == null) throw Exception('Chưa đăng nhập');
-
       final bytes = await image.readAsBytes();
       final fileName = 'avatar_${DateTime.now().millisecondsSinceEpoch}_${image.name}';
-
-      await ref.read(avatarServiceProvider).uploadAvatar(
-        userId: user.id,
-        bytes: bytes,
-        fileName: fileName,
-      );
-      
+      await ref.read(avatarServiceProvider).uploadAvatar(userId: user.id, bytes: bytes, fileName: fileName);
       debugPrint('AvatarController: Upload completed, invalidating currentUserProvider');
-      // Refresh user data to show new avatar
       ref.invalidate(currentUserProvider);
     });
 
@@ -61,11 +53,8 @@ class AvatarController extends AsyncNotifier<void> {
     state = await AsyncValue.guard(() async {
       final user = await ref.read(currentUserProvider.future);
       if (user == null) throw Exception('Chưa đăng nhập');
-
       await ref.read(avatarServiceProvider).removeAvatar(user.id);
-      
       debugPrint('AvatarController: Removal completed, invalidating currentUserProvider');
-      // Refresh user data
       ref.invalidate(currentUserProvider);
     });
 

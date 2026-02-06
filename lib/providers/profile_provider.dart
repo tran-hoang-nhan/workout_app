@@ -29,13 +29,7 @@ class EditProfileController extends AsyncNotifier<void> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       try {
-        await ref.read(profileServiceProvider).saveProfile(
-          userId: userId,
-          fullName: fullName,
-          gender: gender,
-          dateOfBirth: dateOfBirth,
-          goal: goal,
-        );
+        await ref.read(profileServiceProvider).saveProfile(userId: userId, fullName: fullName, gender: gender, dateOfBirth: dateOfBirth, goal: goal,);
       } catch (e, st) {
         throw handleException(e, st);
       }
