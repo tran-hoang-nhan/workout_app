@@ -290,7 +290,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         },
       );
     }
-    if (hasHealthData.isLoading) {
+    if (hasHealthData.isLoading && !hasHealthData.hasValue) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (hasHealthData.hasError) {

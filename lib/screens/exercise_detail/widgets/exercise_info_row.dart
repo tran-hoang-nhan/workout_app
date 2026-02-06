@@ -5,6 +5,7 @@ class ExerciseInfoRow extends StatelessWidget {
   final String label;
   final String value;
   final Color? iconColor;
+  final Color? valueColor;
 
   const ExerciseInfoRow({
     super.key,
@@ -12,6 +13,7 @@ class ExerciseInfoRow extends StatelessWidget {
     required this.label,
     required this.value,
     this.iconColor,
+    this.valueColor,
   });
 
   @override
@@ -31,7 +33,8 @@ class ExerciseInfoRow extends StatelessWidget {
           value,
           style: TextStyle(
             fontSize: 16,
-            color: Colors.grey[700],
+            color: valueColor ?? Colors.grey[700],
+            fontWeight: valueColor != null ? FontWeight.bold : FontWeight.normal,
           ),
         ),
       ],

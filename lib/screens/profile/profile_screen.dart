@@ -82,20 +82,6 @@ class ProfileScreen extends ConsumerWidget {
                     icon: Icons.lock_outline_rounded,
                     onTap: () => _showChangePasswordDialog(context, ref),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  ProfileMenuButton(
-                    title: 'Thông báo',
-                    description: 'Nhắc nhở luyện tập hàng ngày',
-                    icon: Icons.notifications_rounded,
-                    onTap: () {},
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  ProfileMenuButton(
-                    title: 'Trợ giúp',
-                    description: 'Trung tâm hỗ trợ và FAQ',
-                    icon: Icons.help_outline_rounded,
-                    onTap: () {},
-                  ),
                   const SizedBox(height: 32),
                   ProfileLogoutButton(
                     onLogoutConfirmed: () async {
