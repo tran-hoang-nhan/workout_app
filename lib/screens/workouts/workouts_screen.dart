@@ -72,8 +72,6 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                 ),
               ),
             ),
-
-            // Workouts List
             workoutsAsync.when(
               data: (workouts) {
                 if (workouts.isEmpty) {
