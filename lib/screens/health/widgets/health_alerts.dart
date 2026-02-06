@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-import '../../../providers/health_provider.dart';
+import '../../../models/health_params.dart';
 
 class HealthAlerts extends StatelessWidget {
-  final HealthFormState formState;
+  final HealthUpdateParams formState;
 
-  const HealthAlerts({
-    super.key,
-    required this.formState,
-  });
+  const HealthAlerts({super.key, required this.formState});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +21,11 @@ class HealthAlerts extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.warning_outlined, color: Colors.orange.shade600, size: 18),
+              Icon(
+                Icons.warning_outlined,
+                color: Colors.orange.shade600,
+                size: 18,
+              ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
@@ -51,7 +52,10 @@ class HealthAlerts extends StatelessWidget {
                   Expanded(
                     child: Text(
                       formState.injuries.join(', '),
-                      style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                 ],

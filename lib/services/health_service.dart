@@ -11,13 +11,7 @@ class HealthService {
   final HealthIntegrationService _healthIntegration;
   final NotificationService _notifications;
 
-  HealthService({
-    HealthRepository? repository,
-    HealthIntegrationService? healthIntegration,
-    NotificationService? notifications,
-  }) : _repository = repository ?? HealthRepository(),
-       _healthIntegration = healthIntegration ?? HealthIntegrationService(),
-       _notifications = notifications ?? NotificationService();
+  HealthService({HealthRepository? repository, HealthIntegrationService? healthIntegration, NotificationService? notifications,}): _repository = repository ?? HealthRepository(), _healthIntegration = healthIntegration ?? HealthIntegrationService(), _notifications = notifications ?? NotificationService();
 
   Future<HealthData?> checkHealthProfile(String userId) async {
     final profile = await _repository.getHealthData(userId);
@@ -43,9 +37,11 @@ class HealthService {
     );
   }
 
-  Future<void> syncWaterReminders(bool enabled, int intervalHours, String wakeTime, String sleepTime) async {
-    debugPrint("🔔 Syncing water reminders: enabled=$enabled, interval=$intervalHours");
-    if (enabled) {
+  Future<void> syncWaterReminders({required bool enabled, required int intervalHours, required String wakeTime, required String sleepTime, int currentWaterMl = 0, int goalWaterMl = 2000,}) async {
+    bool isGoalReached = currentWaterMl >= goalWaterMl;
+    debugPrint("🔔 Syncing water reminders: enabled=$enabled, goalReached=$isGoalReached ($currentWaterMl/$goalWaterMl)",);
+
+    if (enabled && !isGoalReached) {
       await _notifications.scheduleWaterReminder(
         intervalHours: intervalHours,
         wakeTime: wakeTime,
@@ -53,28 +49,28 @@ class HealthService {
       );
     } else {
       await _notifications.cancelAllReminders();
+      if (enabled && isGoalReached) {
+        debugPrint("🎯 Water goal reached. Reminders stopped.");
+      }
     }
   }
 
-  Future<void> updateQuickMetrics({required String userId, double? weight, double? height, String? gender, String? goal,}) async {
+  Future<void> updateQuickMetrics({required String userId, double? weight, double? height}) async {
     await _repository.updateQuickMetrics(
-      userId: userId,
-      weight: weight,
-      height: height,
+      userId: userId, 
+      weight: weight, 
+      height: height
     );
   }
 
   Future<void> updateFullProfile(HealthUpdateParams params) async {
     await _repository.updateFullProfile(params);
-    if (params.waterReminderEnabled != null &&
-        params.waterReminderInterval != null) {
-      await syncWaterReminders(
-        params.waterReminderEnabled!,
-        params.waterReminderInterval!,
-        params.wakeTime ?? '07:00',
-        params.sleepTime ?? '23:00',
-      );
-    }
+    await syncWaterReminders(
+      enabled: params.waterReminderEnabled,
+      intervalHours: params.waterReminderInterval,
+      wakeTime: params.wakeTime,
+      sleepTime: params.sleepTime,
+    );
   }
 
   double calculateBMI(double weight, double height) => health_utils.calculateBMI(weight, height);
