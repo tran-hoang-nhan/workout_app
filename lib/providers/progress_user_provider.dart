@@ -5,6 +5,8 @@ import '../models/progress_user.dart';
 import './auth_provider.dart';
 import '../utils/app_error.dart';
 import './health_provider.dart';
+import './daily_stats_provider.dart';
+import './notification_provider.dart';
 
 final progressUserControllerProvider = AsyncNotifierProvider<ProgressUserController, void>(() {
   return ProgressUserController();
@@ -30,15 +32,24 @@ class ProgressUserController extends AsyncNotifier<void> {
         final healthService = ref.read(healthServiceProvider);
         final healthData = await healthService.checkHealthProfile(userId);
         if (healthData != null) {
-          final progress = await repo.getProgress(userId, now);
+          // Get the current progress BEFORE the update to calculate the new total locally
+          // (avoiding waiting for the invalidated provider to re-fetch if we need it NOW)
+          final prevProgress = await repo.getProgress(userId, now);
+          final currentWaterMl = (prevProgress?.waterMl ?? 0);
+          
+          debugPrint("💧 Syncing reminders after manual input: newTotal=${currentWaterMl}ml");
+          
           await healthService.syncWaterReminders(
             enabled: healthData.waterReminderEnabled,
             intervalHours: healthData.waterReminderInterval,
             wakeTime: healthData.wakeTime,
             sleepTime: healthData.sleepTime,
-            currentWaterMl: progress?.waterMl ?? 0,
+            currentWaterMl: currentWaterMl,
             goalWaterMl: healthData.waterIntake,
           );
+          
+          // Start countdown on notification cards if any are active
+          ref.read(notificationProvider.notifier).handleGlobalWaterIntake();
         }
       } catch (e) {
         debugPrint("Error syncing reminders: $e");
@@ -59,6 +70,16 @@ class ProgressUserController extends AsyncNotifier<void> {
       final rawNow = DateTime.now();
       final now = DateTime(rawNow.year, rawNow.month, rawNow.day);
       await repo.updateActivityProgress(userId: userId, date: now, addSteps: deltaSteps);
+      
+      // Sync with daily_summaries
+      try {
+        final dailyRepo = ref.read(dailyStatsRepositoryProvider);
+        await dailyRepo.updateActivityStats(userId: userId, date: now, steps: deltaSteps);
+        ref.invalidate(dailyStatsProvider(now));
+      } catch (e) {
+        debugPrint('Error syncing daily steps: $e');
+      }
+
       ref.invalidate(progressDailyProvider(now));
     });
 

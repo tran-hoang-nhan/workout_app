@@ -64,8 +64,8 @@ class WorkoutHeader extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: _getDifficultyColor(
-                          workout.level!,
+                        color: LabelUtils.getDifficultyColor(
+                          workout.level,
                         ).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -76,7 +76,7 @@ class WorkoutHeader extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: _getDifficultyColor(workout.level!),
+                          color: LabelUtils.getDifficultyColor(workout.level),
                         ),
                       ),
                     ),
@@ -109,25 +109,4 @@ class WorkoutHeader extends StatelessWidget {
     );
   }
 
-  Color _getDifficultyColor(String difficulty) {
-    switch (difficulty.toLowerCase()) {
-      case 'beginner':
-      case 'easy':
-      case 'novice':
-      case 'dễ':
-        return Colors.green;
-      case 'intermediate':
-      case 'medium':
-      case 'trung bình':
-        return Colors.orange;
-      case 'advanced':
-      case 'hard':
-      case 'expert':
-      case 'khó':
-      case 'nâng cao':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
 }

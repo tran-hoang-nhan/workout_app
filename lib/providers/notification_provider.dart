@@ -66,6 +66,25 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
     }
   }
 
+  /// Called when water is added globally (e.g., from the WaterCard '+')
+  /// to ensure any active water notifications and their UI cards also reflect this.
+  void handleGlobalWaterIntake() {
+    final now = DateTime.now();
+    // Find the latest water notification that hasn't been marked as "drank" yet
+    // and mark it as drank to trigger the countdown UI.
+    bool updated = false;
+    state = [
+      for (final notification in state)
+        if (!updated && notification.type == NotificationType.water && notification.drankAt == null)
+          () {
+            updated = true;
+            return notification.copyWith(isRead: true, drankAt: now);
+          }()
+        else
+          notification,
+    ];
+  }
+
   void markAsRead(String id) {
     state = [
       for (final notification in state)
