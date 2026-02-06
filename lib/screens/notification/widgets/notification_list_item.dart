@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../constants/app_constants.dart';
 import '../../../models/notification.dart';
 import '../../../providers/notification_provider.dart';
+import '../../../providers/health_provider.dart';
 import './water_countdown_circle.dart';
 
 class NotificationListItem extends ConsumerWidget {
@@ -111,18 +112,29 @@ class NotificationListItem extends ConsumerWidget {
     if (notification.type != NotificationType.water) return const SizedBox.shrink();
 
     if (notification.drankAt != null) {
-      final now = DateTime.now();
-      final limit = notification.drankAt!.add(const Duration(hours: 1));
-      if (now.isBefore(limit)) {
-        return Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.md),
-          child: WaterCountdownCircle(
-            startTime: notification.drankAt!,
-            duration: const Duration(hours: 1),
-          ),
-        );
-      }
-      return const SizedBox.shrink();
+      final healthDataAsync = ref.watch(healthDataProvider);
+      
+      return healthDataAsync.when(
+        data: (healthData) {
+          final interval = healthData?.waterReminderInterval ?? 1;
+          final duration = Duration(hours: interval);
+          final now = DateTime.now();
+          final limit = notification.drankAt!.add(duration);
+          
+          if (now.isBefore(limit)) {
+            return Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.md),
+              child: WaterCountdownCircle(
+                startTime: notification.drankAt!,
+                duration: duration,
+              ),
+            );
+          }
+          return const SizedBox.shrink();
+        },
+        loading: () => const SizedBox.shrink(),
+        error: (_, __) => const SizedBox.shrink(),
+      );
     }
 
     // Nút "Đã uống" sẽ hiển thị cho đến khi người dùng bấm "Đã uống"
