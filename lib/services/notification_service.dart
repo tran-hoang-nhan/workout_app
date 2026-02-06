@@ -23,11 +23,37 @@ class NotificationService {
 
     final wakeHour = int.tryParse(wakeTime.split(':')[0]) ?? 7;
     final sleepHour = int.tryParse(sleepTime.split(':')[0]) ?? 23;
-    final nowHour = DateTime.now().hour;
+    final now = DateTime.now();
+    final nowHour = now.hour;
     final isActive = nowHour >= wakeHour && nowHour < sleepHour;
 
     if (!isActive) {
-      debugPrint("💤 Outside active hours ($wakeTime - $sleepTime). Skipping immediate schedule.",);
+      debugPrint("💤 Outside active hours ($wakeTime - $sleepTime). Scheduling for next wake time.",);
+      
+      // Schedule a one-time notification for tomorrow morning wake time
+      DateTime nextWake = DateTime(now.year, now.month, now.day, wakeHour, 0);
+      if (nowHour >= sleepHour) {
+        nextWake = nextWake.add(const Duration(days: 1));
+      }
+
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: 10,
+          channelKey: waterChannelKey,
+          title: 'Chào buổi sáng! 💧',
+          body: 'Đã đến lúc bắt đầu ngày mới với một cốc nước rồi!',
+          notificationLayout: NotificationLayout.Default,
+          category: NotificationCategory.Reminder,
+        ),
+        schedule: NotificationCalendar(
+          hour: wakeHour,
+          minute: 0,
+          second: 0,
+          millisecond: 0,
+          repeats: true,
+          allowWhileIdle: true,
+        ),
+      );
       return;
     }
 

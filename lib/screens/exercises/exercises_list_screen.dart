@@ -5,6 +5,7 @@ import '../../models/exercise.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/exercise_provider.dart';
 import '../exercise_detail/exercise_detail_screen.dart';
+import '../../utils/label_utils.dart';
 
 class ExercisesListScreen extends ConsumerWidget {
   const ExercisesListScreen({super.key});
@@ -165,8 +166,8 @@ class ExercisesListScreen extends ConsumerWidget {
                       children: [
                         if (exercise.difficulty != null) ...[
                           _buildTag(
-                            exercise.difficulty!,
-                            _getDifficultyColor(exercise.difficulty!),
+                            LabelUtils.getWorkoutLevelLabel(exercise.difficulty),
+                            LabelUtils.getDifficultyColor(exercise.difficulty),
                           ),
                           const SizedBox(width: 8),
                         ],
@@ -215,17 +216,4 @@ class ExercisesListScreen extends ConsumerWidget {
     );
   }
 
-  Color _getDifficultyColor(String difficulty) {
-    switch (difficulty.toLowerCase()) {
-      case 'dễ':
-        return Colors.green;
-      case 'trung bình':
-        return Colors.orange;
-      case 'khó':
-      case 'nâng cao':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
 }
