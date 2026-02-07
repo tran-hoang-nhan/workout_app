@@ -30,12 +30,12 @@ class StatsSection extends ConsumerWidget {
         todayStatsAsync.when(
           data: (stats) {
             final steps = stats?.stepsCount ?? 0;
-            final calories = stats?.activeEnergyBurned ?? 0;
+            final calories = stats?.activeEnergyCalo ?? 0;
             final minutes = stats?.activeMinutes ?? 0;
             
             // Goals
             const stepGoal = 10000;
-            final calorieGoal = healthCalculations.tdee > 0 ? healthCalculations.tdee : 2000;
+            final calorieGoal = (healthCalculations.tdee > 0 ? healthCalculations.tdee : 2000) * 1000;
             const minuteGoal = 60;
 
             return Column(
@@ -45,7 +45,7 @@ class StatsSection extends ConsumerWidget {
                   title: 'Calo tiêu thụ',
                   value: calories.toStringAsFixed(0),
                   goal: calorieGoal.toStringAsFixed(0),
-                  unit: 'kcal',
+                  unit: 'calo',
                   progress: (calories / calorieGoal).clamp(0, 1),
                   color: const Color(0xFFFF7F00),
                   icon: Icons.local_fire_department_rounded,

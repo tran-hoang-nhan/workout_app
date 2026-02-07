@@ -48,7 +48,7 @@ class WeeklyActivityChart extends StatelessWidget {
                 data: (stats) => BarChart(
                   BarChartData(
                     alignment: BarChartAlignment.spaceAround,
-                    maxY: 3000,
+                    maxY: 3000 * 1000,
                     barTouchData: BarTouchData(enabled: false),
                     titlesData: FlTitlesData(
                       show: true,
@@ -95,7 +95,7 @@ class WeeklyActivityChart extends StatelessWidget {
                           .where((s) => s.date.weekday == (i + 1))
                           .toList();
                       final calories = dayStats.isNotEmpty
-                          ? dayStats.first.activeEnergyBurned
+                          ? dayStats.first.activeEnergyCalo
                           : 0.0;
                       return BarChartGroupData(
                         x: i,
@@ -107,7 +107,7 @@ class WeeklyActivityChart extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                             backDrawRodData: BackgroundBarChartRodData(
                               show: true,
-                              toY: 3000,
+                              toY: 3000 * 1000,
                               color: AppColors.primary.withValues(alpha: 0.05),
                             ),
                           ),

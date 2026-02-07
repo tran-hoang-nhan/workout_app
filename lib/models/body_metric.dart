@@ -82,5 +82,8 @@ class ProgressStats {
     required this.totalWorkouts,
     required this.avgCaloriesPerSession,
   });
+
+  double get totalCaloriesCalo => totalCalories * 1000;
+  double get avgCaloriesPerSessionCalo => avgCaloriesPerSession * 1000;
 }
 

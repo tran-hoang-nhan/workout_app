@@ -173,7 +173,7 @@ class ExercisesListScreen extends ConsumerWidget {
                         ],
                         if (exercise.caloriesPerMinute != null)
                           _buildTag(
-                            '${exercise.caloriesPerMinute!.toStringAsFixed(0)} kcal/phút',
+                            '${exercise.caloriesPerMinute!.toStringAsFixed(0)} calo/phút',
                             Colors.orange,
                           ),
                       ],

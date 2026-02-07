@@ -35,8 +35,8 @@ class WorkoutHistoryList extends StatelessWidget {
                 ? item.completedAt
                 : (item as dynamic).completedAt;
             final calories = item is WorkoutHistory
-                ? item.totalCaloriesBurned
-                : (item as dynamic).totalCaloriesBurned;
+                ? item.totalCaloriesCalo
+                : (item as dynamic).totalCaloriesCalo;
             final duration = item is WorkoutHistory
                 ? item.durationSeconds
                 : (item as dynamic).durationSeconds;
@@ -86,7 +86,7 @@ class WorkoutHistoryList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '${calories?.toInt() ?? 0} kcal',
+                        '${calories?.toInt() ?? 0} calo',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
