@@ -127,9 +127,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   if (widget.exercise.caloriesPerMinute != null) ...[
                     ExerciseInfoRow(
                       icon: Icons.local_fire_department,
-                      label: 'Calories/phút',
+                      label: 'Calo/phút',
                       value:
-                          '${widget.exercise.caloriesPerMinute!.toStringAsFixed(1)} kcal',
+                          '${widget.exercise.caloriesPerMinute!.toStringAsFixed(1)} calo',
                     ),
                     const SizedBox(height: 12),
                   ],

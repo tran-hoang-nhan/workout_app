@@ -86,7 +86,7 @@ class WorkoutHistoryList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '${calories?.toInt() ?? 0} kcal',
+                        '${calories?.toInt() ?? 0} calo',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,

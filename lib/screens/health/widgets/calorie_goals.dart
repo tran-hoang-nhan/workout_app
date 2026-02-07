@@ -120,7 +120,7 @@ class CalorieGoals extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                'KCAL',
+                'CALO',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
