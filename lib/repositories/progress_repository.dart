@@ -2,6 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/workout_history.dart';
 import '../models/body_metric.dart';
 import '../utils/app_error.dart';
+import './daily_stats_repository.dart';
 
 class ProgressRepository {
   final SupabaseClient _supabase;
@@ -49,7 +50,13 @@ class ProgressRepository {
     }
   }
 
-  Future<WorkoutHistory> recordWorkout({required String userId,required int? workoutId,required String workoutTitle,required double caloriesBurned,required int durationSeconds,}) async {
+  Future<WorkoutHistory> recordWorkout({
+    required String userId,
+    required int? workoutId,
+    required String workoutTitle,
+    required double caloriesBurned,
+    required int durationSeconds,
+  }) async {
     try {
       final response = await _supabase.from('workout_history').insert({
         'user_id': userId,
@@ -59,6 +66,23 @@ class ProgressRepository {
         'duration_seconds': durationSeconds,
         'completed_at': DateTime.now().toIso8601String(),
       }).select().single();
+
+      // Sync with daily_summaries
+      try {
+        final now = DateTime.now();
+        final date = DateTime(now.year, now.month, now.day);
+        final dailyRepo = DailyStatsRepository(supabase: _supabase);
+        await dailyRepo.updateActivityStats(
+          userId: userId,
+          date: date,
+          addEnergy: caloriesBurned,
+          addMinutes: (durationSeconds / 60).round(),
+        );
+      } catch (e) {
+        // Log error but don't fail the whole operation
+        print('Error syncing daily stats: $e');
+      }
+
       return WorkoutHistory.fromJson(response);
     } catch (e, st) {
       throw handleException(e, st);

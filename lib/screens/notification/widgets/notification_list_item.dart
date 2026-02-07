@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../constants/app_constants.dart';
 import '../../../models/notification.dart';
 import '../../../providers/notification_provider.dart';
+import '../../../providers/health_provider.dart';
 import './water_countdown_circle.dart';
 
 class NotificationListItem extends ConsumerWidget {
@@ -108,49 +109,62 @@ class NotificationListItem extends ConsumerWidget {
   }
 
   Widget _buildActionArea(BuildContext context, WidgetRef ref) {
-    if (notification.type == NotificationType.water) {
-      if (notification.drankAt != null) {
-        // Show countdown if within 1 hour
-        final now = DateTime.now();
-        final limit = notification.drankAt!.add(const Duration(hours: 1));
-        if (now.isBefore(limit)) {
-          return Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.md),
-            child: WaterCountdownCircle(
-              startTime: notification.drankAt!,
-              duration: const Duration(hours: 1),
-            ),
-          );
-        }
-      } else if (!notification.isRead) {
-        return Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.md),
-          child: ElevatedButton.icon(
-            onPressed: () => ref
-                .read(notificationProvider.notifier)
-                .drinkWater(notification.id),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.white,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: 8,
+    if (notification.type != NotificationType.water) return const SizedBox.shrink();
+
+    if (notification.drankAt != null) {
+      final healthDataAsync = ref.watch(healthDataProvider);
+      
+      return healthDataAsync.when(
+        data: (healthData) {
+          final interval = healthData?.waterReminderInterval ?? 1;
+          final duration = Duration(hours: interval);
+          final now = DateTime.now();
+          final limit = notification.drankAt!.add(duration);
+          
+          if (now.isBefore(limit)) {
+            return Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.md),
+              child: WaterCountdownCircle(
+                startTime: notification.drankAt!,
+                duration: duration,
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            icon: const Icon(Icons.local_drink, size: 16),
-            label: const Text(
-              'Đã uống',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-            ),
-          ),
-        );
-      }
+            );
+          }
+          return const SizedBox.shrink();
+        },
+        loading: () => const SizedBox.shrink(),
+        error: (_, __) => const SizedBox.shrink(),
+      );
     }
-    return const SizedBox.shrink();
+
+    // Nút "Đã uống" sẽ hiển thị cho đến khi người dùng bấm "Đã uống"
+    // Việc đánh dấu thông báo là "Đã đọc" (isRead) sẽ KHÔNG làm mất nút này
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: ElevatedButton.icon(
+        onPressed: () => ref.read(notificationProvider.notifier).drinkWater(notification.id),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: 8,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        icon: const Icon(
+          Icons.shopping_basket,
+          size: 16,
+        ),
+        label: const Text(
+          'Đã uống',
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
   }
 
   String _formatDateTime(DateTime dateTime) {

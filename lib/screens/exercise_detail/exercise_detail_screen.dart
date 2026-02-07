@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/exercise.dart';
 import '../exercises/widgets/exercise_animation_widget.dart';
 import 'widgets/exercise_info_row.dart';
+import '../../utils/label_utils.dart';
 
 class ExerciseDetailScreen extends StatefulWidget {
   final Exercise exercise;
@@ -119,7 +120,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     ExerciseInfoRow(
                       icon: Icons.speed,
                       label: 'Độ khó',
-                      value: widget.exercise.difficulty!,
+                      value: LabelUtils.getWorkoutLevelLabel(widget.exercise.difficulty),
+                      valueColor: LabelUtils.getDifficultyColor(widget.exercise.difficulty),
                     ),
                     const SizedBox(height: 12),
                   ],

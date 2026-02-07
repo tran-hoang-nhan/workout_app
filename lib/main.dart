@@ -22,6 +22,8 @@ import 'repositories/progress_user_repository.dart';
 import 'providers/progress_user_provider.dart';
 import 'providers/app_state_provider.dart';
 import 'utils/logger.dart';
+import 'repositories/health_repository.dart';
+import 'services/health_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -120,6 +122,26 @@ class NotificationController {
           // 3. Trigger UI Refresh
           if (onWaterAdded != null) {
             onWaterAdded!(now);
+          }
+
+          // 4. Re-sync notifications
+          final healthRepo = HealthRepository(supabase: supabase);
+          final healthService = HealthService(repository: healthRepo);
+          final healthData = await healthService.checkHealthProfile(userId);
+
+          if (healthData != null) {
+            final progress = await repo.getProgress(
+              userId,
+              DateTime(now.year, now.month, now.day),
+            );
+            await healthService.syncWaterReminders(
+              enabled: healthData.waterReminderEnabled,
+              intervalHours: healthData.waterReminderInterval,
+              wakeTime: healthData.wakeTime,
+              sleepTime: healthData.sleepTime,
+              currentWaterMl: progress?.waterMl ?? 0,
+              goalWaterMl: healthData.waterIntake,
+            );
           }
         } else {
           debugPrint(
@@ -268,7 +290,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         },
       );
     }
-    if (hasHealthData.isLoading) {
+    if (hasHealthData.isLoading && !hasHealthData.hasValue) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (hasHealthData.hasError) {

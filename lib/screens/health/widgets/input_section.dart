@@ -5,8 +5,10 @@ import '../../../providers/auth_provider.dart';
 import '../../../providers/health_provider.dart';
 import '../../../providers/weight_provider.dart';
 
+import '../../../models/health_params.dart';
+
 class InputSection extends ConsumerWidget {
-  final HealthFormState formState;
+  final HealthUpdateParams formState;
   final TextEditingController weightInput;
   final TextEditingController heightInput;
 

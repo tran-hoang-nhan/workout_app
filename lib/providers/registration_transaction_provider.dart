@@ -27,10 +27,7 @@ class RegistrationTransactionController extends AsyncNotifier<void> {
     state = const AsyncValue.loading();
     try {
       final service = ref.read(registrationTransactionServiceProvider);
-      final user = await service.completeRegistration(
-        signUpParams: signUpParams,
-        healthParams: healthParams,
-      );
+      final user = await service.completeRegistration(signUpParams: signUpParams, healthParams: healthParams);
       state = const AsyncValue.data(null);
       return user;
     } catch (e, st) {

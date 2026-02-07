@@ -46,19 +46,33 @@ class ProfileRepository {
     }
   }
 
-  Future<void> saveProfile({required String userId,required String fullName,String? gender,double? weight,int? age,String? goal,}) async {
+  Future<void> saveProfile({required String userId, required String fullName, String? gender, double? weight, DateTime? dateOfBirth, String? goal,}) async {
     try {
       // 1. Update profiles table
-      final Map<String, dynamic> profileUpdates = {'full_name': fullName,};
+      final Map<String, dynamic> profileUpdates = {'full_name': fullName};
       if (gender != null) profileUpdates['gender'] = gender;
       if (goal != null) profileUpdates['goal'] = goal;
+      if (dateOfBirth != null) {
+        profileUpdates['date_of_birth'] = dateOfBirth.toIso8601String().split(
+          'T',
+        )[0];
+      }
 
       await _supabase.from('profiles').update(profileUpdates).eq('id', userId);
 
       // 2. Update health table
       final Map<String, dynamic> healthUpdates = {};
       if (weight != null) healthUpdates['weight'] = weight;
-      if (age != null) healthUpdates['age'] = age;
+
+      if (dateOfBirth != null) {
+        final now = DateTime.now();
+        int age = now.year - dateOfBirth.year;
+        if (now.month < dateOfBirth.month ||
+            (now.month == dateOfBirth.month && now.day < dateOfBirth.day)) {
+          age--;
+        }
+        healthUpdates['age'] = age;
+      }
 
       if (healthUpdates.isNotEmpty) {
         await _supabase.from('health').upsert({

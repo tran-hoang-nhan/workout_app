@@ -6,6 +6,7 @@ import 'widgets/stats_section.dart';
 import 'widgets/ai_suggestions_section.dart';
 
 import '../../providers/notification_provider.dart';
+import '../../providers/health_provider.dart';
 import '../notification/notification_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -15,6 +16,8 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userAsync = ref.watch(currentUserProvider);
     final unreadCount = ref.watch(unreadNotificationCountProvider);
+    // Sync health data to ensure correct calorie goals
+    ref.watch(syncHealthProfileProvider);
     
     return Scaffold(
       backgroundColor: AppColors.bgLight,
