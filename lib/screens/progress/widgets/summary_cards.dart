@@ -29,8 +29,8 @@ class ProgressSummaryCards extends StatelessWidget {
             children: [
               _buildStatSquare(
                 'Calo',
-                '${stats?.totalCaloriesBurned.toInt() ?? 0}',
-                'kcal',
+                '${stats?.totalCaloriesCalo.toInt() ?? 0}',
+                'calo',
                 Icons.local_fire_department,
                 AppColors.primary,
               ),

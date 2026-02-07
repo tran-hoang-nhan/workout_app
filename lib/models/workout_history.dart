@@ -6,6 +6,7 @@ class WorkoutHistory {
   final double? totalCaloriesBurned;
   final int? durationSeconds;
   final DateTime completedAt;
+  double get totalCaloriesCalo => (totalCaloriesBurned ?? 0) * 1000;
 
   String? get workoutName => workoutTitleSnapshot;
 

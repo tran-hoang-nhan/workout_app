@@ -10,6 +10,7 @@ class ProgressUser {
   final int waterMl;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  double get totalCaloriesCalo => totalCaloriesBurned * 1000;
 
   ProgressUser({
     this.id,

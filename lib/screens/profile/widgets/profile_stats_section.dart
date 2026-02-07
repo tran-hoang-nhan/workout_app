@@ -14,7 +14,7 @@ class ProfileStatsSection extends ConsumerWidget {
       data: (stats) => _buildContent(
         totalWorkouts: stats.totalWorkouts.toString(),
         totalTime: '${(stats.totalDuration / 3600).toStringAsFixed(1)}h',
-        caloriesBurned: '${(stats.totalCalories / 1000).toStringAsFixed(1)}k',
+        caloriesBurned: stats.totalCaloriesCalo.toStringAsFixed(0),
         streakDays: '0 ngày',
       ),
       loading: () => _buildContent(
@@ -92,7 +92,7 @@ class ProfileStatsSection extends ConsumerWidget {
         const SizedBox(height: AppSpacing.md),
         _buildBentoCard(
           caloriesBurned,
-          'Calories đã đốt',
+          'Calo đã đốt',
           Icons.local_fire_department_rounded,
           const Color(0xFFFF4B2B),
           height: 90,
