@@ -14,7 +14,7 @@ class ProfileStatsSection extends ConsumerWidget {
       data: (stats) => _buildContent(
         totalWorkouts: stats.totalWorkouts.toString(),
         totalTime: '${(stats.totalDuration / 3600).toStringAsFixed(1)}h',
-        caloriesBurned: stats.totalCalories.toStringAsFixed(0),
+        caloriesBurned: stats.totalCaloriesCalo.toStringAsFixed(0),
         streakDays: '0 ngày',
       ),
       loading: () => _buildContent(

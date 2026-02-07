@@ -30,12 +30,12 @@ class StatsSection extends ConsumerWidget {
         todayStatsAsync.when(
           data: (stats) {
             final steps = stats?.stepsCount ?? 0;
-            final calories = stats?.activeEnergyBurned ?? 0;
+            final calories = stats?.activeEnergyCalo ?? 0;
             final minutes = stats?.activeMinutes ?? 0;
             
             // Goals
             const stepGoal = 10000;
-            final calorieGoal = healthCalculations.tdee > 0 ? healthCalculations.tdee : 2000;
+            final calorieGoal = (healthCalculations.tdee > 0 ? healthCalculations.tdee : 2000) * 1000;
             const minuteGoal = 60;
 
             return Column(
