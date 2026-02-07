@@ -45,7 +45,7 @@ class StatsSection extends ConsumerWidget {
                   title: 'Calo tiêu thụ',
                   value: calories.toStringAsFixed(0),
                   goal: calorieGoal.toStringAsFixed(0),
-                  unit: 'kcal',
+                  unit: 'calo',
                   progress: (calories / calorieGoal).clamp(0, 1),
                   color: const Color(0xFFFF7F00),
                   icon: Icons.local_fire_department_rounded,
