@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import '../constants/app_constants.dart';
+
 class LabelUtils {
   static String getGenderLabel(String? gender) =>
       switch (gender?.toLowerCase()) {
@@ -45,4 +48,26 @@ class LabelUtils {
         null => 'Chưa cập nhật',
         _ => level!,
       };
+
+  static Color getDifficultyColor(String? difficulty) {
+    switch (difficulty?.toLowerCase()) {
+      case 'beginner':
+      case 'easy':
+      case 'novice':
+      case 'dễ':
+        return AppColors.success;
+      case 'intermediate':
+      case 'medium':
+      case 'trung bình':
+        return AppColors.warning;
+      case 'advanced':
+      case 'hard':
+      case 'expert':
+      case 'khó':
+      case 'nâng cao':
+        return AppColors.danger;
+      default:
+        return AppColors.grey;
+    }
+  }
 }

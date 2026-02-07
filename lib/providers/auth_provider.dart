@@ -28,9 +28,7 @@ final currentUserIdProvider = StreamProvider<String?>((ref) async* {
   yield authService.currentUser?.id;
   await for (final state in authService.authStateStream) {
     final userId = state.session?.user.id;
-    debugPrint(
-      '[currentUserIdProvider] Auth Event: ${state.event}, User: $userId',
-    );
+    debugPrint('[currentUserIdProvider] Auth Event: ${state.event}, User: $userId');
     yield userId;
   }
 });
@@ -92,25 +90,17 @@ class AuthController extends AsyncNotifier<void> {
     return !result.hasError;
   }
 
-  Future<void> updatePassword(
-    String newPassword, {
-    String? confirmPassword,
-  }) async {
+  Future<void> updatePassword(String newPassword, {String? confirmPassword}) async {
     debugPrint('[AuthController] updatePassword starting...');
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final authService = ref.read(authServiceProvider);
-      await authService.updatePassword(
-        newPassword,
-        confirmPassword: confirmPassword,
-      );
+      await authService.updatePassword(newPassword, confirmPassword: confirmPassword);
       debugPrint('[AuthController] updatePassword completed successfully.');
     });
 
     if (state.hasError) {
-      debugPrint(
-        '[AuthController] updatePassword failed with error: ${state.error}',
-      );
+      debugPrint('[AuthController] updatePassword failed with error: ${state.error}');
     }
   }
 }

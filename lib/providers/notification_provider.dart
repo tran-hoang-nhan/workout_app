@@ -49,7 +49,6 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
   }
 
   Future<void> drinkWater(String id) async {
-    // 1. Mark notification as read with timestamp
     final now = DateTime.now();
     state = [
       for (final notification in state)
@@ -58,18 +57,32 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
         else
           notification,
     ];
-
-    // 2. Add water to health progress using ProgressUserController
     try {
-      // Call the controller's updateWater method which handles user session, repo call and invalidation
       await ref.read(progressUserControllerProvider.notifier).updateWater(250);
-
-      // Additional refresh for related providers
       ref.invalidate(progressWeeklyProvider);
       ref.invalidate(healthDataProvider);
     } catch (e) {
       logger.e('Error updating water progress from notification: $e');
     }
+  }
+
+  /// Called when water is added globally (e.g., from the WaterCard '+')
+  /// to ensure any active water notifications and their UI cards also reflect this.
+  void handleGlobalWaterIntake() {
+    final now = DateTime.now();
+    // Find the latest water notification that hasn't been marked as "drank" yet
+    // and mark it as drank to trigger the countdown UI.
+    bool updated = false;
+    state = [
+      for (final notification in state)
+        if (!updated && notification.type == NotificationType.water && notification.drankAt == null)
+          () {
+            updated = true;
+            return notification.copyWith(isRead: true, drankAt: now);
+          }()
+        else
+          notification,
+    ];
   }
 
   void markAsRead(String id) {
@@ -83,9 +96,7 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
   }
 
   void markAllAsRead() {
-    state = [
-      for (final notification in state) notification.copyWith(isRead: true),
-    ];
+    state = [for (final notification in state) notification.copyWith(isRead: true)];
   }
 
   void addNotification(NotificationModel notification) {

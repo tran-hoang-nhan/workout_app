@@ -160,7 +160,7 @@ class WorkoutCard extends StatelessWidget {
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 0.5,
-                                color: color,
+                                color: LabelUtils.getDifficultyColor(workout.level),
                               ),
                             ),
                           ),

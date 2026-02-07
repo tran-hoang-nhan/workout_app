@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-import '../../../providers/health_provider.dart';
+
+import '../../../models/health_params.dart';
 
 class HealthEditForm extends StatefulWidget {
-  final HealthFormState initialState;
-  final Function(HealthFormState) onSave;
+  final HealthUpdateParams initialState;
+  final Function(HealthUpdateParams) onSave;
   final VoidCallback onCancel;
 
   const HealthEditForm({
@@ -27,9 +28,15 @@ class _HealthEditFormState extends State<HealthEditForm> {
   @override
   void initState() {
     super.initState();
-    ageController = TextEditingController(text: widget.initialState.age.toString());
-    weightController = TextEditingController(text: widget.initialState.weight.toString());
-    heightController = TextEditingController(text: widget.initialState.height.toString());
+    ageController = TextEditingController(
+      text: widget.initialState.age.toString(),
+    );
+    weightController = TextEditingController(
+      text: widget.initialState.weight.toString(),
+    );
+    heightController = TextEditingController(
+      text: widget.initialState.height.toString(),
+    );
     dietType = widget.initialState.dietType;
   }
 
@@ -65,7 +72,10 @@ class _HealthEditFormState extends State<HealthEditForm> {
           const SizedBox(height: AppSpacing.md),
           _buildField('Chiều cao (cm)', heightController, TextInputType.number),
           const SizedBox(height: AppSpacing.md),
-          const Text('Chế độ ăn', style: TextStyle(fontSize: 13, color: AppColors.grey)),
+          const Text(
+            'Chế độ ăn',
+            style: TextStyle(fontSize: 13, color: AppColors.grey),
+          ),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -78,14 +88,23 @@ class _HealthEditFormState extends State<HealthEditForm> {
               child: DropdownButton<String>(
                 value: dietType,
                 isExpanded: true,
-                items: [
-                  'normal', 'vegan', 'vegetarian', 'keto', 'paleo', 'low_carb'
-                ].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(_mapDietType(value), style: const TextStyle(fontSize: 14)),
-                  );
-                }).toList(),
+                items:
+                    [
+                      'normal',
+                      'vegan',
+                      'vegetarian',
+                      'keto',
+                      'paleo',
+                      'low_carb',
+                    ].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          _mapDietType(value),
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      );
+                    }).toList(),
                 onChanged: (val) {
                   if (val != null) setState(() => dietType = val);
                 },
@@ -98,7 +117,10 @@ class _HealthEditFormState extends State<HealthEditForm> {
               Expanded(
                 child: TextButton(
                   onPressed: widget.onCancel,
-                  child: const Text('Hủy', style: TextStyle(color: AppColors.grey)),
+                  child: const Text(
+                    'Hủy',
+                    style: TextStyle(color: AppColors.grey),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -106,18 +128,29 @@ class _HealthEditFormState extends State<HealthEditForm> {
                 child: ElevatedButton(
                   onPressed: () {
                     final newState = widget.initialState.copyWith(
-                      age: int.tryParse(ageController.text) ?? widget.initialState.age,
-                      weight: double.tryParse(weightController.text) ?? widget.initialState.weight,
-                      height: double.tryParse(heightController.text) ?? widget.initialState.height,
+                      age:
+                          int.tryParse(ageController.text) ??
+                          widget.initialState.age,
+                      weight:
+                          double.tryParse(weightController.text) ??
+                          widget.initialState.weight,
+                      height:
+                          double.tryParse(heightController.text) ??
+                          widget.initialState.height,
                       dietType: dietType,
                     );
                     widget.onSave(newState);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  child: const Text('Lưu thay đổi', style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    'Lưu thay đổi',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ],
@@ -127,11 +160,18 @@ class _HealthEditFormState extends State<HealthEditForm> {
     );
   }
 
-  Widget _buildField(String label, TextEditingController controller, TextInputType type) {
+  Widget _buildField(
+    String label,
+    TextEditingController controller,
+    TextInputType type,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 13, color: AppColors.grey)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 13, color: AppColors.grey),
+        ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -155,15 +195,13 @@ class _HealthEditFormState extends State<HealthEditForm> {
     );
   }
 
-  String _mapDietType(String type) {
-    switch (type) {
-      case 'normal': return 'Bình thường';
-      case 'vegan': return 'Thuần chay';
-      case 'vegetarian': return 'Ăn chay';
-      case 'keto': return 'Keto';
-      case 'paleo': return 'Paleo';
-      case 'low_carb': return 'Low Carb';
-      default: return type;
-    }
-  }
+  String _mapDietType(String type) => switch (type) {
+    'normal'     => 'Bình thường',
+    'vegan'      => 'Thuần chay',
+    'vegetarian' => 'Ăn chay',
+    'keto'       => 'Keto',
+    'paleo'      => 'Paleo',
+    'low_carb'   => 'Low Carb',
+    _            => type,
+  };
 }
