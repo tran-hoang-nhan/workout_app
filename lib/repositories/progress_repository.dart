@@ -2,6 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/workout_history.dart';
 import '../models/body_metric.dart';
 import '../utils/app_error.dart';
+import '../utils/logger.dart';
 import './daily_stats_repository.dart';
 
 class ProgressRepository {
@@ -79,8 +80,7 @@ class ProgressRepository {
           addMinutes: (durationSeconds / 60).round(),
         );
       } catch (e) {
-        // Log error but don't fail the whole operation
-        print('Error syncing daily stats: $e');
+        logger.e('Error syncing daily stats: $e');
       }
 
       return WorkoutHistory.fromJson(response);
