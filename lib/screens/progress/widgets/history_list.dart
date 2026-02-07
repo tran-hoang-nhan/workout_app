@@ -35,8 +35,8 @@ class WorkoutHistoryList extends StatelessWidget {
                 ? item.completedAt
                 : (item as dynamic).completedAt;
             final calories = item is WorkoutHistory
-                ? item.totalCaloriesBurned
-                : (item as dynamic).totalCaloriesBurned;
+                ? item.totalCaloriesCalo
+                : (item as dynamic).totalCaloriesCalo;
             final duration = item is WorkoutHistory
                 ? item.durationSeconds
                 : (item as dynamic).durationSeconds;
