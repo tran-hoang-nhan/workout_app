@@ -32,13 +32,9 @@ class ProgressUserController extends AsyncNotifier<void> {
         final healthService = ref.read(healthServiceProvider);
         final healthData = await healthService.checkHealthProfile(userId);
         if (healthData != null) {
-          // Get the current progress BEFORE the update to calculate the new total locally
-          // (avoiding waiting for the invalidated provider to re-fetch if we need it NOW)
           final prevProgress = await repo.getProgress(userId, now);
-          final currentWaterMl = (prevProgress?.waterMl ?? 0);
-          
-          debugPrint("💧 Syncing reminders after manual input: newTotal=${currentWaterMl}ml");
-          
+          final currentWaterMl = (prevProgress?.waterMl ?? 0);  
+          debugPrint("💧 Syncing reminders after manual input: newTotal=${currentWaterMl}ml");      
           await healthService.syncWaterReminders(
             enabled: healthData.waterReminderEnabled,
             intervalHours: healthData.waterReminderInterval,
@@ -47,8 +43,6 @@ class ProgressUserController extends AsyncNotifier<void> {
             currentWaterMl: currentWaterMl,
             goalWaterMl: healthData.waterIntake,
           );
-          
-          // Start countdown on notification cards if any are active
           ref.read(notificationProvider.notifier).handleGlobalWaterIntake();
         }
       } catch (e) {
@@ -70,8 +64,6 @@ class ProgressUserController extends AsyncNotifier<void> {
       final rawNow = DateTime.now();
       final now = DateTime(rawNow.year, rawNow.month, rawNow.day);
       await repo.updateActivityProgress(userId: userId, date: now, addSteps: deltaSteps);
-      
-      // Sync with daily_summaries
       try {
         final dailyRepo = ref.read(dailyStatsRepositoryProvider);
         await dailyRepo.updateActivityStats(userId: userId, date: now, steps: deltaSteps);
@@ -79,7 +71,6 @@ class ProgressUserController extends AsyncNotifier<void> {
       } catch (e) {
         debugPrint('Error syncing daily steps: $e');
       }
-
       ref.invalidate(progressDailyProvider(now));
     });
 

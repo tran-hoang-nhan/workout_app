@@ -70,7 +70,6 @@ class HealthUpdateParams {
       'allergies': allergies,
       'updated_at': DateTime.now().toIso8601String(),
     };
-
     map['water_reminder_enabled'] = waterReminderEnabled;
     map['water_reminder_interval'] = waterReminderInterval;
     map['wake_time'] = wakeTime;
@@ -115,8 +114,7 @@ class HealthUpdateParams {
       medicalConditions: medicalConditions ?? this.medicalConditions,
       allergies: allergies ?? this.allergies,
       waterReminderEnabled: waterReminderEnabled ?? this.waterReminderEnabled,
-      waterReminderInterval:
-          waterReminderInterval ?? this.waterReminderInterval,
+      waterReminderInterval: waterReminderInterval ?? this.waterReminderInterval,
       wakeTime: wakeTime ?? this.wakeTime,
       sleepTime: sleepTime ?? this.sleepTime,
     );

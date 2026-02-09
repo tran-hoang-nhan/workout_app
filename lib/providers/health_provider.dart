@@ -327,12 +327,7 @@ final healthCalculationsProvider = Provider<HealthCalculations>((ref) {
   final service = ref.watch(healthServiceProvider);
   final bmi = service.calculateBMI(form.weight, form.height);
   final bmiCategory = service.getBMICategory(bmi);
-  final bmr = service.calculateBMR(
-    form.weight,
-    form.height,
-    form.age,
-    form.gender,
-  );
+  final bmr = service.calculateBMR(form.weight, form.height, form.age, form.gender,);
   final tdee = service.calculateTDEE(bmr, form.activityLevel);
   final maxHR = service.calculateMaxHeartRate(form.age);
   final zone1 = service.calculateZone1(maxHR);
@@ -361,18 +356,12 @@ final hasHealthDataProvider = FutureProvider<bool>((ref) async {
 });
 
 final saveHealthProfileProvider =
-    FutureProvider.family<void, ({double height, String? gender})>((
-      ref,
-      params,
-    ) async {
+    FutureProvider.family<void, ({double height, String? gender})>((ref, params) async {
       try {
         final userId = await ref.read(currentUserIdProvider.future);
-        if (userId == null) {
-          throw UnauthorizedException('Chưa đăng nhập');
-        }
+        if (userId == null) throw UnauthorizedException('Chưa đăng nhập');
         final currentUser = await ref.read(fullUserProfileProvider.future);
         final currentGoal = currentUser?.goal ?? 'maintain';
-
         final form = ref.read(healthFormProvider);
         final updateParams = form.copyWith(
           userId: userId,
@@ -380,9 +369,7 @@ final saveHealthProfileProvider =
           gender: params.gender ?? form.gender,
           goal: currentGoal,
         );
-        await ref
-            .read(healthControllerProvider.notifier)
-            .saveFullProfile(updateParams);
+        await ref.read(healthControllerProvider.notifier).saveFullProfile(updateParams);
       } catch (e, st) {
         throw handleException(e, st);
       }

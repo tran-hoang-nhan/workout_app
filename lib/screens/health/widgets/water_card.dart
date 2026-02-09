@@ -18,9 +18,7 @@ class WaterCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isCompleted = waterGoal > 0 && currentCups >= waterGoal;
-    final progress = (waterGoal > 0)
-        ? (currentCups / waterGoal).clamp(0.0, 1.0)
-        : 0.0;
+    final progress = (waterGoal > 0) ? (currentCups / waterGoal).clamp(0.0, 1.0) : 0.0;
     final remaining = (waterGoal - currentCups).clamp(0, waterGoal);
 
     return Expanded(
@@ -128,16 +126,10 @@ class WaterCard extends ConsumerWidget {
     );
   }
 
-  void _updateWaterCup(
-    BuildContext context,
-    WidgetRef ref,
-    int deltaCups,
-  ) async {
+  void _updateWaterCup(BuildContext context, WidgetRef ref, int deltaCups) async {
     try {
       final deltaMl = deltaCups * 250;
-      await ref
-          .read(progressUserControllerProvider.notifier)
-          .updateWater(deltaMl);
+      await ref.read(progressUserControllerProvider.notifier).updateWater(deltaMl);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -161,11 +153,7 @@ class WaterCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildWaterButton(
-    IconData icon,
-    VoidCallback onTap, {
-    bool isPrimary = false,
-  }) {
+  Widget _buildWaterButton(IconData icon, VoidCallback onTap, {bool isPrimary = false}) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -239,7 +227,6 @@ class _WaterCupPainter extends CustomPainter {
             : [Colors.blue.shade700, Colors.blue.shade400],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
-    // Draw Cup Background
     final path = Path()
       ..moveTo(size.width * 0.1, 0)
       ..lineTo(size.width * 0.9, 0)
@@ -249,12 +236,9 @@ class _WaterCupPainter extends CustomPainter {
 
     canvas.drawPath(path, paint);
 
-    // Draw Liquid
     if (progress > 0) {
       final liquidHeight = size.height * progress;
       final liquidTop = size.height - liquidHeight;
-
-      // Calculate liquid path based on progress (cup is wider at top)
       final liquidPath = Path()
         ..moveTo(size.width * (0.2 - (0.1 * progress)), liquidTop)
         ..lineTo(size.width * (0.8 + (0.1 * progress)), liquidTop)
@@ -263,7 +247,6 @@ class _WaterCupPainter extends CustomPainter {
         ..close();
 
       canvas.drawPath(liquidPath, liquidPaint);
-
       final surfacePaint = Paint()
         ..color = Colors.white.withValues(alpha: 0.3)
         ..style = PaintingStyle.stroke
@@ -275,11 +258,9 @@ class _WaterCupPainter extends CustomPainter {
       );
     }
 
-    // Draw Cup Outline
     canvas.drawPath(path, borderPaint);
   }
 
   @override
-  bool shouldRepaint(covariant _WaterCupPainter oldDelegate) =>
-      oldDelegate.progress != progress;
+  bool shouldRepaint(covariant _WaterCupPainter oldDelegate) => oldDelegate.progress != progress;
 }

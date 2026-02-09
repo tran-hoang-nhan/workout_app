@@ -16,7 +16,6 @@ class HealthData {
   final String wakeTime;
   final String sleepTime;
 
-
   HealthData({
     required this.userId,
     required this.age,
