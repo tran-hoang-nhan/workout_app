@@ -280,7 +280,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         onComplete: () async {
           ref.invalidate(healthDataProvider);
           ref.invalidate(hasHealthDataProvider);
-          // Preload health data sau khi hoàn thành onboarding
           await ref.read(healthDataProvider.future);
         },
       );
