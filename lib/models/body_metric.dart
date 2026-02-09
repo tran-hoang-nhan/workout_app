@@ -31,6 +31,7 @@ class BodyMetric {
       'recorded_at': recordedAt.toIso8601String(),
     };
   }
+
   BodyMetric copyWith({
     int? id,
     String? userId,
@@ -86,4 +87,3 @@ class ProgressStats {
   double get totalCaloriesCalo => totalCalories * 1000;
   double get avgCaloriesPerSessionCalo => avgCaloriesPerSession * 1000;
 }
-
