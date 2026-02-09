@@ -11,7 +11,6 @@ import 'widgets/health_form_water_goal.dart';
 import 'widgets/health_form_reminders.dart';
 import 'widgets/health_form_diet_nutrition.dart';
 
-/// Simplified UI Form component using Riverpod.
 class HealthFormUI extends ConsumerWidget {
   final TextEditingController injuryController;
   final TextEditingController conditionController;
