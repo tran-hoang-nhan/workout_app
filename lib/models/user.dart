@@ -32,18 +32,12 @@ class AppUser {
       fullName: json['full_name'] as String?,
       avatarUrl: json['avatar_url'] as String?,
       gender: json['gender'] as String?,
-      dateOfBirth: json['date_of_birth'] != null
-          ? DateTime.parse(json['date_of_birth'] as String)
-          : null,
-      weight: json['weight'] != null
-          ? (json['weight'] is int ? (json['weight'] as int).toDouble() : json['weight'] as double)
-          : null,
+      dateOfBirth: json['date_of_birth'] != null ? DateTime.parse(json['date_of_birth'] as String) : null,
+      weight: json['weight'] != null ? (json['weight'] is int ? (json['weight'] as int).toDouble() : json['weight'] as double) : null,
       age: json['age'] as int?,
       goal: json['goal'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
-          : null,
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String) : null,
     );
   }
 

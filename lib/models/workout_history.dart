@@ -26,12 +26,8 @@ class WorkoutHistory {
       workoutId: json['workout_id'],
       workoutTitleSnapshot: json['workout_title_snapshot'],
       totalCaloriesBurned: json['total_calories_burned']?.toDouble(),
-      durationSeconds: json['duration_seconds'] is int
-          ? json['duration_seconds']
-          : (json['duration_seconds'] as double?)?.toInt(),
-      completedAt: json['completed_at'] != null
-          ? DateTime.parse(json['completed_at'])
-          : DateTime.now(),
+      durationSeconds: json['duration_seconds'] is int ? json['duration_seconds'] : (json['duration_seconds'] as double?)?.toInt(),
+      completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at']) : DateTime.now(),
     );
   }
 
