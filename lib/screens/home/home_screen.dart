@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import 'widgets/ai_suggestions_section.dart';
+import 'widgets/hero_card.dart';
 
 import '../../providers/notification_provider.dart';
 import '../../providers/health_provider.dart';
@@ -224,6 +225,9 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: AppSpacing.xl),
+              // Hero Card
+              const HeroCard(),
               const SizedBox(height: AppSpacing.xl),
 
               // AI Suggestions Section
