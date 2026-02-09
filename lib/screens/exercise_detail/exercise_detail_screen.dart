@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+
 import '../../models/exercise.dart';
 import '../exercises/widgets/exercise_animation_widget.dart';
 import 'widgets/exercise_info_row.dart';
@@ -35,29 +35,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   child: ExerciseAnimationWidget(
                     animationUrl: widget.exercise.animationUrl!,
                     height: 350,
-                  ),
-                ),
-              )
-            else if (widget.exercise.thumbnailUrl != null)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: CachedNetworkImage(
-                      imageUrl: widget.exercise.thumbnailUrl!,
-                      height: 300,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: Colors.grey[200],
-                        child: const Center(child: CircularProgressIndicator()),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey[200],
-                        child: const Icon(Icons.image_not_supported, size: 48),
-                      ),
-                    ),
                   ),
                 ),
               )
@@ -120,8 +97,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     ExerciseInfoRow(
                       icon: Icons.speed,
                       label: 'Độ khó',
-                      value: LabelUtils.getWorkoutLevelLabel(widget.exercise.difficulty),
-                      valueColor: LabelUtils.getDifficultyColor(widget.exercise.difficulty),
+                      value: LabelUtils.getWorkoutLevelLabel(
+                        widget.exercise.difficulty,
+                      ),
+                      valueColor: LabelUtils.getDifficultyColor(
+                        widget.exercise.difficulty,
+                      ),
                     ),
                     const SizedBox(height: 12),
                   ],
