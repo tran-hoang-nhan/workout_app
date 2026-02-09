@@ -2,83 +2,106 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
 import '../../../providers/daily_stats_provider.dart';
+import '../../../providers/progress_provider.dart';
 import '../../../providers/health_provider.dart';
 
 class StatsSection extends ConsumerWidget {
-  const StatsSection({super.key});
+  final DateTime? date;
+  final bool showTitle;
+
+  const StatsSection({super.key, this.date, this.showTitle = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final todayStatsAsync = ref.watch(dailyStatsProvider(today));
+    final effectiveDate = date != null
+        ? DateTime(date!.year, date!.month, date!.day)
+        : DateTime(now.year, now.month, now.day);
+    final todayStatsAsync = ref.watch(dailyStatsProvider(effectiveDate));
+    final workoutStatsAsync = ref.watch(
+      dailyWorkoutStatsProvider(effectiveDate),
+    );
     final healthCalculations = ref.watch(healthCalculationsProvider);
+
+    final isToday =
+        effectiveDate.year == now.year &&
+        effectiveDate.month == now.month &&
+        effectiveDate.day == now.day;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Hoạt động hôm nay',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.black,
-            letterSpacing: -0.5,
+        if (showTitle)
+          Text(
+            isToday ? 'Hoạt động hôm nay' : 'Hoạt động ngày này',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.black,
+              letterSpacing: -0.5,
+            ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        todayStatsAsync.when(
-          data: (stats) {
-            final steps = stats?.stepsCount ?? 0;
-            final calories = stats?.activeEnergyCalo ?? 0;
-            final minutes = stats?.activeMinutes ?? 0;
-            
-            // Goals
-            const stepGoal = 10000;
-            final calorieGoal = (healthCalculations.tdee > 0 ? healthCalculations.tdee : 2000) * 1000;
-            const minuteGoal = 60;
+        if (showTitle) const SizedBox(height: AppSpacing.md),
+        workoutStatsAsync.when(
+          data: (workoutStats) {
+            return todayStatsAsync.when(
+              data: (stats) {
+                final steps = stats?.stepsCount ?? 0;
+                final calories = workoutStats.calories;
+                final minutes = workoutStats.minutes;
 
-            return Column(
-              children: [
-                _buildProgressCard(
-                  context,
-                  title: 'Calo tiêu thụ',
-                  value: calories.toStringAsFixed(0),
-                  goal: calorieGoal.toStringAsFixed(0),
-                  unit: 'calo',
-                  progress: (calories / calorieGoal).clamp(0, 1),
-                  color: const Color(0xFFFF7F00),
-                  icon: Icons.local_fire_department_rounded,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Row(
+                // Goals
+                const stepGoal = 10000;
+                final calorieGoal = healthCalculations.tdee > 0
+                    ? healthCalculations.tdee
+                    : 2000;
+                const minuteGoal = 60;
+
+                return Column(
                   children: [
-                    Expanded(
-                      child: _buildSimpleStatCard(
-                        context,
-                        title: 'Số bước',
-                        value: steps.toString(),
-                        unit: 'bước',
-                        progress: (steps / stepGoal).clamp(0, 1),
-                        color: const Color(0xFF3B82F6),
-                        icon: Icons.directions_walk_rounded,
-                      ),
+                    _buildProgressCard(
+                      context,
+                      title: 'Calo tiêu thụ',
+                      value: calories.toStringAsFixed(0),
+                      goal: calorieGoal.toStringAsFixed(0),
+                      unit: 'calo',
+                      progress: (calories / calorieGoal).clamp(0, 1),
+                      color: const Color(0xFFFF7F00),
+                      icon: Icons.local_fire_department_rounded,
                     ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: _buildSimpleStatCard(
-                        context,
-                        title: 'Tập luyện',
-                        value: minutes.toString(),
-                        unit: 'phút',
-                        progress: (minutes / minuteGoal).clamp(0, 1),
-                        color: const Color(0xFF10B981),
-                        icon: Icons.timer_rounded,
-                      ),
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSimpleStatCard(
+                            context,
+                            title: 'Số bước',
+                            value: steps.toString(),
+                            unit: 'bước',
+                            progress: (steps / stepGoal).clamp(0, 1),
+                            color: const Color(0xFF3B82F6),
+                            icon: Icons.directions_walk_rounded,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: _buildSimpleStatCard(
+                            context,
+                            title: 'Tập luyện',
+                            value: minutes.toString(),
+                            unit: 'phút',
+                            progress: (minutes / minuteGoal).clamp(0, 1),
+                            color: const Color(0xFF10B981),
+                            icon: Icons.timer_rounded,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
-                ),
-              ],
+                );
+              },
+              loading: () => _buildLoadingState(),
+              error: (_, _) => _buildErrorState(),
             );
           },
           loading: () => _buildLoadingState(),
@@ -269,9 +292,6 @@ class StatsSection extends ConsumerWidget {
   }
 
   Widget _buildErrorState() {
-    return const Center(
-      child: Text('Không thể tải dữ liệu'),
-    );
+    return const Center(child: Text('Không thể tải dữ liệu'));
   }
 }
-
