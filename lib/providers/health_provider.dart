@@ -11,6 +11,7 @@ import '../services/health_integration_service.dart';
 import '../services/notification_service.dart';
 import './progress_user_provider.dart';
 import './daily_stats_provider.dart';
+import './weight_provider.dart';
 
 final healthRepositoryProvider = Provider<HealthRepository>((ref) {
   return HealthRepository();
@@ -67,11 +68,13 @@ final healthServiceProvider = Provider<HealthService>((ref) {
   final healthIntegration = ref.watch(healthIntegrationServiceProvider);
   final notifications = ref.watch(notificationServiceProvider);
   final dailyStatsRepo = ref.watch(dailyStatsRepositoryProvider);
+  final weightRepo = ref.watch(weightRepositoryProvider);
   return HealthService(
     repository: repo,
     healthIntegration: healthIntegration,
     notifications: notifications,
     dailyStatsRepository: dailyStatsRepo,
+    weightRepository: weightRepo,
   );
 });
 
@@ -327,7 +330,12 @@ final healthCalculationsProvider = Provider<HealthCalculations>((ref) {
   final service = ref.watch(healthServiceProvider);
   final bmi = service.calculateBMI(form.weight, form.height);
   final bmiCategory = service.getBMICategory(bmi);
-  final bmr = service.calculateBMR(form.weight, form.height, form.age, form.gender,);
+  final bmr = service.calculateBMR(
+    form.weight,
+    form.height,
+    form.age,
+    form.gender,
+  );
   final tdee = service.calculateTDEE(bmr, form.activityLevel);
   final maxHR = service.calculateMaxHeartRate(form.age);
   final zone1 = service.calculateZone1(maxHR);
@@ -356,7 +364,10 @@ final hasHealthDataProvider = FutureProvider<bool>((ref) async {
 });
 
 final saveHealthProfileProvider =
-    FutureProvider.family<void, ({double height, String? gender})>((ref, params) async {
+    FutureProvider.family<void, ({double height, String? gender})>((
+      ref,
+      params,
+    ) async {
       try {
         final userId = await ref.read(currentUserIdProvider.future);
         if (userId == null) throw UnauthorizedException('Chưa đăng nhập');
@@ -369,7 +380,9 @@ final saveHealthProfileProvider =
           gender: params.gender ?? form.gender,
           goal: currentGoal,
         );
-        await ref.read(healthControllerProvider.notifier).saveFullProfile(updateParams);
+        await ref
+            .read(healthControllerProvider.notifier)
+            .saveFullProfile(updateParams);
       } catch (e, st) {
         throw handleException(e, st);
       }
