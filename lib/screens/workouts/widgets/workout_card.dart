@@ -14,22 +14,21 @@ class WorkoutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _getWorkoutColor(workout.category ?? 'default');
+    const color = Color(0xFF00C6FF); // Fixed premium color
 
     return GestureDetector(
       onTap: () {
         const encoder = JsonEncoder.withIndent('  ');
         final prettyJson = encoder.convert(workout.toJson());
-        
+
         debugPrint('============ WORKOUT CLICKED ============');
         debugPrint('Workout JSON:');
         debugPrint(prettyJson);
         debugPrint('Workout ID: ${workout.id}');
         debugPrint('Workout Title: ${workout.title}');
-        debugPrint('Workout Category: ${workout.category}');
         debugPrint('Workout Level: ${workout.level}');
         debugPrint('========================================');
-        
+
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -129,8 +128,8 @@ class WorkoutCard extends StatelessWidget {
                             color: color.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            _getWorkoutIcon(workout.category),
+                          child: const Icon(
+                            Icons.fitness_center,
                             color: color,
                             size: 24,
                           ),
@@ -160,7 +159,9 @@ class WorkoutCard extends StatelessWidget {
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 0.5,
-                                color: LabelUtils.getDifficultyColor(workout.level),
+                                color: LabelUtils.getDifficultyColor(
+                                  workout.level,
+                                ),
                               ),
                             ),
                           ),
@@ -255,55 +256,5 @@ class WorkoutCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _getWorkoutColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'chest':
-      case 'ngực':
-        return const Color(0xFF00C6FF);
-      case 'back':
-      case 'lưng':
-        return const Color(0xFF8B00FF);
-      case 'legs':
-      case 'chân':
-        return const Color(0xFFFF4B2B);
-      case 'arms':
-      case 'tay':
-        return const Color(0xFF00D98E);
-      case 'cardio':
-        return const Color(0xFFFFD700);
-      case 'hiit':
-        return const Color(0xFFFF6B6B);
-      case 'yoga':
-        return const Color(0xFF7C3AED);
-      default:
-        return const Color(0xFF00C6FF);
-    }
-  }
-
-  IconData _getWorkoutIcon(String? category) {
-    switch (category?.toLowerCase()) {
-      case 'chest':
-      case 'ngực':
-        return Icons.fitness_center;
-      case 'back':
-      case 'lưng':
-        return Icons.accessibility;
-      case 'legs':
-      case 'chân':
-        return Icons.directions_run;
-      case 'arms':
-      case 'tay':
-        return Icons.power;
-      case 'cardio':
-        return Icons.favorite;
-      case 'hiit':
-        return Icons.flash_on;
-      case 'yoga':
-        return Icons.self_improvement;
-      default:
-        return Icons.fitness_center;
-    }
   }
 }

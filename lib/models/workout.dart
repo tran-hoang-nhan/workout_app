@@ -3,10 +3,8 @@ class Workout {
   final String title;
   final String? description;
   final String? level;
-  final String? category;
   final int? estimatedDuration;
   final String? thumbnailUrl;
-  final bool isPremium;
   final int? days;
 
   Workout({
@@ -14,10 +12,8 @@ class Workout {
     required this.title,
     this.description,
     this.level,
-    this.category,
     this.estimatedDuration,
     this.thumbnailUrl,
-    this.isPremium = false,
     this.days,
   });
 
@@ -27,10 +23,8 @@ class Workout {
       title: json['title'] ?? '',
       description: json['description'],
       level: json['level'],
-      category: json['category'],
       estimatedDuration: json['estimated_duration'],
       thumbnailUrl: json['thumbnail_url'],
-      isPremium: json['is_premium'] ?? false,
       days: (() {
         final v = json['days'];
         if (v == null) return null;
@@ -53,10 +47,8 @@ class Workout {
       'title': title,
       'description': description,
       'level': level,
-      'category': category,
       'estimated_duration': estimatedDuration,
       'thumbnail_url': thumbnailUrl,
-      'is_premium': isPremium,
       'days': days,
     };
   }
@@ -66,10 +58,8 @@ class Workout {
     String? title,
     String? description,
     String? level,
-    String? category,
     int? estimatedDuration,
     String? thumbnailUrl,
-    bool? isPremium,
     int? days,
   }) {
     return Workout(
@@ -77,10 +67,8 @@ class Workout {
       title: title ?? this.title,
       description: description ?? this.description,
       level: level ?? this.level,
-      category: category ?? this.category,
       estimatedDuration: estimatedDuration ?? this.estimatedDuration,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
-      isPremium: isPremium ?? this.isPremium,
       days: days ?? this.days,
     );
   }

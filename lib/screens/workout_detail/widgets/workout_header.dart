@@ -95,18 +95,10 @@ class WorkoutHeader extends StatelessWidget {
                     ),
                 ],
               ),
-              if (workout.category != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  'Danh mục: ${workout.category}',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                ),
-              ],
             ],
           ),
         ),
       ],
     );
   }
-
 }

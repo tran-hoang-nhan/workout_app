@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
 import '../../../models/exercise.dart';
@@ -67,34 +66,6 @@ class WorkoutExerciseCard extends StatelessWidget {
                         child: ExerciseAnimationWidget(
                           animationUrl: exercise.animationUrl!,
                           height: 240,
-                        ),
-                      ),
-                    )
-                  else if (exercise.thumbnailUrl != null &&
-                      exercise.thumbnailUrl!.isNotEmpty)
-                    Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: CachedNetworkImage(
-                          imageUrl: exercise.thumbnailUrl!,
-                          height: 240,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            height: 240,
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            height: 240,
-                            color: Colors.grey[200],
-                            child: const Icon(
-                              Icons.image_not_supported,
-                              size: 40,
-                            ),
-                          ),
                         ),
                       ),
                     ),

@@ -24,7 +24,8 @@ class WorkoutSessionScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<WorkoutSessionScreen> createState() => _WorkoutSessionScreenState();
+  ConsumerState<WorkoutSessionScreen> createState() =>
+      _WorkoutSessionScreenState();
 }
 
 class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
@@ -168,11 +169,11 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     return total;
   }
 
-  double _fallbackCaloriesPerMinute(String? category) {
-    final c = (category ?? '').toLowerCase();
-    if (c.contains('hiit')) return 12;
-    if (c.contains('cardio')) return 10;
-    if (c.contains('yoga')) return 4;
+  double _fallbackCaloriesPerMinute(String title) {
+    final t = title.toLowerCase();
+    if (t.contains('hiit')) return 12;
+    if (t.contains('cardio')) return 10;
+    if (t.contains('yoga')) return 4;
     return 8;
   }
 
@@ -195,7 +196,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
 
     final basePerMinute = values.isNotEmpty
         ? values.reduce((a, b) => a + b) / values.length
-        : _fallbackCaloriesPerMinute(widget.workout.category);
+        : _fallbackCaloriesPerMinute(widget.workout.title);
 
     final weightFactor =
         (userWeightKg != null && userWeightKg > 0 && userWeightKg.isFinite)
