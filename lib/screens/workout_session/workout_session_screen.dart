@@ -206,7 +206,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     final caloriesPerSecond = (basePerMinute / 60.0) * weightFactor;
     final calories = caloriesPerSecond * activeSeconds;
     if (!calories.isFinite || calories.isNaN) return 0;
-    return double.parse(calories.toStringAsFixed(2));
+    return calories.roundToDouble();
   }
 
   Future<void> _showCompletion() async {

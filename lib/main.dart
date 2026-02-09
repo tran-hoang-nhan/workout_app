@@ -45,7 +45,8 @@ void main() async {
       anonKey: SupabaseConfig.supabaseAnonKey,
     ).timeout(
       const Duration(seconds: 10),
-      onTimeout: () => throw TimeoutException('Supabase initialization timeout', null),
+      onTimeout: () =>
+          throw TimeoutException('Supabase initialization timeout', null),
     );
     logger.i('✅ Supabase initialized successfully');
   } catch (e) {
@@ -89,11 +90,27 @@ class NotificationController {
   static Function(DateTime date)? onWaterAdded;
 
   @pragma("vm:entry-point")
-  static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
+  static Future<void> onActionReceivedMethod(
+    ReceivedAction receivedAction,
+  ) async {
     if (receivedAction.buttonKeyPressed == 'DRANK_WATER') {
       debugPrint("💧 User clicked 'Đã uống nước!'");
 
       try {
+        // Ensure dotenv and Supabase are initialized
+        if (!SupabaseConfig.isValid()) {
+          await dotenv.load(fileName: '.env');
+        }
+
+        try {
+          Supabase.instance.client;
+        } catch (_) {
+          await Supabase.initialize(
+            url: SupabaseConfig.supabaseUrl,
+            anonKey: SupabaseConfig.supabaseAnonKey,
+          );
+        }
+
         // 1. Get User ID
         final supabase = Supabase.instance.client;
         final session = supabase.auth.currentSession;
@@ -115,7 +132,7 @@ class NotificationController {
 
           debugPrint("✅ Database updated successfully!");
 
-          // 3. Trigger UI Refresh
+          // 3. Trigger UI Refresh (works if app is in foreground)
           if (onWaterAdded != null) {
             onWaterAdded!(now);
           }
@@ -151,17 +168,27 @@ class NotificationController {
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onNotificationCreatedMethod(ReceivedNotification receivedNotification) async {
-    debugPrint("🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})");
+  static Future<void> onNotificationCreatedMethod(
+    ReceivedNotification receivedNotification,
+  ) async {
+    debugPrint(
+      "🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})",
+    );
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onNotificationDisplayedMethod(ReceivedNotification receivedNotification) async {
-    debugPrint("📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})");
+  static Future<void> onNotificationDisplayedMethod(
+    ReceivedNotification receivedNotification,
+  ) async {
+    debugPrint(
+      "📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})",
+    );
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onDismissActionReceivedMethod(ReceivedAction receivedAction) async {}
+  static Future<void> onDismissActionReceivedMethod(
+    ReceivedAction receivedAction,
+  ) async {}
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -180,9 +207,12 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-      onNotificationCreatedMethod: NotificationController.onNotificationCreatedMethod,
-      onNotificationDisplayedMethod: NotificationController.onNotificationDisplayedMethod,
-      onDismissActionReceivedMethod: NotificationController.onDismissActionReceivedMethod,
+      onNotificationCreatedMethod:
+          NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod:
+          NotificationController.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod:
+          NotificationController.onDismissActionReceivedMethod,
     );
 
     NotificationController.onWaterAdded = (date) {
@@ -245,7 +275,10 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildHome(AsyncValue<bool> authState, AsyncValue<bool> hasHealthData) {
+  Widget _buildHome(
+    AsyncValue<bool> authState,
+    AsyncValue<bool> hasHealthData,
+  ) {
     if (authState.isLoading && !authState.hasValue) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }

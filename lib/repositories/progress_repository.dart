@@ -75,7 +75,7 @@ class ProgressRepository {
             'user_id': userId,
             'workout_id': workoutId,
             'workout_title_snapshot': workoutTitle,
-            'total_calories_burned': caloriesBurned * 1000,
+            'total_calories_burned': caloriesBurned,
             'duration_seconds': durationSeconds,
             'completed_at': DateTime.now().toIso8601String(),
           })
@@ -89,14 +89,14 @@ class ProgressRepository {
         await dailyRepo.updateActivityStats(
           userId: userId,
           date: date,
-          addEnergy: caloriesBurned * 1000,
+          addEnergy: caloriesBurned,
           addMinutes: (durationSeconds / 60).round(),
         );
         final userProgressRepo = ProgressUserRepository(supabase: _supabase);
         await userProgressRepo.updateActivityProgress(
           userId: userId,
           date: date,
-          addEnergy: caloriesBurned * 1000,
+          addEnergy: caloriesBurned,
           addDuration: durationSeconds,
           addWorkouts: 1,
         );

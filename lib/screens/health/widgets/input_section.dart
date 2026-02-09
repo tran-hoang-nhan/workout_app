@@ -173,28 +173,16 @@ class InputSection extends ConsumerWidget {
                     }
                     if (weight != null || height != null) {
                       try {
-                        await ref
-                            .read(healthControllerProvider.notifier)
-                            .saveQuickMetrics(weight: weight, height: height);
-
-                        // Log weight history if provided
+                        await ref.read(healthControllerProvider.notifier).saveQuickMetrics(weight: weight, height: height);
                         if (weight != null) {
                           try {
-                            final userId = ref
-                                .read(currentUserIdProvider)
-                                .value;
+                            final userId = ref.read(currentUserIdProvider).value;
                             if (userId != null) {
-                              await ref
-                                  .read(weightServiceProvider)
-                                  .logNewWeight(userId: userId, weight: weight);
-                              debugPrint(
-                                '[InputSection] Weight saved to body_metrics',
-                              );
+                              await ref.read(weightServiceProvider).logNewWeight(userId: userId, weight: weight);
+                              debugPrint('[InputSection] Weight saved to body_metrics');
                             }
                           } catch (e) {
-                            debugPrint(
-                              '[InputSection] Warning: Could not save to body_metrics: $e',
-                            );
+                            debugPrint('[InputSection] Warning: Could not save to body_metrics: $e');
                           }
                         }
 

@@ -13,30 +13,21 @@ class HealthService {
   final NotificationService _notifications;
   final DailyStatsRepository _dailyStatsRepository;
 
-  HealthService({
-    HealthRepository? repository, 
-    HealthIntegrationService? healthIntegration, 
-    NotificationService? notifications, 
-    DailyStatsRepository? dailyStatsRepository,
-  }): _repository = repository ?? HealthRepository(), 
-      _healthIntegration = healthIntegration ?? HealthIntegrationService(), 
-      _notifications = notifications ?? NotificationService(), 
-      _dailyStatsRepository = dailyStatsRepository ?? DailyStatsRepository();
+  HealthService({HealthRepository? repository,  HealthIntegrationService? healthIntegration,  NotificationService? notifications,  DailyStatsRepository? dailyStatsRepository,}): 
+    _repository = repository ?? HealthRepository(), 
+    _healthIntegration = healthIntegration ?? HealthIntegrationService(), 
+    _notifications = notifications ?? NotificationService(), 
+    _dailyStatsRepository = dailyStatsRepository ?? DailyStatsRepository();
 
   Future<HealthData?> checkHealthProfile(String userId) async {
     final profile = await _repository.getHealthData(userId);
     if (profile == null) return null;
     final steps = await _healthIntegration.getTodaySteps();
 
-    // Sync steps to daily_summaries in Supabase
     try {
       final now = DateTime.now();
       final date = DateTime(now.year, now.month, now.day);
-      await _dailyStatsRepository.updateActivityStats(
-        userId: userId,
-        date: date,
-        steps: steps,
-      );
+      await _dailyStatsRepository.updateActivityStats(userId: userId, date: date, steps: steps);
     } catch (e) {
       debugPrint('Error syncing steps to Supabase: $e');
     }
@@ -65,11 +56,7 @@ class HealthService {
     bool isGoalReached = currentWaterMl >= goalWaterMl;
     debugPrint("🔔 Syncing water reminders: enabled=$enabled, goalReached=$isGoalReached ($currentWaterMl/$goalWaterMl)");
     if (enabled && !isGoalReached) {
-      await _notifications.scheduleWaterReminder(
-        intervalHours: intervalHours,
-        wakeTime: wakeTime,
-        sleepTime: sleepTime,
-      );
+      await _notifications.scheduleWaterReminder(intervalHours: intervalHours, wakeTime: wakeTime, sleepTime: sleepTime);
     } else {
       await _notifications.cancelAllReminders();
       if (enabled && isGoalReached) {
@@ -79,11 +66,7 @@ class HealthService {
   }
 
   Future<void> updateQuickMetrics({required String userId, double? weight, double? height,}) async {
-    await _repository.updateQuickMetrics(
-      userId: userId,
-      weight: weight,
-      height: height,
-    );
+    await _repository.updateQuickMetrics(userId: userId, weight: weight, height: height);
   }
 
   Future<void> updateFullProfile(HealthUpdateParams params) async {

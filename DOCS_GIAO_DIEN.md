@@ -45,9 +45,9 @@ Hình 3.8 – Giao diện Bài tập
 ---
 
 ### Xây dựng giao diện Tiến độ
-Thay vì những bảng thống kê truyền thống, giao diện Tiến độ được nâng cấp thành một **Hành trình chinh phục**. Hệ thống Cấp độ (Level) và bộ sưu tập Huy hiệu (Badges) như "Kiên trì", "Kỷ luật", "Huyền thoại" được cá nhân hóa dựa trên số lượng bài tập hoàn thành, biến quá trình rèn luyện thành một trò chơi thú vị và đầy động lực.
+Giao diện Tiến độ cung cấp hệ thống theo dõi chỉ số vận động (calo, bước chân, thời gian) kết hợp tính năng theo dõi chạy bộ chuyên sâu. Hệ thống tích hợp cơ chế Gamification (Cấp độ/Huy hiệu) và lịch sử hoạt động chi tiết giúp trực quan hóa tiến trình rèn luyện, tạo động lực duy trì thói quen tập luyện cho người dùng.
 
-Hình 3.9 – Giao diện Tiến độ
+Hình 3.9 – Giao diện Tiến độ: Thống kê hoạt động và Hệ thống thành tích
 
 ---
 

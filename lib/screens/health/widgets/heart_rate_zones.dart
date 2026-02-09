@@ -145,13 +145,7 @@ class _HeartRateZonesState extends State<HeartRateZones>
     );
   }
 
-  Widget _buildHeartRateZoneRow(
-    String label,
-    String percentage,
-    String value,
-    Color color,
-    double progress,
-  ) {
+  Widget _buildHeartRateZoneRow(String label, String percentage, String value, Color color, double progress,) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

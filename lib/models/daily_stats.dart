@@ -36,8 +36,7 @@ class DailyStats {
       id: json['id']?.toString(),
       userId: json['user_id'] as String,
       date: DateTime.parse(json['date'] as String),
-      activeEnergyBurned:
-          (json['active_energy_burned'] as num?)?.toDouble() ?? 0,
+      activeEnergyBurned: (json['active_energy_burned'] as num?)?.toDouble() ?? 0,
       activeMinutes: json['active_minutes'] as int? ?? 0,
       stepsCount: json['steps_count'] as int? ?? 0,
       distanceMeters: (json['distance_meters'] as num?)?.toDouble() ?? 0,
@@ -46,12 +45,8 @@ class DailyStats {
       maxHeartRate: json['max_heart_rate'] as int?,
       restingHeartRate: json['resting_heart_rate'] as int?,
       heartRateZones: json['heart_rate_zones'] as Map<String, dynamic>?,
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'] as String)
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
-          : null,
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String) : null,
     );
   }
 
