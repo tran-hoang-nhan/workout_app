@@ -5,8 +5,9 @@ import '../../providers/progress_provider.dart';
 import 'widgets/history_list.dart';
 import 'widgets/progress_header.dart';
 import 'widgets/achievements_section.dart';
-import 'widgets/weekly_activity_slider.dart';
+import 'widgets/calendar_slider.dart';
 import 'widgets/running_card.dart';
+import 'widgets/stats_section.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});
@@ -36,7 +37,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
           physics: const BouncingScrollPhysics(),
           slivers: [
             const ProgressHeader(),
-            WeeklyActivitySlider(
+            CalendarSlider(
               selectedDay: _selectedDay,
               onDaySelected: (day) {
                 setState(() {
@@ -44,6 +45,13 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                 });
               },
             ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: StatsSection(date: _selectedDay, showTitle: false),
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
             const RunningCard(),
 
             // Replaced Statistics with Achievements
