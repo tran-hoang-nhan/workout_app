@@ -48,7 +48,7 @@ class WeeklyActivityChart extends StatelessWidget {
                 data: (stats) => BarChart(
                   BarChartData(
                     alignment: BarChartAlignment.spaceAround,
-                    maxY: 3000 * 1000,
+                    maxY: 3000,
                     barTouchData: BarTouchData(enabled: false),
                     titlesData: FlTitlesData(
                       show: true,
@@ -107,7 +107,7 @@ class WeeklyActivityChart extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                             backDrawRodData: BackgroundBarChartRodData(
                               show: true,
-                              toY: 3000 * 1000,
+                              toY: 3000,
                               color: AppColors.primary.withValues(alpha: 0.05),
                             ),
                           ),
