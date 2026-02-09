@@ -45,8 +45,7 @@ void main() async {
       anonKey: SupabaseConfig.supabaseAnonKey,
     ).timeout(
       const Duration(seconds: 10),
-      onTimeout: () =>
-          throw TimeoutException('Supabase initialization timeout', null),
+      onTimeout: () => throw TimeoutException('Supabase initialization timeout', null),
     );
     logger.i('✅ Supabase initialized successfully');
   } catch (e) {
@@ -87,13 +86,10 @@ void main() async {
 
 @pragma("vm:entry-point")
 class NotificationController {
-  // Callback to refresh UI
   static Function(DateTime date)? onWaterAdded;
 
   @pragma("vm:entry-point")
-  static Future<void> onActionReceivedMethod(
-    ReceivedAction receivedAction,
-  ) async {
+  static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     if (receivedAction.buttonKeyPressed == 'DRANK_WATER') {
       debugPrint("💧 User clicked 'Đã uống nước!'");
 
@@ -155,27 +151,17 @@ class NotificationController {
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onNotificationCreatedMethod(
-    ReceivedNotification receivedNotification,
-  ) async {
-    debugPrint(
-      "🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})",
-    );
+  static Future<void> onNotificationCreatedMethod(ReceivedNotification receivedNotification) async {
+    debugPrint("🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})");
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onNotificationDisplayedMethod(
-    ReceivedNotification receivedNotification,
-  ) async {
-    debugPrint(
-      "📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})",
-    );
+  static Future<void> onNotificationDisplayedMethod(ReceivedNotification receivedNotification) async {
+    debugPrint("📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})");
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onDismissActionReceivedMethod(
-    ReceivedAction receivedAction,
-  ) async {}
+  static Future<void> onDismissActionReceivedMethod(ReceivedAction receivedAction) async {}
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -190,24 +176,17 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
-    // Check for date change on startup
     ref.read(currentDateProvider.notifier).updateDate();
 
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-      onNotificationCreatedMethod:
-          NotificationController.onNotificationCreatedMethod,
-      onNotificationDisplayedMethod:
-          NotificationController.onNotificationDisplayedMethod,
-      onDismissActionReceivedMethod:
-          NotificationController.onDismissActionReceivedMethod,
+      onNotificationCreatedMethod: NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod: NotificationController.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod: NotificationController.onDismissActionReceivedMethod,
     );
 
-    // Set up callback to refresh UI when water is added from notification
     NotificationController.onWaterAdded = (date) {
       debugPrint("🔄 Refreshing UI after water notification action");
-      // Must use same date format as provider (midnight)
       final dateOnly = DateTime(date.year, date.month, date.day);
       ref.invalidate(progressDailyProvider(dateOnly));
       ref.invalidate(progressWeeklyProvider);
@@ -220,7 +199,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       }
     });
 
-    // Trigger notification sync on app launch
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(initializeNotificationProvider.future);
     });
@@ -231,9 +209,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       debugPrint("📱 App resumed: checking for date change...");
       ref.read(currentDateProvider.notifier).updateDate();
-
-      // Also potentially re-check health data sync if needed
-      // ref.read(initializeNotificationProvider.future);
     }
   }
 
@@ -270,10 +245,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildHome(
-    AsyncValue<bool> authState,
-    AsyncValue<bool> hasHealthData,
-  ) {
+  Widget _buildHome(AsyncValue<bool> authState, AsyncValue<bool> hasHealthData) {
     if (authState.isLoading && !authState.hasValue) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -317,27 +289,8 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   }
 }
 
-class AppShell extends ConsumerStatefulWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key});
-  @override
-  ConsumerState<AppShell> createState() => _AppShellState();
-}
-
-class _AppShellState extends ConsumerState<AppShell> {
-  String _activeTab = 'home';
-
-  @override
-  void initState() {
-    super.initState();
-    // Preload health data ngay khi vào app
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(healthDataProvider.future);
-    });
-  }
-
-  void _setActiveTab(String tabId) {
-    setState(() => _activeTab = tabId);
-  }
 
   Widget _buildScreen(String tabId) {
     switch (tabId) {
@@ -357,12 +310,19 @@ class _AppShellState extends ConsumerState<AppShell> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activeTab = ref.watch(navigationProvider);
+
     return Scaffold(
       body: Stack(
         children: [
-          Column(children: [Expanded(child: _buildScreen(_activeTab))]),
-          BottomNav(activeTab: _activeTab, setActiveTab: _setActiveTab),
+          Column(children: [Expanded(child: _buildScreen(activeTab))]),
+          BottomNav(
+            activeTab: activeTab,
+            setActiveTab: (tabId) {
+              ref.read(navigationProvider.notifier).setTab(tabId);
+            },
+          ),
         ],
       ),
     );

@@ -14,19 +14,12 @@ class StatsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = DateTime.now();
-    final effectiveDate = date != null
-        ? DateTime(date!.year, date!.month, date!.day)
-        : DateTime(now.year, now.month, now.day);
+    final effectiveDate = date != null ? DateTime(date!.year, date!.month, date!.day) : DateTime(now.year, now.month, now.day);
     final todayStatsAsync = ref.watch(dailyStatsProvider(effectiveDate));
-    final workoutStatsAsync = ref.watch(
-      dailyWorkoutStatsProvider(effectiveDate),
-    );
+    final workoutStatsAsync = ref.watch(dailyWorkoutStatsProvider(effectiveDate),);
     final healthCalculations = ref.watch(healthCalculationsProvider);
 
-    final isToday =
-        effectiveDate.year == now.year &&
-        effectiveDate.month == now.month &&
-        effectiveDate.day == now.day;
+    final isToday = effectiveDate.year == now.year && effectiveDate.month == now.month && effectiveDate.day == now.day;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
