@@ -10,7 +10,6 @@ class ProgressUser {
   final int waterMl;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  double get totalCaloriesCalo => totalCaloriesBurned * 1000;
 
   ProgressUser({
     this.id,
@@ -33,18 +32,22 @@ class ProgressUser {
       date: DateTime.parse(json['date'] as String),
       workoutsCompleted: json['workouts_completed'] as int? ?? 0,
       totalDurationSeconds: json['total_duration_seconds'] as int? ?? 0,
-      totalCaloriesBurned: (json['total_calories_burned'] as num?)?.toDouble() ?? 0.0,
+      totalCaloriesBurned:
+          (json['total_calories_burned'] as num?)?.toDouble() ?? 0.0,
       steps: json['steps'] as int? ?? 0,
       waterGlasses: json['water_glasses'] as int? ?? 0,
       waterMl: json['water_ml'] as int? ?? 0,
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
       'user_id': userId,
       'date': date.toIso8601String().split('T')[0],
       'workouts_completed': workoutsCompleted,

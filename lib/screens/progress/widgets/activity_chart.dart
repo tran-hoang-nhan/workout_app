@@ -95,7 +95,7 @@ class WeeklyActivityChart extends StatelessWidget {
                           .where((s) => s.date.weekday == (i + 1))
                           .toList();
                       final calories = dayStats.isNotEmpty
-                          ? dayStats.first.activeEnergyCalo
+                          ? dayStats.first.activeEnergyBurned
                           : 0.0;
                       return BarChartGroupData(
                         x: i,
