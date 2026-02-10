@@ -15,15 +15,13 @@ import 'screens/profile/profile_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/health_provider.dart';
 import 'widgets/bottom_nav.dart';
+import 'widgets/add_water_dialog.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:device_preview/device_preview.dart';
 import 'services/notification_service.dart';
-import 'repositories/progress_user_repository.dart';
 import 'providers/progress_user_provider.dart';
 import 'providers/app_state_provider.dart';
 import 'utils/logger.dart';
-import 'repositories/health_repository.dart';
-import 'services/health_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -96,73 +94,24 @@ class NotificationController {
     if (receivedAction.buttonKeyPressed == 'DRANK_WATER') {
       debugPrint("💧 User clicked 'Đã uống nước!'");
 
-      try {
-        // Ensure dotenv and Supabase are initialized
-        if (!SupabaseConfig.isValid()) {
-          await dotenv.load(fileName: '.env');
-        }
-
-        try {
-          Supabase.instance.client;
-        } catch (_) {
-          await Supabase.initialize(
-            url: SupabaseConfig.supabaseUrl,
-            anonKey: SupabaseConfig.supabaseAnonKey,
-          );
-        }
-
-        // 1. Get User ID
-        final supabase = Supabase.instance.client;
-        final session = supabase.auth.currentSession;
-        final userId = session?.user.id;
-
-        if (userId != null) {
-          debugPrint("👤 Updating water for user: $userId");
-          // 2. Update DB
-          final repo = ProgressUserRepository(supabase: supabase);
-          final now = DateTime.now();
-
-          // +250ml and +1 glass
-          await repo.updateActivityProgress(
-            userId: userId,
-            date: DateTime(now.year, now.month, now.day),
-            addWaterMl: 250,
-            addWaterGlasses: 1,
-          );
-
-          debugPrint("✅ Database updated successfully!");
-
-          // 3. Trigger UI Refresh (works if app is in foreground)
-          if (onWaterAdded != null) {
-            onWaterAdded!(now);
+      final currentContext = navigatorKey.currentContext;
+      if (currentContext != null) {
+        Future.delayed(const Duration(milliseconds: 500), () async {
+          // Re-check context validity after delay
+          if (navigatorKey.currentContext == null) return;
+          
+          final amount = await AddWaterDialog.show(currentContext);
+          if (amount != null && amount > 0) {
+            // Check context validity again after dialog close
+            if (navigatorKey.currentContext == null) return;
+            
+            final container = ProviderScope.containerOf(currentContext);
+            await container
+                .read(progressUserControllerProvider.notifier)
+                .updateWater(amount);
+            debugPrint("✅ Water updated from notification dialog: ${amount}ml");
           }
-
-          // 4. Re-sync notifications
-          final healthRepo = HealthRepository(supabase: supabase);
-          final healthService = HealthService(repository: healthRepo);
-          final healthData = await healthService.checkHealthProfile(userId);
-
-          if (healthData != null) {
-            final progress = await repo.getProgress(
-              userId,
-              DateTime(now.year, now.month, now.day),
-            );
-            await healthService.syncWaterReminders(
-              enabled: healthData.waterReminderEnabled,
-              intervalHours: healthData.waterReminderInterval,
-              wakeTime: healthData.wakeTime,
-              sleepTime: healthData.sleepTime,
-              currentWaterMl: progress?.waterMl ?? 0,
-              goalWaterMl: healthData.waterIntake,
-            );
-          }
-        } else {
-          debugPrint(
-            "⚠️ No user session found when handling notification action",
-          );
-        }
-      } catch (e) {
-        debugPrint("❌ Error handling water action: $e");
+        });
       }
     }
   }
@@ -191,6 +140,8 @@ class NotificationController {
   ) async {}
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
@@ -206,7 +157,10 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     ref.read(currentDateProvider.notifier).updateDate();
 
     AwesomeNotifications().setListeners(
-      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+      onActionReceivedMethod: (receivedAction) {
+        if (!mounted) return Future.value();
+        return NotificationController.onActionReceivedMethod(receivedAction);
+      },
       onNotificationCreatedMethod:
           NotificationController.onNotificationCreatedMethod,
       onNotificationDisplayedMethod:
@@ -271,6 +225,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           foregroundColor: AppColors.black,
         ),
       ),
+      navigatorKey: navigatorKey,
       home: _buildHome(authStateAsync, hasHealthDataAsync),
     );
   }

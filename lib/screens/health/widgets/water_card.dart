@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
 import '../../../providers/progress_user_provider.dart';
+import '../../../widgets/add_water_dialog.dart';
 
 class WaterCard extends ConsumerWidget {
   final int currentCups;
@@ -128,8 +129,17 @@ class WaterCard extends ConsumerWidget {
 
   void _updateWaterCup(BuildContext context, WidgetRef ref, int deltaCups) async {
     try {
-      final deltaMl = deltaCups * 250;
-      await ref.read(progressUserControllerProvider.notifier).updateWater(deltaMl);
+      if (deltaCups > 0) {
+        if (!context.mounted) return;
+        final amount = await AddWaterDialog.show(context);
+        if (amount != null && amount > 0 && context.mounted) {
+          await ref.read(progressUserControllerProvider.notifier).updateWater(amount);
+        }
+      } else {
+        if (currentCups <= 0) return;
+        final deltaMl = deltaCups * 250;
+        await ref.read(progressUserControllerProvider.notifier).updateWater(deltaMl);
+      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
