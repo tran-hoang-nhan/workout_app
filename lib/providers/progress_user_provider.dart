@@ -23,9 +23,19 @@ class ProgressUserController extends AsyncNotifier<void> {
       final repo = ref.read(progressUserRepositoryProvider);
       final rawNow = DateTime.now();
       final now = DateTime(rawNow.year, rawNow.month, rawNow.day);
-      final deltaGlasses = (deltaMl / 250).round();
+      
+      // Correctly handle negative delta to not go below 0
+      final prevProgress = await repo.getProgress(userId, now);
+      final currentWaterMl = prevProgress?.waterMl ?? 0;
+      
+      int actualDeltaMl = deltaMl;
+      if (currentWaterMl + deltaMl < 0) {
+        actualDeltaMl = -currentWaterMl;
+      }
+      
+      final deltaGlasses = (actualDeltaMl / 250).round();
 
-      await repo.updateActivityProgress(userId: userId, date: now, addWaterMl: deltaMl, addWaterGlasses: deltaGlasses);
+      await repo.updateActivityProgress(userId: userId, date: now, addWaterMl: actualDeltaMl, addWaterGlasses: deltaGlasses);
       ref.invalidate(progressDailyProvider(now));
 
       try {
