@@ -38,14 +38,7 @@ void main() async {
   }
 
   try {
-    await Supabase.initialize(
-      url: SupabaseConfig.supabaseUrl,
-      anonKey: SupabaseConfig.supabaseAnonKey,
-    ).timeout(
-      const Duration(seconds: 10),
-      onTimeout: () =>
-          throw TimeoutException('Supabase initialization timeout', null),
-    );
+    await Supabase.initialize(url: SupabaseConfig.supabaseUrl, anonKey: SupabaseConfig.supabaseAnonKey,).timeout(const Duration(seconds: 10), onTimeout: () => throw TimeoutException('Supabase initialization timeout', null),);
     logger.i('✅ Supabase initialized successfully');
   } catch (e) {
     logger.e('❌ Error initializing Supabase: $e');
@@ -88,27 +81,23 @@ class NotificationController {
   static Function(DateTime date)? onWaterAdded;
 
   @pragma("vm:entry-point")
-  static Future<void> onActionReceivedMethod(
-    ReceivedAction receivedAction,
-  ) async {
+  static Future<void> onActionReceivedMethod(ReceivedAction receivedAction,) async {
     if (receivedAction.buttonKeyPressed == 'DRANK_WATER') {
       debugPrint("💧 User clicked 'Đã uống nước!'");
 
-      final currentContext = navigatorKey.currentContext;
-      if (currentContext != null) {
+      if (navigatorKey.currentContext != null) {
         Future.delayed(const Duration(milliseconds: 500), () async {
-          // Re-check context validity after delay
-          if (navigatorKey.currentContext == null) return;
-          
-          final amount = await AddWaterDialog.show(currentContext);
+          final context1 = navigatorKey.currentContext;
+          if (context1 == null || !context1.mounted) return;
+
+          final amount = await AddWaterDialog.show(context1);
+
+          final context2 = navigatorKey.currentContext;
+          if (context2 == null || !context2.mounted) return;
+
           if (amount != null && amount > 0) {
-            // Check context validity again after dialog close
-            if (navigatorKey.currentContext == null) return;
-            
-            final container = ProviderScope.containerOf(currentContext);
-            await container
-                .read(progressUserControllerProvider.notifier)
-                .updateWater(amount);
+            final container = ProviderScope.containerOf(context2);
+            await container.read(progressUserControllerProvider.notifier).updateWater(amount);
             debugPrint("✅ Water updated from notification dialog: ${amount}ml");
           }
         });
@@ -117,27 +106,17 @@ class NotificationController {
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onNotificationCreatedMethod(
-    ReceivedNotification receivedNotification,
-  ) async {
-    debugPrint(
-      "🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})",
-    );
+  static Future<void> onNotificationCreatedMethod(ReceivedNotification receivedNotification,) async {
+    debugPrint("🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})");
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onNotificationDisplayedMethod(
-    ReceivedNotification receivedNotification,
-  ) async {
-    debugPrint(
-      "📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})",
-    );
+  static Future<void> onNotificationDisplayedMethod(ReceivedNotification receivedNotification,) async {
+    debugPrint("📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})");
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onDismissActionReceivedMethod(
-    ReceivedAction receivedAction,
-  ) async {}
+  static Future<void> onDismissActionReceivedMethod(ReceivedAction receivedAction,) async {}
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -161,12 +140,9 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         if (!mounted) return Future.value();
         return NotificationController.onActionReceivedMethod(receivedAction);
       },
-      onNotificationCreatedMethod:
-          NotificationController.onNotificationCreatedMethod,
-      onNotificationDisplayedMethod:
-          NotificationController.onNotificationDisplayedMethod,
-      onDismissActionReceivedMethod:
-          NotificationController.onDismissActionReceivedMethod,
+      onNotificationCreatedMethod: NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod: NotificationController.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod: NotificationController.onDismissActionReceivedMethod,
     );
 
     NotificationController.onWaterAdded = (date) {
@@ -230,10 +206,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildHome(
-    AsyncValue<bool> authState,
-    AsyncValue<bool> hasHealthData,
-  ) {
+  Widget _buildHome(AsyncValue<bool> authState, AsyncValue<bool> hasHealthData) {
     if (authState.isLoading && !authState.hasValue) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
