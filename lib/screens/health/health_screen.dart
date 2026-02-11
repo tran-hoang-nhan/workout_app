@@ -68,9 +68,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     final healthDataAsync = ref.watch(healthDataProvider);
     final calculations = ref.watch(healthCalculationsProvider);
 
-    final goalCups = (formState.waterIntake / 250).ceil();
-    final currentCups = todayProgressAsync.when(
-      data: (progress) => (progress?.waterMl ?? 0) ~/ 250,
+    final currentMl = todayProgressAsync.when(
+      data: (progress) => progress?.waterMl ?? 0,
       loading: () => 0,
       error: (_, _) => 0,
     );
@@ -150,8 +149,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                     StepCard(steps: steps, height: cardHeight),
                     const SizedBox(width: AppSpacing.md),
                     WaterCard(
-                      currentCups: currentCups,
-                      waterGoal: goalCups,
+                      currentMl: currentMl,
+                      goalMl: formState.waterIntake,
                       height: cardHeight,
                     ),
                   ],
