@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
 import '../../ai_suggestions/ai_suggestions_screen.dart';
+import '../../ai_suggestions/widgets/chat_history_screen.dart';
 
 class AISuggestionsSection extends StatelessWidget {
   const AISuggestionsSection({super.key});
@@ -41,11 +42,18 @@ class AISuggestionsSection extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: () => _navigateToAISuggestions(context),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ChatHistoryScreen(),
+                  ),
+                );
+              },
               child: const Row(
                 children: [
                   Text(
-                    'Xem tất cả',
+                    'Xem lịch sử',
                     style: TextStyle(
                       fontSize: AppFontSize.sm,
                       color: Color(0xFFFF7F00),
@@ -53,11 +61,7 @@ class AISuggestionsSection extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: AppSpacing.xs),
-                  Icon(
-                    Icons.chevron_right,
-                    color: Color(0xFFFF7F00),
-                    size: 18,
-                  ),
+                  Icon(Icons.chevron_right, color: Color(0xFFFF7F00), size: 18),
                 ],
               ),
             ),
@@ -65,7 +69,14 @@ class AISuggestionsSection extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         GestureDetector(
-          onTap: () => _navigateToAISuggestions(context),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AISuggestionsScreen(),
+              ),
+            );
+          },
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -106,7 +117,9 @@ class AISuggestionsSection extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFFFF7F00).withValues(alpha: 0.15),
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFFFF7F00).withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: const Color(0xFFFF7F00).withValues(alpha: 0.3),
+                        ),
                       ),
                       child: const Icon(
                         Icons.auto_awesome,
@@ -150,13 +163,6 @@ class AISuggestionsSection extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  void _navigateToAISuggestions(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AISuggestionsScreen()),
     );
   }
 }
