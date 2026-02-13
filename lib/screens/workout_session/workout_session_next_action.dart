@@ -20,9 +20,8 @@ WorkoutSessionNextAction computeNextAction({
   required bool inRest,
   required WorkoutItem item,
 }) {
-  final reps = item.reps ?? 0;
   final rest = item.restSeconds ?? 0;
-  if (!inRest && reps > 0 && rest > 0) {
+  if (!inRest && rest > 0) {
     return WorkoutSessionNextAction.enterRest(rest);
   }
   if (currentIndex < totalItems - 1) {
