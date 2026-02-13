@@ -8,16 +8,16 @@ import '../../../widgets/loading_animation.dart';
 class ProgressSummaryCards extends StatelessWidget {
   final AsyncValue<ProgressUser?> statsAsync;
 
-  const ProgressSummaryCards({
-    super.key,
-    required this.statsAsync,
-  });
+  const ProgressSummaryCards({super.key, required this.statsAsync});
 
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
         child: statsAsync.when(
           data: (stats) => GridView.count(
             shrinkWrap: true,
@@ -29,7 +29,7 @@ class ProgressSummaryCards extends StatelessWidget {
             children: [
               _buildStatSquare(
                 'Calo',
-                '${stats?.totalCaloriesCalo.toInt() ?? 0}',
+                '${stats?.totalCaloriesBurned.toInt() ?? 0}',
                 'calo',
                 Icons.local_fire_department,
                 AppColors.primary,
@@ -74,7 +74,13 @@ class ProgressSummaryCards extends StatelessWidget {
     );
   }
 
-  Widget _buildStatSquare(String label, String value, String unit, IconData icon, Color color) {
+  Widget _buildStatSquare(
+    String label,
+    String value,
+    String unit,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(

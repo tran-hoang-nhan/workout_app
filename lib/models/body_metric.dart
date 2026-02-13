@@ -17,9 +17,7 @@ class BodyMetric {
       userId: json['user_id'] ?? '',
       weight: (json['weight'] ?? 0).toDouble(),
       bmi: json['bmi']?.toDouble(),
-      recordedAt: json['recorded_at'] != null
-          ? DateTime.parse(json['recorded_at'])
-          : DateTime.now(),
+      recordedAt: json['recorded_at'] != null ? DateTime.parse(json['recorded_at']) : DateTime.now(),
     );
   }
   Map<String, dynamic> toJson() {
@@ -31,13 +29,8 @@ class BodyMetric {
       'recorded_at': recordedAt.toIso8601String(),
     };
   }
-  BodyMetric copyWith({
-    int? id,
-    String? userId,
-    double? weight,
-    double? bmi,
-    DateTime? recordedAt,
-  }) {
+
+  BodyMetric copyWith({int? id, String? userId, double? weight, double? bmi, DateTime? recordedAt,}) {
     return BodyMetric(
       id: id ?? this.id,
       userId: userId ?? this.userId,
@@ -83,7 +76,6 @@ class ProgressStats {
     required this.avgCaloriesPerSession,
   });
 
-  double get totalCaloriesCalo => totalCalories * 1000;
-  double get avgCaloriesPerSessionCalo => avgCaloriesPerSession * 1000;
+  double get totalCaloriesCalo => totalCalories;
+  double get avgCaloriesPerSessionCalo => avgCaloriesPerSession;
 }
-

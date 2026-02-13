@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
-import 'widgets/stats_section.dart';
 import 'widgets/ai_suggestions_section.dart';
+import 'widgets/hero_card.dart';
 
 import '../../providers/notification_provider.dart';
 import '../../providers/health_provider.dart';
+import '../../providers/progress_provider.dart';
 import '../notification/notification_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -18,12 +19,18 @@ class HomeScreen extends ConsumerWidget {
     final unreadCount = ref.watch(unreadNotificationCountProvider);
     // Sync health data to ensure correct calorie goals
     ref.watch(syncHealthProfileProvider);
-    
+    ref.watch(syncDailySummaryProvider);
+
     return Scaffold(
       backgroundColor: AppColors.bgLight,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, 90),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            90,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -42,11 +49,19 @@ class HomeScreen extends ConsumerWidget {
                               height: 40,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 1.5),
+                                border: Border.all(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  width: 1.5,
+                                ),
                                 image: DecorationImage(
-                                  image: avatarUrl != null && avatarUrl.isNotEmpty
+                                  image:
+                                      avatarUrl != null && avatarUrl.isNotEmpty
                                       ? NetworkImage(avatarUrl)
-                                      : NetworkImage('https://ui-avatars.com/api/?name=${Uri.encodeComponent(fullName)}&background=FF7F00&color=fff'),
+                                      : NetworkImage(
+                                          'https://ui-avatars.com/api/?name=${Uri.encodeComponent(fullName)}&background=FF7F00&color=fff',
+                                        ),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -57,19 +72,35 @@ class HomeScreen extends ConsumerWidget {
                             height: 40,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 1.5),
+                              border: Border.all(
+                                color: AppColors.primary.withValues(alpha: 0.2),
+                                width: 1.5,
+                              ),
                               color: AppColors.grey.withValues(alpha: 0.2),
                             ),
-                            child: const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))),
+                            child: const Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ),
                           ),
                           error: (_, _) => Container(
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 1.5),
+                              border: Border.all(
+                                color: AppColors.primary.withValues(alpha: 0.2),
+                                width: 1.5,
+                              ),
                               image: const DecorationImage(
-                                image: NetworkImage('https://ui-avatars.com/api/?name=User&background=FF7F00&color=fff'),
+                                image: NetworkImage(
+                                  'https://ui-avatars.com/api/?name=User&background=FF7F00&color=fff',
+                                ),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -157,7 +188,9 @@ class HomeScreen extends ConsumerWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const NotificationScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const NotificationScreen(),
+                        ),
                       );
                     },
                     child: Container(
@@ -165,7 +198,9 @@ class HomeScreen extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: AppColors.white,
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5)),
+                        border: Border.all(
+                          color: AppColors.cardBorder.withValues(alpha: 0.5),
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.05),
@@ -176,24 +211,28 @@ class HomeScreen extends ConsumerWidget {
                       ),
                       child: Badge(
                         isLabelVisible: unreadCount > 0,
-                        label: Text(unreadCount > 9 ? '9+' : unreadCount.toString(), style: const TextStyle(fontSize: 9)),
-                        child: const Icon(Icons.notifications_outlined, color: AppColors.black, size: 22),
+                        label: Text(
+                          unreadCount > 9 ? '9+' : unreadCount.toString(),
+                          style: const TextStyle(fontSize: 9),
+                        ),
+                        child: const Icon(
+                          Icons.notifications_outlined,
+                          color: AppColors.black,
+                          size: 22,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.xl),
-              
-              // Stats Section
-              const StatsSection(),
-              const SizedBox(height: AppSpacing.md),
-              
+              // Hero Card
+              const HeroCard(),
+              const SizedBox(height: AppSpacing.xl),
+
               // AI Suggestions Section
               const AISuggestionsSection(),
               const SizedBox(height: AppSpacing.lg),
-              
-
             ],
           ),
         ),

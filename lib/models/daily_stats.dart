@@ -13,7 +13,6 @@ class DailyStats {
   final Map<String, dynamic>? heartRateZones;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  double get activeEnergyCalo => activeEnergyBurned * 1000;
 
   DailyStats({
     this.id,
@@ -46,14 +45,13 @@ class DailyStats {
       maxHeartRate: json['max_heart_rate'] as int?,
       restingHeartRate: json['resting_heart_rate'] as int?,
       heartRateZones: json['heart_rate_zones'] as Map<String, dynamic>?,
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String): null,
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String): null,
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String) : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
       'user_id': userId,
       'date': date.toIso8601String().split('T')[0],
       'active_energy_burned': activeEnergyBurned,

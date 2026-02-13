@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+
 import '../../models/exercise.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/exercise_provider.dart';
@@ -87,33 +87,12 @@ class ExercisesListScreen extends ConsumerWidget {
                 topLeft: Radius.circular(16),
                 bottomLeft: Radius.circular(16),
               ),
-              child: exercise.thumbnailUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: exercise.thumbnailUrl!,
-                      width: 120,
-                      height: 120,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        width: 120,
-                        height: 120,
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        width: 120,
-                        height: 120,
-                        color: Colors.grey[200],
-                        child: const Icon(Icons.fitness_center, size: 40),
-                      ),
-                    )
-                  : Container(
-                      width: 120,
-                      height: 120,
-                      color: Colors.grey[200],
-                      child: const Icon(Icons.fitness_center, size: 40),
-                    ),
+              child: Container(
+                width: 120,
+                height: 120,
+                color: Colors.grey[200],
+                child: const Icon(Icons.fitness_center, size: 40),
+              ),
             ),
 
             // Info
@@ -166,7 +145,9 @@ class ExercisesListScreen extends ConsumerWidget {
                       children: [
                         if (exercise.difficulty != null) ...[
                           _buildTag(
-                            LabelUtils.getWorkoutLevelLabel(exercise.difficulty),
+                            LabelUtils.getWorkoutLevelLabel(
+                              exercise.difficulty,
+                            ),
                             LabelUtils.getDifficultyColor(exercise.difficulty),
                           ),
                           const SizedBox(width: 8),
@@ -215,5 +196,4 @@ class ExercisesListScreen extends ConsumerWidget {
       ),
     );
   }
-
 }

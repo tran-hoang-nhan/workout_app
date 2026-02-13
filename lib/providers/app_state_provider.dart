@@ -19,3 +19,16 @@ class CurrentDateNotifier extends Notifier<DateTime> {
 final currentDateProvider = NotifierProvider<CurrentDateNotifier, DateTime>(() {
   return CurrentDateNotifier();
 });
+
+class NavigationNotifier extends Notifier<String> {
+  @override
+  String build() => 'home';
+
+  void setTab(String tabId) {
+    state = tabId;
+  }
+}
+
+final navigationProvider = NotifierProvider<NavigationNotifier, String>(() {
+  return NavigationNotifier();
+});
