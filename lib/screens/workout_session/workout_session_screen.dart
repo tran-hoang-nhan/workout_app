@@ -24,7 +24,8 @@ class WorkoutSessionScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<WorkoutSessionScreen> createState() => _WorkoutSessionScreenState();
+  ConsumerState<WorkoutSessionScreen> createState() =>
+      _WorkoutSessionScreenState();
 }
 
 class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
@@ -38,7 +39,6 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   final Stopwatch _sessionStopwatch = Stopwatch();
 
   WorkoutItem get _currentItem => widget.items[_currentIndex];
-  Exercise get _currentExercise => widget.exercises[_currentIndex];
 
   @override
   void dispose() {
@@ -77,14 +77,20 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     _runTimer();
   }
 
-  void _advanceToNext() {
+  void _advanceToNext({bool autoStart = false}) {
     if (_currentIndex < widget.items.length - 1) {
+      final nextIndex = _currentIndex + 1;
+      final nextItem = widget.items[nextIndex];
+      final nextDuration = nextItem.durationSeconds ?? 0;
       setState(() {
-        _currentIndex++;
+        _currentIndex = nextIndex;
         _inRest = false;
-        _started = false;
-        _remainingSeconds = 0;
+        _started = autoStart;
+        _remainingSeconds = autoStart ? nextDuration : 0;
       });
+      if (autoStart && nextDuration > 0) {
+        _runTimer();
+      }
     } else {
       _showCompletion();
     }
@@ -103,7 +109,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
       if (action.type == WorkoutSessionNextActionType.enterRest) {
         _enterRest(action.restSeconds ?? 0);
       } else if (action.type == WorkoutSessionNextActionType.advance) {
-        _advanceToNext();
+        _advanceToNext(autoStart: _inRest);
         return;
       } else {
         _showCompletion();
@@ -133,7 +139,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
           if (action.type == WorkoutSessionNextActionType.enterRest) {
             _enterRest(action.restSeconds ?? 0);
           } else if (action.type == WorkoutSessionNextActionType.advance) {
-            _advanceToNext();
+            _advanceToNext(autoStart: _inRest);
           } else {
             _showCompletion();
           }
@@ -153,7 +159,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     if (action.type == WorkoutSessionNextActionType.enterRest) {
       _enterRest(action.restSeconds ?? 0);
     } else if (action.type == WorkoutSessionNextActionType.advance) {
-      _advanceToNext();
+      _advanceToNext(autoStart: _inRest);
     } else {
       _showCompletion();
     }
@@ -256,8 +262,11 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   @override
   Widget build(BuildContext context) {
     final item = _currentItem;
-    final ex = _currentExercise;
-    final hasDuration = (item.durationSeconds ?? 0) > 0;
+    final hasNext = _currentIndex < widget.items.length - 1;
+    final displayIndex = _inRest && hasNext ? _currentIndex + 1 : _currentIndex;
+    final displayItem = widget.items[displayIndex];
+    final displayExercise = widget.exercises[displayIndex];
+    final hasDuration = (displayItem.durationSeconds ?? 0) > 0;
     final isTimeBased = hasDuration;
 
     return Scaffold(
@@ -269,7 +278,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
             Row(
               children: [
                 Text(
-                  '${_currentIndex + 1}/${widget.items.length}',
+                  '${displayIndex + 1}/${widget.items.length}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
@@ -277,12 +286,13 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
             const SizedBox(height: 16),
             Expanded(
               child: WorkoutExerciseCard(
-                exercise: ex,
-                item: item,
+                exercise: displayExercise,
+                item: displayItem,
                 started: _started,
                 inRest: _inRest,
                 isTimeBased: isTimeBased,
                 remainingSeconds: _remainingSeconds,
+                restTotalSeconds: item.restSeconds ?? 0,
               ),
             ),
             const SizedBox(height: 16),
@@ -296,7 +306,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: Text(
-                      _started ? 'Tiếp' : 'Bắt đầu',
+                      _started ? (_inRest ? 'Bỏ qua nghỉ' : 'Tiếp') : 'Bắt đầu',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,

@@ -14,6 +14,7 @@ class WorkoutExerciseCard extends StatelessWidget {
   final bool inRest;
   final bool isTimeBased;
   final int remainingSeconds;
+  final int restTotalSeconds;
 
   const WorkoutExerciseCard({
     super.key,
@@ -23,12 +24,14 @@ class WorkoutExerciseCard extends StatelessWidget {
     required this.inRest,
     required this.isTimeBased,
     required this.remainingSeconds,
+    required this.restTotalSeconds,
   });
 
   @override
   Widget build(BuildContext context) {
     final hasDuration = (item.durationSeconds ?? 0) > 0;
     final hasReps = (item.reps ?? 0) > 0;
+    final restChipSeconds = inRest ? restTotalSeconds : (item.restSeconds ?? 0);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -128,12 +131,12 @@ class WorkoutExerciseCard extends StatelessWidget {
                             ),
                           );
                         }
-                        if ((item.restSeconds ?? 0) > 0) {
+                        if (restChipSeconds > 0) {
                           chips.add(
                             WorkoutSessionInfoChip(
                               icon: Icons.pause_circle_outline,
                               color: Colors.red,
-                              text: 'Nghỉ: ${item.restSeconds} giây',
+                              text: 'Nghỉ: $restChipSeconds giây',
                             ),
                           );
                         }
@@ -163,7 +166,7 @@ class WorkoutExerciseCard extends StatelessWidget {
                 if (inRest) {
                   return WorkoutSessionCountdownRing(
                     remainingSeconds: remainingSeconds,
-                    totalSeconds: item.restSeconds ?? 0,
+                    totalSeconds: restTotalSeconds,
                     title: 'Nghỉ',
                     color: AppColors.info,
                     icon: Icons.pause_circle_filled,

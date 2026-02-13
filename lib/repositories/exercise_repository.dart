@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/exercise.dart';
 import '../utils/storage_utils.dart';
+import '../utils/text_utils.dart';
 
 class ExerciseRepository {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -25,9 +26,15 @@ class ExerciseRepository {
 
   Future<List<Exercise>> searchExercises(String query) async {
     try {
-      final response = await _supabase.from('exercises').select().ilike('name', '%$query%').order('id', ascending: true);
+      final all = await getExercises();
+      final trimmed = query.trim();
+      if (trimmed.isEmpty) return all;
 
-      return (response as List).map((json) => Exercise.fromJson(processExerciseJson(_supabase, json as Map<String, dynamic>),),).toList();
+      return all
+          .where(
+            (e) => TextUtils.containsQuery(text: e.name, query: trimmed),
+          )
+          .toList();
     } catch (e) {
       throw Exception('Lỗi khi tìm kiếm bài tập: $e');
     }
