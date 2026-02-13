@@ -174,24 +174,13 @@ class WaterIntakeCard extends StatelessWidget {
 
   Future<void> _saveSettings(WidgetRef ref) async {
     try {
-      await ref.read(
-        saveHealthProfileProvider((
-          height: formState.height,
-          gender: null,
-        )).future,
-      );
+      await ref.read(saveHealthProfileProvider((height: formState.height, gender: null)).future);
     } catch (e) {
-      // Error handling is managed by the provider/ui usually
       debugPrint('Error saving water times: $e');
     }
   }
 
-  Widget _buildTimeSelector(
-    BuildContext context,
-    String label,
-    String currentTime,
-    Function(String) onChanged,
-  ) {
+  Widget _buildTimeSelector(BuildContext context, String label, String currentTime, Function(String) onChanged) {
     return InkWell(
       onTap: () async {
         final parts = currentTime.split(':');
@@ -219,8 +208,7 @@ class WaterIntakeCard extends StatelessWidget {
         );
 
         if (picked != null) {
-          final formattedTime =
-              '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+          final formattedTime = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
           onChanged(formattedTime);
         }
       },

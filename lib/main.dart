@@ -15,15 +15,13 @@ import 'screens/profile/profile_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/health_provider.dart';
 import 'widgets/bottom_nav.dart';
+import 'widgets/add_water_dialog.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:device_preview/device_preview.dart';
 import 'services/notification_service.dart';
-import 'repositories/progress_user_repository.dart';
 import 'providers/progress_user_provider.dart';
 import 'providers/app_state_provider.dart';
 import 'utils/logger.dart';
-import 'repositories/health_repository.dart';
-import 'services/health_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,14 +38,7 @@ void main() async {
   }
 
   try {
-    await Supabase.initialize(
-      url: SupabaseConfig.supabaseUrl,
-      anonKey: SupabaseConfig.supabaseAnonKey,
-    ).timeout(
-      const Duration(seconds: 10),
-      onTimeout: () =>
-          throw TimeoutException('Supabase initialization timeout', null),
-    );
+    await Supabase.initialize(url: SupabaseConfig.supabaseUrl, anonKey: SupabaseConfig.supabaseAnonKey,).timeout(const Duration(seconds: 10), onTimeout: () => throw TimeoutException('Supabase initialization timeout', null),);
     logger.i('✅ Supabase initialized successfully');
   } catch (e) {
     logger.e('❌ Error initializing Supabase: $e');
@@ -87,96 +78,48 @@ void main() async {
 
 @pragma("vm:entry-point")
 class NotificationController {
-  // Callback to refresh UI
   static Function(DateTime date)? onWaterAdded;
 
   @pragma("vm:entry-point")
-  static Future<void> onActionReceivedMethod(
-    ReceivedAction receivedAction,
-  ) async {
+  static Future<void> onActionReceivedMethod(ReceivedAction receivedAction,) async {
     if (receivedAction.buttonKeyPressed == 'DRANK_WATER') {
       debugPrint("💧 User clicked 'Đã uống nước!'");
 
-      try {
-        // 1. Get User ID
-        final supabase = Supabase.instance.client;
-        final session = supabase.auth.currentSession;
-        final userId = session?.user.id;
+      if (navigatorKey.currentContext != null) {
+        Future.delayed(const Duration(milliseconds: 500), () async {
+          final context1 = navigatorKey.currentContext;
+          if (context1 == null || !context1.mounted) return;
 
-        if (userId != null) {
-          debugPrint("👤 Updating water for user: $userId");
-          // 2. Update DB
-          final repo = ProgressUserRepository(supabase: supabase);
-          final now = DateTime.now();
+          final amount = await AddWaterDialog.show(context1);
 
-          // +250ml and +1 glass
-          await repo.updateActivityProgress(
-            userId: userId,
-            date: DateTime(now.year, now.month, now.day),
-            addWaterMl: 250,
-            addWaterGlasses: 1,
-          );
+          final context2 = navigatorKey.currentContext;
+          if (context2 == null || !context2.mounted) return;
 
-          debugPrint("✅ Database updated successfully!");
-
-          // 3. Trigger UI Refresh
-          if (onWaterAdded != null) {
-            onWaterAdded!(now);
+          if (amount != null && amount > 0) {
+            final container = ProviderScope.containerOf(context2);
+            await container.read(progressUserControllerProvider.notifier).updateWater(amount);
+            debugPrint("✅ Water updated from notification dialog: ${amount}ml");
           }
-
-          // 4. Re-sync notifications
-          final healthRepo = HealthRepository(supabase: supabase);
-          final healthService = HealthService(repository: healthRepo);
-          final healthData = await healthService.checkHealthProfile(userId);
-
-          if (healthData != null) {
-            final progress = await repo.getProgress(
-              userId,
-              DateTime(now.year, now.month, now.day),
-            );
-            await healthService.syncWaterReminders(
-              enabled: healthData.waterReminderEnabled,
-              intervalHours: healthData.waterReminderInterval,
-              wakeTime: healthData.wakeTime,
-              sleepTime: healthData.sleepTime,
-              currentWaterMl: progress?.waterMl ?? 0,
-              goalWaterMl: healthData.waterIntake,
-            );
-          }
-        } else {
-          debugPrint(
-            "⚠️ No user session found when handling notification action",
-          );
-        }
-      } catch (e) {
-        debugPrint("❌ Error handling water action: $e");
+        });
       }
     }
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onNotificationCreatedMethod(
-    ReceivedNotification receivedNotification,
-  ) async {
-    debugPrint(
-      "🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})",
-    );
+  static Future<void> onNotificationCreatedMethod(ReceivedNotification receivedNotification,) async {
+    debugPrint("🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})");
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onNotificationDisplayedMethod(
-    ReceivedNotification receivedNotification,
-  ) async {
-    debugPrint(
-      "📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})",
-    );
+  static Future<void> onNotificationDisplayedMethod(ReceivedNotification receivedNotification,) async {
+    debugPrint("📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})");
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onDismissActionReceivedMethod(
-    ReceivedAction receivedAction,
-  ) async {}
+  static Future<void> onDismissActionReceivedMethod(ReceivedAction receivedAction,) async {}
 }
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
@@ -190,24 +133,20 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
-    // Check for date change on startup
     ref.read(currentDateProvider.notifier).updateDate();
 
     AwesomeNotifications().setListeners(
-      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-      onNotificationCreatedMethod:
-          NotificationController.onNotificationCreatedMethod,
-      onNotificationDisplayedMethod:
-          NotificationController.onNotificationDisplayedMethod,
-      onDismissActionReceivedMethod:
-          NotificationController.onDismissActionReceivedMethod,
+      onActionReceivedMethod: (receivedAction) {
+        if (!mounted) return Future.value();
+        return NotificationController.onActionReceivedMethod(receivedAction);
+      },
+      onNotificationCreatedMethod: NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod: NotificationController.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod: NotificationController.onDismissActionReceivedMethod,
     );
 
-    // Set up callback to refresh UI when water is added from notification
     NotificationController.onWaterAdded = (date) {
       debugPrint("🔄 Refreshing UI after water notification action");
-      // Must use same date format as provider (midnight)
       final dateOnly = DateTime(date.year, date.month, date.day);
       ref.invalidate(progressDailyProvider(dateOnly));
       ref.invalidate(progressWeeklyProvider);
@@ -220,7 +159,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       }
     });
 
-    // Trigger notification sync on app launch
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(initializeNotificationProvider.future);
     });
@@ -231,9 +169,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       debugPrint("📱 App resumed: checking for date change...");
       ref.read(currentDateProvider.notifier).updateDate();
-
-      // Also potentially re-check health data sync if needed
-      // ref.read(initializeNotificationProvider.future);
     }
   }
 
@@ -266,14 +201,12 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           foregroundColor: AppColors.black,
         ),
       ),
+      navigatorKey: navigatorKey,
       home: _buildHome(authStateAsync, hasHealthDataAsync),
     );
   }
 
-  Widget _buildHome(
-    AsyncValue<bool> authState,
-    AsyncValue<bool> hasHealthData,
-  ) {
+  Widget _buildHome(AsyncValue<bool> authState, AsyncValue<bool> hasHealthData) {
     if (authState.isLoading && !authState.hasValue) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -308,7 +241,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         onComplete: () async {
           ref.invalidate(healthDataProvider);
           ref.invalidate(hasHealthDataProvider);
-          // Preload health data sau khi hoàn thành onboarding
           await ref.read(healthDataProvider.future);
         },
       );
@@ -317,27 +249,8 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   }
 }
 
-class AppShell extends ConsumerStatefulWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key});
-  @override
-  ConsumerState<AppShell> createState() => _AppShellState();
-}
-
-class _AppShellState extends ConsumerState<AppShell> {
-  String _activeTab = 'home';
-
-  @override
-  void initState() {
-    super.initState();
-    // Preload health data ngay khi vào app
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(healthDataProvider.future);
-    });
-  }
-
-  void _setActiveTab(String tabId) {
-    setState(() => _activeTab = tabId);
-  }
 
   Widget _buildScreen(String tabId) {
     switch (tabId) {
@@ -357,12 +270,19 @@ class _AppShellState extends ConsumerState<AppShell> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activeTab = ref.watch(navigationProvider);
+
     return Scaffold(
       body: Stack(
         children: [
-          Column(children: [Expanded(child: _buildScreen(_activeTab))]),
-          BottomNav(activeTab: _activeTab, setActiveTab: _setActiveTab),
+          Column(children: [Expanded(child: _buildScreen(activeTab))]),
+          BottomNav(
+            activeTab: activeTab,
+            setActiveTab: (tabId) {
+              ref.read(navigationProvider.notifier).setTab(tabId);
+            },
+          ),
         ],
       ),
     );

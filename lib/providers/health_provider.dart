@@ -10,12 +10,16 @@ import './profile_provider.dart';
 import '../services/health_integration_service.dart';
 import '../services/notification_service.dart';
 import './progress_user_provider.dart';
+import './daily_stats_provider.dart';
+import './weight_provider.dart';
 
 final healthRepositoryProvider = Provider<HealthRepository>((ref) {
   return HealthRepository();
 });
 
-final healthIntegrationServiceProvider = Provider<HealthIntegrationService>((ref,) {
+final healthIntegrationServiceProvider = Provider<HealthIntegrationService>((
+  ref,
+) {
   return HealthIntegrationService();
 });
 
@@ -39,7 +43,9 @@ final initializeNotificationProvider = FutureProvider<void>((ref) async {
         final progress = await ref.read(progressDailyProvider(now).future);
         final currentWaterMl = progress?.waterMl ?? 0;
 
-        debugPrint("📊 Health data found. Goal: ${healthData.waterIntake}ml, Current: ${currentWaterMl}ml",);
+        debugPrint(
+          "📊 Health data found. Goal: ${healthData.waterIntake}ml, Current: ${currentWaterMl}ml",
+        );
         await healthService.syncWaterReminders(
           enabled: healthData.waterReminderEnabled,
           intervalHours: healthData.waterReminderInterval,
@@ -61,10 +67,14 @@ final healthServiceProvider = Provider<HealthService>((ref) {
   final repo = ref.watch(healthRepositoryProvider);
   final healthIntegration = ref.watch(healthIntegrationServiceProvider);
   final notifications = ref.watch(notificationServiceProvider);
+  final dailyStatsRepo = ref.watch(dailyStatsRepositoryProvider);
+  final weightRepo = ref.watch(weightRepositoryProvider);
   return HealthService(
     repository: repo,
     healthIntegration: healthIntegration,
     notifications: notifications,
+    dailyStatsRepository: dailyStatsRepo,
+    weightRepository: weightRepo,
   );
 });
 
@@ -86,8 +96,10 @@ class HealthFormNotifier extends Notifier<HealthUpdateParams> {
   void setHeight(double height) => state = state.copyWith(height: height);
   void setGender(String gender) => state = state.copyWith(gender: gender);
   void setGoal(String goal) => state = state.copyWith(goal: goal);
-  void setWaterReminderEnabled(bool enabled) => state = state.copyWith(waterReminderEnabled: enabled);
-  void setWaterReminderInterval(int interval) => state = state.copyWith(waterReminderInterval: interval);
+  void setWaterReminderEnabled(bool enabled) =>
+      state = state.copyWith(waterReminderEnabled: enabled);
+  void setWaterReminderInterval(int interval) =>
+      state = state.copyWith(waterReminderInterval: interval);
   void setWakeTime(String time) => state = state.copyWith(wakeTime: time);
   void setSleepTime(String time) => state = state.copyWith(sleepTime: time);
 
@@ -105,7 +117,9 @@ class HealthFormNotifier extends Notifier<HealthUpdateParams> {
 
   void addCondition(String condition) {
     if (!state.medicalConditions.contains(condition)) {
-      state = state.copyWith(medicalConditions: [...state.medicalConditions, condition]);
+      state = state.copyWith(
+        medicalConditions: [...state.medicalConditions, condition],
+      );
     }
   }
 
@@ -115,8 +129,10 @@ class HealthFormNotifier extends Notifier<HealthUpdateParams> {
     state = state.copyWith(medicalConditions: list);
   }
 
-  void setActivityLevel(String level) => state = state.copyWith(activityLevel: level);
-  void setWaterIntake(double ml) => state = state.copyWith(waterIntake: ml.toInt());
+  void setActivityLevel(String level) =>
+      state = state.copyWith(activityLevel: level);
+  void setWaterIntake(double ml) =>
+      state = state.copyWith(waterIntake: ml.toInt());
   void setDietType(String type) => state = state.copyWith(dietType: type);
 
   void addAllergy(String allergy) {
@@ -170,9 +186,21 @@ class HealthFormNotifier extends Notifier<HealthUpdateParams> {
   }) async {
     final activityKey = _mapActivityLevel(activityLevel);
     final goalKey = _mapGoal(goal);
-    final injuriesList = injuries.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-    final conditionsList = medicalConditions.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-    final allergiesList = allergies.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    final injuriesList = injuries
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+    final conditionsList = medicalConditions
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+    final allergiesList = allergies
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
 
     final params = HealthUpdateParams(
       userId: userId,
@@ -212,8 +240,13 @@ class HealthFormNotifier extends Notifier<HealthUpdateParams> {
   }
 }
 
-final healthFormProvider = NotifierProvider<HealthFormNotifier, HealthUpdateParams>(HealthFormNotifier.new);
-final healthControllerProvider = AsyncNotifierProvider<HealthController, void>(HealthController.new);
+final healthFormProvider =
+    NotifierProvider<HealthFormNotifier, HealthUpdateParams>(
+      HealthFormNotifier.new,
+    );
+final healthControllerProvider = AsyncNotifierProvider<HealthController, void>(
+  HealthController.new,
+);
 
 class HealthController extends AsyncNotifier<void> {
   @override
@@ -243,7 +276,11 @@ class HealthController extends AsyncNotifier<void> {
         final userId = await ref.read(currentUserIdProvider.future);
         if (userId == null) throw UnauthorizedException('Chưa đăng nhập');
         final service = ref.read(healthServiceProvider);
-        await service.updateQuickMetrics(userId: userId, weight: weight, height: height);
+        await service.updateQuickMetrics(
+          userId: userId,
+          weight: weight,
+          height: height,
+        );
         ref.invalidate(healthDataProvider);
       } catch (e, st) {
         throw handleException(e, st);
@@ -293,7 +330,12 @@ final healthCalculationsProvider = Provider<HealthCalculations>((ref) {
   final service = ref.watch(healthServiceProvider);
   final bmi = service.calculateBMI(form.weight, form.height);
   final bmiCategory = service.getBMICategory(bmi);
-  final bmr = service.calculateBMR(form.weight, form.height, form.age, form.gender);
+  final bmr = service.calculateBMR(
+    form.weight,
+    form.height,
+    form.age,
+    form.gender,
+  );
   final tdee = service.calculateTDEE(bmr, form.activityLevel);
   final maxHR = service.calculateMaxHeartRate(form.age);
   final zone1 = service.calculateZone1(maxHR);
@@ -321,19 +363,27 @@ final hasHealthDataProvider = FutureProvider<bool>((ref) async {
   return healthData != null;
 });
 
-final saveHealthProfileProvider = FutureProvider.family<void, ({double height, String? gender})>((ref,params) async {
-  try {
-    final userId = await ref.read(currentUserIdProvider.future);
-    if (userId == null) {
-      throw UnauthorizedException('Chưa đăng nhập');
-    }
-    final currentUser = await ref.read(fullUserProfileProvider.future);
-    final currentGoal = currentUser?.goal ?? 'maintain';
-
-    final form = ref.read(healthFormProvider);
-    final updateParams = form.copyWith(userId: userId, height: params.height, gender: params.gender ?? form.gender, goal: currentGoal);
-    await ref.read(healthControllerProvider.notifier).saveFullProfile(updateParams);
-  } catch (e, st) {
-    throw handleException(e, st);
-  }
-});
+final saveHealthProfileProvider =
+    FutureProvider.family<void, ({double height, String? gender})>((
+      ref,
+      params,
+    ) async {
+      try {
+        final userId = await ref.read(currentUserIdProvider.future);
+        if (userId == null) throw UnauthorizedException('Chưa đăng nhập');
+        final currentUser = await ref.read(fullUserProfileProvider.future);
+        final currentGoal = currentUser?.goal ?? 'maintain';
+        final form = ref.read(healthFormProvider);
+        final updateParams = form.copyWith(
+          userId: userId,
+          height: params.height,
+          gender: params.gender ?? form.gender,
+          goal: currentGoal,
+        );
+        await ref
+            .read(healthControllerProvider.notifier)
+            .saveFullProfile(updateParams);
+      } catch (e, st) {
+        throw handleException(e, st);
+      }
+    });

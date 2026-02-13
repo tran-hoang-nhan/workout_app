@@ -10,7 +10,6 @@ class ProgressUser {
   final int waterMl;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  double get totalCaloriesCalo => totalCaloriesBurned * 1000;
 
   ProgressUser({
     this.id,
@@ -44,7 +43,6 @@ class ProgressUser {
 
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
       'user_id': userId,
       'date': date.toIso8601String().split('T')[0],
       'workouts_completed': workoutsCompleted,

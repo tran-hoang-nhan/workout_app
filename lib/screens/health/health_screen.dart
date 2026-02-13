@@ -4,7 +4,7 @@ import '../../constants/app_constants.dart';
 import '../../providers/health_provider.dart';
 import '../../models/health_params.dart';
 
-import 'health_form.dart';
+import '../health_form/health_form.dart';
 import 'widgets/health_header.dart';
 import 'widgets/health_alerts.dart';
 import 'widgets/input_section.dart';
@@ -16,7 +16,6 @@ import 'widgets/heart_rate_zones.dart';
 import 'widgets/calorie_goals.dart';
 import '../../providers/progress_user_provider.dart';
 import '../../providers/app_state_provider.dart';
-import '../../utils/ui_utils.dart';
 import '../../widgets/loading_animation.dart';
 import '../../utils/app_error.dart';
 
@@ -69,9 +68,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     final healthDataAsync = ref.watch(healthDataProvider);
     final calculations = ref.watch(healthCalculationsProvider);
 
-    final goalCups = (formState.waterIntake / 250).ceil();
-    final currentCups = todayProgressAsync.when(
-      data: (progress) => (progress?.waterMl ?? 0) ~/ 250,
+    final currentMl = todayProgressAsync.when(
+      data: (progress) => progress?.waterMl ?? 0,
       loading: () => 0,
       error: (_, _) => 0,
     );
@@ -151,8 +149,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                     StepCard(steps: steps, height: cardHeight),
                     const SizedBox(width: AppSpacing.md),
                     WaterCard(
-                      currentCups: currentCups,
-                      waterGoal: goalCups,
+                      currentMl: currentMl,
+                      goalMl: formState.waterIntake,
                       height: cardHeight,
                     ),
                   ],
@@ -219,8 +217,6 @@ class _HealthEditModalContentState
 
   @override
   Widget build(BuildContext context) {
-    final formState = ref.watch(healthFormProvider);
-
     return DraggableScrollableSheet(
       initialChildSize: 0.9,
       maxChildSize: 0.95,
@@ -234,99 +230,11 @@ class _HealthEditModalContentState
           ),
         ),
         child: HealthFormUI(
-          age: formState.age,
-          weight: formState.weight,
-          height: formState.height,
-          gender: formState.gender,
-          injuries: formState.injuries,
-          medicalConditions: formState.medicalConditions,
-          activityLevel: formState.activityLevel,
-          waterIntake: formState.waterIntake.toInt(),
-          dietType: formState.dietType,
-          allergies: formState.allergies,
-          waterReminderEnabled: formState.waterReminderEnabled,
-          waterReminderInterval: formState.waterReminderInterval,
-          wakeTime: formState.wakeTime,
-          sleepTime: formState.sleepTime,
           injuryController: injuryController,
           conditionController: conditionController,
           allergyController: allergyController,
-          isSaving: false,
-          onAgeChanged: (value) =>
-              ref.read(healthFormProvider.notifier).setAge(value),
-          onWeightChanged: (value) =>
-              ref.read(healthFormProvider.notifier).setWeight(value),
-          onHeightChanged: (value) =>
-              ref.read(healthFormProvider.notifier).setHeight(value),
-          onGenderChanged: (value) =>
-              ref.read(healthFormProvider.notifier).setGender(value),
-          onAddInjury: () {
-            if (injuryController.text.trim().isNotEmpty) {
-              ref
-                  .read(healthFormProvider.notifier)
-                  .addInjury(injuryController.text.trim());
-              injuryController.clear();
-            }
-          },
-          onRemoveInjury: (index) =>
-              ref.read(healthFormProvider.notifier).removeInjury(index),
-          onAddCondition: () {
-            if (conditionController.text.trim().isNotEmpty) {
-              ref
-                  .read(healthFormProvider.notifier)
-                  .addCondition(conditionController.text.trim());
-              conditionController.clear();
-            }
-          },
-          onRemoveCondition: (index) =>
-              ref.read(healthFormProvider.notifier).removeCondition(index),
-          onAddAllergy: () {
-            if (allergyController.text.trim().isNotEmpty) {
-              ref
-                  .read(healthFormProvider.notifier)
-                  .addAllergy(allergyController.text.trim());
-              allergyController.clear();
-            }
-          },
-          onRemoveAllergy: (index) =>
-              ref.read(healthFormProvider.notifier).removeAllergy(index),
-          onActivityLevelChanged: (value) =>
-              ref.read(healthFormProvider.notifier).setActivityLevel(value),
-          onWaterIntakeChanged: (value) => ref
-              .read(healthFormProvider.notifier)
-              .setWaterIntake(value.toDouble()),
-          onDietTypeChanged: (value) =>
-              ref.read(healthFormProvider.notifier).setDietType(value),
-          onWaterReminderEnabledChanged: (value) => ref
-              .read(healthFormProvider.notifier)
-              .setWaterReminderEnabled(value),
-          onWaterReminderIntervalChanged: (value) => ref
-              .read(healthFormProvider.notifier)
-              .setWaterReminderInterval(value),
-          onWakeTimeChanged: (value) =>
-              ref.read(healthFormProvider.notifier).setWakeTime(value),
-          onSleepTimeChanged: (value) =>
-              ref.read(healthFormProvider.notifier).setSleepTime(value),
           onClose: () => Navigator.pop(context),
-          onSave: () async {
-            try {
-              await ref.read(
-                saveHealthProfileProvider((
-                  height: formState.height,
-                  gender: null,
-                )).future,
-              );
-
-              if (context.mounted) {
-                context.showSuccess('Đã lưu thông tin sức khỏe thành công!');
-                Navigator.pop(context);
-              }
-            } catch (e) {
-              if (context.mounted) {
-                context.showError(e);
-              }
-            }
-          },
+          isSaving: false,
         ),
       ),
     );

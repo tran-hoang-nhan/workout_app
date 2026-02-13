@@ -10,16 +10,11 @@ class AppError implements Exception {
 
   AppError(this.message, {this.code, this.originalException, this.stackTrace});
 
-  /// Thông báo hiển thị cho User (Logic Dart 3)
   String get userMessage {
-    // Nếu có code, ưu tiên map code sang tiếng Việt
     if (code != null) {
       return _mapCodeToUserMessage(code!);
     }
-    // Nếu là lỗi Validation (lỗi logic form), hiển thị message gốc
     if (this is ValidationException) return message;
-    
-    // Nếu lỗi lạ (Exception kỹ thuật), không show cho user xem -> show thông báo chung
     return 'Đã có lỗi không mong muốn xảy ra. Vui lòng thử lại.';
   }
 

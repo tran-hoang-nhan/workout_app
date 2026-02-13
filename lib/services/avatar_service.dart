@@ -15,15 +15,9 @@ class AvatarService {
       final oldAvatarUrl = response?['avatar_url'] as String?;
       debugPrint('AvatarService: Existing avatar URL: $oldAvatarUrl');
       debugPrint('AvatarService: Uploading bytes for file: $fileName');
-      final storagePath = await _repository.uploadImageToStorage(
-        userId: userId,
-        bytes: bytes,
-        fileName: fileName,
-      );
-      
+      final storagePath = await _repository.uploadImageToStorage(userId: userId, bytes: bytes, fileName: fileName);
       final publicUrl = _repository.getPublicUrl(storagePath);
       debugPrint('AvatarService: New public URL: $publicUrl');
-      
       await _repository.updateProfileAvatar(userId, publicUrl);
       debugPrint('AvatarService: DB updated successfully');
 
