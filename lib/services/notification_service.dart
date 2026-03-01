@@ -63,7 +63,7 @@ class NotificationService {
       actionButtons: [
         NotificationActionButton(
           key: 'DRANK_WATER',
-          label: 'Đã uống nước!',
+          label: 'Đã uống',
           actionType: ActionType.Default,
         ),
       ],

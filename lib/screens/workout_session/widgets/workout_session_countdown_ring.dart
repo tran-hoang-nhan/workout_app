@@ -47,12 +47,19 @@ class WorkoutSessionCountdownRing extends StatelessWidget {
                 SizedBox(
                   height: 110,
                   width: 110,
-                  child: CircularProgressIndicator(
-                    value: progress,
-                    strokeWidth: 10,
-                    backgroundColor: color.withValues(alpha: 0.18),
-                    valueColor: AlwaysStoppedAnimation<Color>(color),
-                    strokeCap: StrokeCap.round,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: progress, end: progress),
+                    duration: const Duration(seconds: 1),
+                    curve: Curves.linear,
+                    builder: (context, value, child) {
+                      return CircularProgressIndicator(
+                        value: value,
+                        strokeWidth: 10,
+                        backgroundColor: color.withValues(alpha: 0.18),
+                        valueColor: AlwaysStoppedAnimation<Color>(color),
+                        strokeCap: StrokeCap.round,
+                      );
+                    },
                   ),
                 ),
                 Column(

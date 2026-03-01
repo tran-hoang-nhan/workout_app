@@ -82,10 +82,11 @@ class NotificationController {
 
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(ReceivedAction receivedAction,) async {
-    if (receivedAction.buttonKeyPressed == 'DRANK_WATER') {
-      debugPrint("💧 User clicked 'Đã uống nước!'");
-
+    if (receivedAction.buttonKeyPressed == 'DRANK_WATER' || receivedAction.buttonKeyPressed == '') {
+      debugPrint("💧 User clicked 'Đã uống' or notification body");
+      
       if (navigatorKey.currentContext != null) {
+        // Delay slightly to ensure app is in foreground and context is ready
         Future.delayed(const Duration(milliseconds: 500), () async {
           final context1 = navigatorKey.currentContext;
           if (context1 == null || !context1.mounted) return;
@@ -98,7 +99,11 @@ class NotificationController {
           if (amount != null && amount > 0) {
             final container = ProviderScope.containerOf(context2);
             await container.read(progressUserControllerProvider.notifier).updateWater(amount);
-            debugPrint("✅ Water updated from notification dialog: ${amount}ml");
+            debugPrint("✅ Water updated from notification action: ${amount}ml");
+            
+            if (onWaterAdded != null) {
+              onWaterAdded!(DateTime.now());
+            }
           }
         });
       }
