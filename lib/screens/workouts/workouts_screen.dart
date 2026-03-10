@@ -123,7 +123,6 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
       'Chân',
       'Tay',
       'Cardio',
-      'Yoga',
       'HIIT',
     ];
     return SizedBox(
