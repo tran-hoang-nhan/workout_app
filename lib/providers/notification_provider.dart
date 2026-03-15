@@ -37,14 +37,6 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
         type: NotificationType.workout,
         isRead: false,
       ),
-      NotificationModel(
-        id: '2',
-        title: 'Nhắc nhở uống nước',
-        message: 'Đã 1 giờ trôi qua, hãy bổ sung cho mình một cốc nước nhé.',
-        createdAt: DateTime.now().subtract(const Duration(hours: 1)),
-        type: NotificationType.water,
-        isRead: true,
-      ),
     ];
   }
 
