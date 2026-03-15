@@ -38,7 +38,14 @@ void main() async {
   }
 
   try {
-    await Supabase.initialize(url: SupabaseConfig.supabaseUrl, anonKey: SupabaseConfig.supabaseAnonKey,).timeout(const Duration(seconds: 10), onTimeout: () => throw TimeoutException('Supabase initialization timeout', null),);
+    await Supabase.initialize(
+      url: SupabaseConfig.supabaseUrl,
+      anonKey: SupabaseConfig.supabaseAnonKey,
+    ).timeout(
+      const Duration(seconds: 10),
+      onTimeout: () =>
+          throw TimeoutException('Supabase initialization timeout', null),
+    );
     logger.i('✅ Supabase initialized successfully');
   } catch (e) {
     logger.e('❌ Error initializing Supabase: $e');
@@ -81,26 +88,26 @@ class NotificationController {
   static Function(DateTime date)? onWaterAdded;
 
   @pragma("vm:entry-point")
-  static Future<void> onActionReceivedMethod(ReceivedAction receivedAction,) async {
-    if (receivedAction.buttonKeyPressed == 'DRANK_WATER' || receivedAction.buttonKeyPressed == '') {
+  static Future<void> onActionReceivedMethod(
+    ReceivedAction receivedAction,
+  ) async {
+    if (receivedAction.buttonKeyPressed == 'DRANK_WATER' ||
+        receivedAction.buttonKeyPressed == '') {
       debugPrint("💧 User clicked 'Đã uống' or notification body");
-      
-      if (navigatorKey.currentContext != null) {
-        // Delay slightly to ensure app is in foreground and context is ready
+
+      final context = navigatorKey.currentContext;
+      if (context != null && context.mounted) {
         Future.delayed(const Duration(milliseconds: 500), () async {
-          final context1 = navigatorKey.currentContext;
-          if (context1 == null || !context1.mounted) return;
+          if (!context.mounted) return;
 
-          final amount = await AddWaterDialog.show(context1);
-
-          final context2 = navigatorKey.currentContext;
-          if (context2 == null || !context2.mounted) return;
-
-          if (amount != null && amount > 0) {
-            final container = ProviderScope.containerOf(context2);
-            await container.read(progressUserControllerProvider.notifier).updateWater(amount);
+          final amount = await AddWaterDialog.show(context);
+          if (amount != null && amount > 0 && context.mounted) {
+            final container = ProviderScope.containerOf(context);
+            await container
+                .read(progressUserControllerProvider.notifier)
+                .updateWater(amount);
             debugPrint("✅ Water updated from notification action: ${amount}ml");
-            
+
             if (onWaterAdded != null) {
               onWaterAdded!(DateTime.now());
             }
@@ -111,17 +118,27 @@ class NotificationController {
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onNotificationCreatedMethod(ReceivedNotification receivedNotification,) async {
-    debugPrint("🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})");
+  static Future<void> onNotificationCreatedMethod(
+    ReceivedNotification receivedNotification,
+  ) async {
+    debugPrint(
+      "🔔 Notification Created: ${receivedNotification.title} (ID: ${receivedNotification.id})",
+    );
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onNotificationDisplayedMethod(ReceivedNotification receivedNotification,) async {
-    debugPrint("📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})");
+  static Future<void> onNotificationDisplayedMethod(
+    ReceivedNotification receivedNotification,
+  ) async {
+    debugPrint(
+      "📱 Notification Displayed: ${receivedNotification.title} (ID: ${receivedNotification.id})",
+    );
   }
 
   @pragma("vm:entry-point")
-  static Future<void> onDismissActionReceivedMethod(ReceivedAction receivedAction,) async {}
+  static Future<void> onDismissActionReceivedMethod(
+    ReceivedAction receivedAction,
+  ) async {}
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -145,9 +162,12 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         if (!mounted) return Future.value();
         return NotificationController.onActionReceivedMethod(receivedAction);
       },
-      onNotificationCreatedMethod: NotificationController.onNotificationCreatedMethod,
-      onNotificationDisplayedMethod: NotificationController.onNotificationDisplayedMethod,
-      onDismissActionReceivedMethod: NotificationController.onDismissActionReceivedMethod,
+      onNotificationCreatedMethod:
+          NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod:
+          NotificationController.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod:
+          NotificationController.onDismissActionReceivedMethod,
     );
 
     NotificationController.onWaterAdded = (date) {
@@ -221,23 +241,13 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         onLoginSuccess: () async {
           ref.invalidate(healthDataProvider);
           ref.invalidate(hasHealthDataProvider);
-          // Preload health data để các màn hình khác sử dụng ngay
           await ref.read(healthDataProvider.future);
           await ref.read(hasHealthDataProvider.future);
-          logger.i('Login success and health data checked.');
         },
       );
     }
     if (hasHealthData.isLoading && !hasHealthData.hasValue) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-    if (hasHealthData.hasError) {
-      return HealthOnboardingScreen(
-        onComplete: () async {
-          ref.invalidate(healthDataProvider);
-          ref.invalidate(hasHealthDataProvider);
-        },
-      );
     }
 
     final hasData = hasHealthData.value ?? false;
@@ -281,7 +291,7 @@ class AppShell extends ConsumerWidget {
     return Scaffold(
       body: Stack(
         children: [
-          Column(children: [Expanded(child: _buildScreen(activeTab))]),
+          _buildScreen(activeTab),
           BottomNav(
             activeTab: activeTab,
             setActiveTab: (tabId) {
