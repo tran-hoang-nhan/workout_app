@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared/shared.dart' as shared;
+import 'package:shared/shared.dart'
+    show AppUser, SignInParams, SignUpParams, UpdateProfileParams;
 import '../services/auth_service.dart';
-import '../models/user.dart';
-import '../models/auth.dart';
 import '../repositories/auth_repository.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -15,29 +16,39 @@ final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService(repository: repo);
 });
 
-final authStateProvider = StreamProvider<bool>((ref) async* {
+final authStateProvider = StreamProvider<shared.AuthState>((ref) {
   final authService = ref.watch(authServiceProvider);
-  yield authService.isAuthenticated;
-  await for (final state in authService.authStateStream) {
-    yield state.session != null;
-  }
+  return authService.authStateStream;
 });
 
 final currentUserIdProvider = StreamProvider<String?>((ref) async* {
+  debugPrint('[currentUserIdProvider] Initializing...');
   final authService = ref.watch(authServiceProvider);
-  yield authService.currentUser?.id;
+  final initialUser = authService.currentUser?.id;
+  debugPrint('[currentUserIdProvider] Initial user: $initialUser');
+  yield initialUser;
   await for (final state in authService.authStateStream) {
     final userId = state.session?.user.id;
-    debugPrint('[currentUserIdProvider] Auth Event: ${state.event}, User: $userId');
+    debugPrint(
+      '[currentUserIdProvider] Auth Event: ${state.event}, User: $userId',
+    );
     yield userId;
   }
 });
 
 final currentUserProvider = FutureProvider<AppUser?>((ref) async {
+  debugPrint('[currentUserProvider] Initializing...');
   final userIdAsync = await ref.watch(currentUserIdProvider.future);
-  if (userIdAsync == null) return null;
+  debugPrint('[currentUserProvider] Awaited currentUserIdProvider: $userIdAsync');
+  if (userIdAsync == null) {
+      debugPrint('[currentUserProvider] User is null, returning null.');
+      return null;
+  }
   final authService = ref.read(authServiceProvider);
-  return await authService.getUserProfile(userIdAsync);
+  debugPrint('[currentUserProvider] Fetching profile for $userIdAsync');
+  final profile = await authService.getUserProfile(userIdAsync);
+  debugPrint('[currentUserProvider] Fetched profile: ${profile != null}');
+  return profile;
 });
 
 final authControllerProvider = AsyncNotifierProvider<AuthController, void>(() {
@@ -69,7 +80,9 @@ class AuthController extends AsyncNotifier<void> {
   Future<void> updateProfile(UpdateProfileParams params) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(authServiceProvider).updateUserProfile(params);
+      final userId = await ref.read(currentUserIdProvider.future);
+      if (userId == null) return;
+      await ref.read(authServiceProvider).updateUserProfile(userId, params);
       ref.invalidate(currentUserProvider);
     });
   }
@@ -90,17 +103,25 @@ class AuthController extends AsyncNotifier<void> {
     return !result.hasError;
   }
 
-  Future<void> updatePassword(String newPassword, {String? confirmPassword}) async {
+  Future<void> updatePassword(
+    String newPassword, {
+    String? confirmPassword,
+  }) async {
     debugPrint('[AuthController] updatePassword starting...');
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final authService = ref.read(authServiceProvider);
-      await authService.updatePassword(newPassword, confirmPassword: confirmPassword);
+      await authService.updatePassword(
+        newPassword,
+        confirmPassword: confirmPassword,
+      );
       debugPrint('[AuthController] updatePassword completed successfully.');
     });
 
     if (state.hasError) {
-      debugPrint('[AuthController] updatePassword failed with error: ${state.error}');
+      debugPrint(
+        '[AuthController] updatePassword failed with error: ${state.error}',
+      );
     }
   }
 }

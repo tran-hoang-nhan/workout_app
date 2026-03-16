@@ -36,10 +36,7 @@ class HeaderWidget extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primary,
-                  AppColors.primaryDark,
-                ],
+                colors: [AppColors.primary, AppColors.primaryDark],
               ),
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
@@ -50,11 +47,7 @@ class HeaderWidget extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(
-              icons[currentStep - 1],
-              color: Colors.white,
-              size: 40,
-            ),
+            child: Icon(icons[currentStep - 1], color: Colors.white, size: 40),
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(

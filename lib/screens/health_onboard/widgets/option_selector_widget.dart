@@ -36,7 +36,8 @@ class OptionSelectorWidget extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: options.length,
-          separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
+          separatorBuilder: (context, index) =>
+              const SizedBox(height: AppSpacing.md),
           itemBuilder: (context, index) {
             final opt = options[index];
             final isSelected = selected == opt['value'];
@@ -50,10 +51,14 @@ class OptionSelectorWidget extends StatelessWidget {
                 curve: Curves.easeInOut,
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.white : AppColors.white.withValues(alpha: 0.6),
+                  color: isSelected
+                      ? AppColors.white
+                      : AppColors.white.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: isSelected ? AppColors.primary : AppColors.cardBorder.withValues(alpha: 0.5),
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.cardBorder.withValues(alpha: 0.5),
                     width: 2,
                   ),
                   boxShadow: [
@@ -77,15 +82,24 @@ class OptionSelectorWidget extends StatelessWidget {
                       width: 52,
                       height: 52,
                       decoration: BoxDecoration(
-                        color: isSelected 
-                            ? AppColors.primary.withValues(alpha: 0.1) 
+                        color: isSelected
+                            ? AppColors.primary.withValues(alpha: 0.1)
                             : AppColors.bgLight,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Center(
-                        child: icon != null 
-                            ? Icon(icon, color: isSelected ? AppColors.primary : AppColors.grey, size: 24)
-                            : Text(emoji ?? '✨', style: const TextStyle(fontSize: 24)),
+                        child: icon != null
+                            ? Icon(
+                                icon,
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.grey,
+                                size: 24,
+                              )
+                            : Text(
+                                emoji ?? '✨',
+                                style: const TextStyle(fontSize: 24),
+                              ),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.md),
@@ -98,7 +112,9 @@ class OptionSelectorWidget extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: isSelected ? AppColors.black : AppColors.black.withValues(alpha: 0.7),
+                              color: isSelected
+                                  ? AppColors.black
+                                  : AppColors.black.withValues(alpha: 0.7),
                             ),
                           ),
                           const SizedBox(height: 4),

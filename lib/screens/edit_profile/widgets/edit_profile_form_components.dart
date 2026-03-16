@@ -13,7 +13,12 @@ class EditProfileSectionTitle extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 12),
         child: Text(
           title.toUpperCase(),
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.grey, letterSpacing: 1),
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            color: AppColors.grey,
+            letterSpacing: 1,
+          ),
         ),
       ),
     );
@@ -33,7 +38,11 @@ class EditProfileInfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(children: children),
@@ -64,7 +73,14 @@ class EditProfileTextField extends StatelessWidget {
           children: [
             Icon(icon, size: 18, color: AppColors.primary),
             const SizedBox(width: 8),
-            Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.black)),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.black,
+              ),
+            ),
           ],
         ),
         TextField(

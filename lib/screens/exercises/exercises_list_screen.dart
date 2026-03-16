@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../models/exercise.dart';
+import 'package:shared/shared.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/exercise_provider.dart';
 import '../exercise_detail/exercise_detail_screen.dart';

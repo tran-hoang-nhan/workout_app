@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/workout.dart';
+import 'package:shared/shared.dart';
 import '../../workout_detail/workout_detail_screen.dart';
 
 class WorkoutSuggestionCard extends StatelessWidget {
   final Workout workout;
 
-  const WorkoutSuggestionCard({
-    super.key,
-    required this.workout,
-  });
+  const WorkoutSuggestionCard({super.key, required this.workout});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +38,11 @@ class WorkoutSuggestionCard extends StatelessWidget {
                     color: const Color(0xFFFF7F00).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.fitness_center, color: Color(0xFFFF7F00), size: 16),
+                  child: const Icon(
+                    Icons.fitness_center,
+                    color: Color(0xFFFF7F00),
+                    size: 16,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -61,7 +62,10 @@ class WorkoutSuggestionCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                _buildChip(Icons.timer_outlined, '${workout.estimatedDuration ?? 0} phút'),
+                _buildChip(
+                  Icons.timer_outlined,
+                  '${workout.estimatedDuration ?? 0} phút',
+                ),
                 const SizedBox(width: 8),
                 _buildChip(Icons.bar_chart, workout.level ?? 'Cơ bản'),
               ],
@@ -95,10 +99,7 @@ class WorkoutSuggestionCard extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: const TextStyle(
-            color: AppColors.grey,
-            fontSize: 11,
-          ),
+          style: const TextStyle(color: AppColors.grey, fontSize: 11),
         ),
       ],
     );

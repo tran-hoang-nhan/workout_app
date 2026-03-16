@@ -8,9 +8,11 @@ final avatarServiceProvider = Provider((ref) {
   return AvatarService();
 });
 
-final avatarControllerProvider = AsyncNotifierProvider<AvatarController, void>(() {
-  return AvatarController();
-});
+final avatarControllerProvider = AsyncNotifierProvider<AvatarController, void>(
+  () {
+    return AvatarController();
+  },
+);
 
 class AvatarController extends AsyncNotifier<void> {
   @override
@@ -36,14 +38,21 @@ class AvatarController extends AsyncNotifier<void> {
       final user = await ref.read(currentUserProvider.future);
       if (user == null) throw Exception('Chưa đăng nhập');
       final bytes = await image.readAsBytes();
-      final fileName = 'avatar_${DateTime.now().millisecondsSinceEpoch}_${image.name}';
-      await ref.read(avatarServiceProvider).uploadAvatar(userId: user.id, bytes: bytes, fileName: fileName);
-      debugPrint('AvatarController: Upload completed, invalidating currentUserProvider');
+      final fileName =
+          'avatar_${DateTime.now().millisecondsSinceEpoch}_${image.name}';
+      await ref
+          .read(avatarServiceProvider)
+          .uploadAvatar(userId: user.id, bytes: bytes, fileName: fileName);
+      debugPrint(
+        'AvatarController: Upload completed, invalidating currentUserProvider',
+      );
       ref.invalidate(currentUserProvider);
     });
 
     if (state.hasError) {
-      debugPrint('AvatarController Error (pickAndUploadAvatar): ${state.error}');
+      debugPrint(
+        'AvatarController Error (pickAndUploadAvatar): ${state.error}',
+      );
     }
   }
 
@@ -54,7 +63,9 @@ class AvatarController extends AsyncNotifier<void> {
       final user = await ref.read(currentUserProvider.future);
       if (user == null) throw Exception('Chưa đăng nhập');
       await ref.read(avatarServiceProvider).removeAvatar(user.id);
-      debugPrint('AvatarController: Removal completed, invalidating currentUserProvider');
+      debugPrint(
+        'AvatarController: Removal completed, invalidating currentUserProvider',
+      );
       ref.invalidate(currentUserProvider);
     });
 

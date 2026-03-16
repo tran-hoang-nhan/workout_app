@@ -1,9 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared/shared.dart';
 import '../repositories/workout_repository.dart';
 import '../services/workout_service.dart';
-import '../models/workout.dart';
-import '../models/workout_item.dart';
-import '../models/exercise.dart';
 
 final workoutRepositoryProvider = Provider<WorkoutRepository>((ref) {
   return WorkoutRepository();
@@ -18,23 +16,34 @@ final workoutsProvider = FutureProvider<List<Workout>>((ref) async {
   return await service.getAllWorkouts();
 });
 
-final workoutsByLevelProvider = FutureProvider.family<List<Workout>, String>((ref, level) async {
+final workoutsByLevelProvider = FutureProvider.family<List<Workout>, String>((
+  ref,
+  level,
+) async {
   final service = ref.watch(workoutServiceProvider);
   return await service.getWorkoutsByLevel(level);
 });
 
-final workoutDetailProvider = FutureProvider.family<({Workout workout, List<WorkoutItem> items, List<Exercise> exercises}),int>((ref, id) async {
+final workoutDetailProvider = FutureProvider.family<WorkoutDetail, int>((
+  ref,
+  id,
+) async {
   final service = ref.watch(workoutServiceProvider);
   return await service.getWorkoutDetail(id);
 });
 
-final searchWorkoutsProvider = FutureProvider.family<List<Workout>, String>((ref, query) async {
+final searchWorkoutsProvider = FutureProvider.family<List<Workout>, String>((
+  ref,
+  query,
+) async {
   if (query.isEmpty) return [];
   final service = ref.watch(workoutServiceProvider);
   return await service.searchWorkouts(query);
 });
 
-final workoutsByCategoryProvider = FutureProvider.family<List<Workout>, String>((ref, category) async {
-  final service = ref.watch(workoutServiceProvider);
-  return await service.getWorkoutsByCategory(category);
-});
+final workoutsByCategoryProvider = FutureProvider.family<List<Workout>, String>(
+  (ref, category) async {
+    final service = ref.watch(workoutServiceProvider);
+    return await service.getWorkoutsByCategory(category);
+  },
+);

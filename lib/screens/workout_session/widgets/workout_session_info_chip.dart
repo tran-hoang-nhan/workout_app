@@ -41,4 +41,3 @@ class WorkoutSessionInfoChip extends StatelessWidget {
     );
   }
 }
-

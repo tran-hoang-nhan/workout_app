@@ -54,12 +54,9 @@ class _ForgotPasswordDialogState extends ConsumerState<ForgotPasswordDialog> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(
-          content: Text('Lỗi: $e'),
-          backgroundColor: Colors.red,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
+        );
       }
     }
   }
@@ -71,7 +68,9 @@ class _ForgotPasswordDialogState extends ConsumerState<ForgotPasswordDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('Nhập email của bạn để nhận mã xác nhận đặt lại mật khẩu.'),
+          const Text(
+            'Nhập email của bạn để nhận mã xác nhận đặt lại mật khẩu.',
+          ),
           const SizedBox(height: AppSpacing.md),
           TextField(
             controller: emailController,

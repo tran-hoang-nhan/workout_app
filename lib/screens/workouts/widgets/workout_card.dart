@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/workout.dart';
+import 'package:shared/shared.dart';
 import '../../../utils/label_utils.dart';
 import '../../workout_detail/workout_detail_screen.dart';
 

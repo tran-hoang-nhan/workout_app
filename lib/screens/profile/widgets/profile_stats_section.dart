@@ -32,7 +32,12 @@ class ProfileStatsSection extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent({required String totalWorkouts, required String totalTime, required String caloriesBurned, required String streakDays,}) {
+  Widget _buildContent({
+    required String totalWorkouts,
+    required String totalTime,
+    required String caloriesBurned,
+    required String streakDays,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -97,7 +102,15 @@ class ProfileStatsSection extends ConsumerWidget {
     );
   }
 
-  Widget _buildBentoCard(String value, String label, IconData icon, Color color, {double? height, bool isCompact = false, bool isWide = false,}) {
+  Widget _buildBentoCard(
+    String value,
+    String label,
+    IconData icon,
+    Color color, {
+    double? height,
+    bool isCompact = false,
+    bool isWide = false,
+  }) {
     return Container(
       height: height,
       padding: EdgeInsets.symmetric(

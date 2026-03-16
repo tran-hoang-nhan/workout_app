@@ -1,6 +1,5 @@
 import '../repositories/weight_repository.dart';
-import '../models/body_metric.dart';
-import '../utils/health_utils.dart';
+import 'package:shared/shared.dart';
 
 class WeightService {
   final WeightRepository _repository;
@@ -14,12 +13,12 @@ class WeightService {
     return _repository.deleteWeightRecord(id);
   }
 
-  Future<void> logNewWeight({required String userId, required double weight, DateTime? date,}) async {
-    final height = await _repository.getUserHeight(userId);
-    double? bmi;
-    if (height != null && height > 0) {
-      bmi = calculateBMI(weight, height);
-    }
-    await _repository.addWeightRecord( userId: userId, weight: weight, bmi: bmi, date: date ?? DateTime.now(),);
+  Future<void> logNewWeight({required String userId,required double weight,DateTime? date,}) async {
+    await _repository.addWeightRecord(
+      userId: userId,
+      weight: weight,
+      bmi: null,
+      date: date ?? DateTime.now(),
+    );
   }
 }

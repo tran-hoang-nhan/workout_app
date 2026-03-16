@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../models/workout.dart';
-import '../../models/workout_item.dart';
-import '../../models/exercise.dart';
+import 'package:shared/shared.dart';
 import 'widgets/workout_completion_dialog.dart';
 import 'widgets/workout_exercise_card.dart';
 import 'workout_session_next_action.dart';
@@ -236,12 +234,16 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
         );
         await ref
             .read(progressRepositoryProvider)
-            .recordWorkout(
-              userId: userId,
-              workoutId: widget.workout.id,
-              workoutTitle: widget.workout.title,
-              caloriesBurned: calories,
-              durationSeconds: totalSeconds,
+            .logWorkout(
+              WorkoutHistory(
+                id: 0,
+                userId: userId,
+                workoutId: widget.workout.id,
+                workoutTitleSnapshot: widget.workout.title,
+                totalCaloriesBurned: calories,
+                durationSeconds: totalSeconds,
+                completedAt: DateTime.now(),
+              ),
             );
         ref.invalidate(progressStatsProvider);
         ref.invalidate(workoutHistoryProvider);

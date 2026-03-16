@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared/shared.dart';
 import '../../../constants/app_constants.dart';
-import '../../../providers/health_provider.dart';
 import '../../heart_rate_detail/heart_rate_detail_screen.dart';
 
 class HeartRateZones extends StatefulWidget {
@@ -145,7 +145,13 @@ class _HeartRateZonesState extends State<HeartRateZones>
     );
   }
 
-  Widget _buildHeartRateZoneRow(String label, String percentage, String value, Color color, double progress,) {
+  Widget _buildHeartRateZoneRow(
+    String label,
+    String percentage,
+    String value,
+    Color color,
+    double progress,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

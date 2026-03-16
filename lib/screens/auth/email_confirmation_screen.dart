@@ -8,16 +8,15 @@ import '../../providers/email_confirmation_provider.dart';
 class EmailConfirmationScreen extends ConsumerStatefulWidget {
   final String email;
 
-  const EmailConfirmationScreen({
-    super.key,
-    required this.email,
-  });
+  const EmailConfirmationScreen({super.key, required this.email});
 
   @override
-  ConsumerState<EmailConfirmationScreen> createState() => _EmailConfirmationScreenState();
+  ConsumerState<EmailConfirmationScreen> createState() =>
+      _EmailConfirmationScreenState();
 }
 
-class _EmailConfirmationScreenState extends ConsumerState<EmailConfirmationScreen> {
+class _EmailConfirmationScreenState
+    extends ConsumerState<EmailConfirmationScreen> {
   final _otpController = TextEditingController();
   int _resendCountdown = 0;
 
@@ -51,7 +50,9 @@ class _EmailConfirmationScreenState extends ConsumerState<EmailConfirmationScree
     }
 
     try {
-      final success = await ref.read(verifyOTPProvider(widget.email).notifier).verifyOTP(_otpController.text.trim());
+      final success = await ref
+          .read(verifyOTPProvider(widget.email).notifier)
+          .verifyOTP(_otpController.text.trim());
       if (success && mounted) {
         // Hiển thị thông báo thành công
         ScaffoldMessenger.of(context).showSnackBar(
@@ -61,7 +62,7 @@ class _EmailConfirmationScreenState extends ConsumerState<EmailConfirmationScree
             duration: Duration(seconds: 2),
           ),
         );
-        
+
         // Chờ 500ms để user thấy thông báo, sau đó pop về màn hình trước (health onboard)
         await Future.delayed(const Duration(milliseconds: 500));
         if (mounted) {
@@ -134,7 +135,10 @@ class _EmailConfirmationScreenState extends ConsumerState<EmailConfirmationScree
                       height: 1.5,
                     ),
                     children: [
-                      const TextSpan(text: 'Vui lòng nhập mã xác thực gồm 6 chữ số đã được gửi đến:\n'),
+                      const TextSpan(
+                        text:
+                            'Vui lòng nhập mã xác thực gồm 6 chữ số đã được gửi đến:\n',
+                      ),
                       TextSpan(
                         text: widget.email,
                         style: const TextStyle(
@@ -146,7 +150,7 @@ class _EmailConfirmationScreenState extends ConsumerState<EmailConfirmationScree
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
-                
+
                 // OTP Input Section
                 SizedBox(
                   width: double.infinity,
@@ -182,9 +186,9 @@ class _EmailConfirmationScreenState extends ConsumerState<EmailConfirmationScree
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: AppSpacing.xl),
-                
+
                 // Help/Tips Section
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
@@ -213,9 +217,9 @@ class _EmailConfirmationScreenState extends ConsumerState<EmailConfirmationScree
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: AppSpacing.xl),
-                
+
                 if (_resendCountdown > 0)
                   Center(
                     child: Text(
@@ -232,7 +236,11 @@ class _EmailConfirmationScreenState extends ConsumerState<EmailConfirmationScree
                       onPressed: isLoading
                           ? null
                           : () {
-                              ref.read(resendEmailProvider(widget.email).notifier).resendEmail();
+                              ref
+                                  .read(
+                                    resendEmailProvider(widget.email).notifier,
+                                  )
+                                  .resendEmail();
                               _startResendCountdown();
                             },
                       child: const Text(

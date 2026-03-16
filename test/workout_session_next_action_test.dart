@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:workout_app/models/workout_item.dart';
+import 'package:shared/shared.dart';
 import 'package:workout_app/screens/workout_session/workout_session_next_action.dart';
 
 void main() {
@@ -48,4 +48,3 @@ void main() {
     });
   });
 }
-

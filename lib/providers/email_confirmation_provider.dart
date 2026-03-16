@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/email_confirmation_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 final emailConfirmationServiceProvider = Provider((ref) {
   return EmailConfirmationService();
 });
 
-final verifyOTPProvider = NotifierProvider.family<OTPNotifier, bool, String>(OTPNotifier.new);
+final verifyOTPProvider = NotifierProvider.family<OTPNotifier, bool, String>(
+  OTPNotifier.new,
+);
+
 class OTPNotifier extends Notifier<bool> {
   final String email;
   OTPNotifier(this.email);
@@ -20,18 +22,20 @@ class OTPNotifier extends Notifier<bool> {
 
   Future<bool> verifyOTP(String token) async {
     state = true;
-    try { 
-      await _service.verifyOTP(email: email, token: token, type: OtpType.signup);
+    try {
+      await _service.verifyOTP(email: email, token: token, type: 'signup');
       state = false;
-      return true; 
+      return true;
     } catch (e) {
       state = false;
-      rethrow; 
+      rethrow;
     }
   }
 }
 
-final resendEmailProvider = NotifierProvider.family<ResendNotifier, bool, String>(ResendNotifier.new);
+final resendEmailProvider =
+    NotifierProvider.family<ResendNotifier, bool, String>(ResendNotifier.new);
+
 class ResendNotifier extends Notifier<bool> {
   final String email;
   ResendNotifier(this.email);

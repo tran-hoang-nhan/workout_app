@@ -1,16 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/material.dart';
+import 'package:shared/shared.dart';
 import '../repositories/progress_user_repository.dart';
-import '../models/progress_user.dart';
 import './auth_provider.dart';
 import '../utils/app_error.dart';
 import './health_provider.dart';
 import './daily_stats_provider.dart';
 import './notification_provider.dart';
 
-final progressUserControllerProvider = AsyncNotifierProvider<ProgressUserController, void>(() {
-  return ProgressUserController();
-});
+final progressUserControllerProvider =
+    AsyncNotifierProvider<ProgressUserController, void>(() {
+      return ProgressUserController();
+    });
 
 class ProgressUserController extends AsyncNotifier<void> {
   @override
@@ -23,28 +24,35 @@ class ProgressUserController extends AsyncNotifier<void> {
       final repo = ref.read(progressUserRepositoryProvider);
       final rawNow = DateTime.now();
       final now = DateTime(rawNow.year, rawNow.month, rawNow.day);
-      
+
       // Correctly handle negative delta to not go below 0
-      final prevProgress = await repo.getProgress(userId, now);
+      final prevProgress = await repo.getDailyProgress(userId, now);
       final currentWaterMl = prevProgress?.waterMl ?? 0;
-      
+
       int actualDeltaMl = deltaMl;
       if (currentWaterMl + deltaMl < 0) {
         actualDeltaMl = -currentWaterMl;
       }
-      
+
       final deltaGlasses = (actualDeltaMl / 250).round();
 
-      await repo.updateActivityProgress(userId: userId, date: now, addWaterMl: actualDeltaMl, addWaterGlasses: deltaGlasses);
+      await repo.updateActivityProgress(
+        userId: userId,
+        date: now,
+        addWaterMl: actualDeltaMl,
+        addWaterGlasses: deltaGlasses,
+      );
       ref.invalidate(progressDailyProvider(now));
 
       try {
         final healthService = ref.read(healthServiceProvider);
         final healthData = await healthService.checkHealthProfile(userId);
         if (healthData != null) {
-          final prevProgress = await repo.getProgress(userId, now);
-          final currentWaterMl = (prevProgress?.waterMl ?? 0);  
-          debugPrint("💧 Syncing reminders after manual input: newTotal=${currentWaterMl}ml");      
+          final prevProgress = await repo.getDailyProgress(userId, now);
+          final currentWaterMl = (prevProgress?.waterMl ?? 0);
+          debugPrint(
+            "💧 Syncing reminders after manual input: newTotal=${currentWaterMl}ml",
+          );
           await healthService.syncWaterReminders(
             enabled: healthData.waterReminderEnabled,
             intervalHours: healthData.waterReminderInterval,
@@ -73,10 +81,18 @@ class ProgressUserController extends AsyncNotifier<void> {
       final repo = ref.read(progressUserRepositoryProvider);
       final rawNow = DateTime.now();
       final now = DateTime(rawNow.year, rawNow.month, rawNow.day);
-      await repo.updateActivityProgress(userId: userId, date: now, addSteps: deltaSteps);
+      await repo.updateActivityProgress(
+        userId: userId,
+        date: now,
+        addSteps: deltaSteps,
+      );
       try {
         final dailyRepo = ref.read(dailyStatsRepositoryProvider);
-        await dailyRepo.updateActivityStats(userId: userId, date: now, steps: deltaSteps);
+        await dailyRepo.updateActivityStats(
+          userId: userId,
+          date: now,
+          steps: deltaSteps,
+        );
         ref.invalidate(dailyStatsProvider(now));
       } catch (e) {
         debugPrint('Error syncing daily steps: $e');
@@ -92,12 +108,15 @@ final progressUserRepositoryProvider = Provider<ProgressUserRepository>((ref) {
   return ProgressUserRepository();
 });
 
-final progressDailyProvider = FutureProvider.family<ProgressUser?, DateTime>((ref, rawDate) async {
+final progressDailyProvider = FutureProvider.family<ProgressUser?, DateTime>((
+  ref,
+  rawDate,
+) async {
   final date = DateTime(rawDate.year, rawDate.month, rawDate.day);
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) return null;
   final repo = ref.watch(progressUserRepositoryProvider);
-  return await repo.getProgress(userId, date);
+  return await repo.getDailyProgress(userId, date);
 });
 
 final progressWeeklyProvider = FutureProvider<List<ProgressUser>>((ref) async {

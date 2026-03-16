@@ -3,7 +3,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
-import '../../models/auth.dart';
+import 'package:shared/shared.dart';
 import '../../utils/app_error.dart';
 import 'register_screen.dart';
 import 'email_confirmation_screen.dart';
@@ -57,20 +57,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final authState = ref.read(authControllerProvider);
       if (authState.hasError) {
         final error = authState.error;
-        final errorMessage = error is AppError ? error.userMessage : error.toString();
-        
+        final errorMessage = error is AppError
+            ? error.userMessage
+            : error.toString();
+
         // Kiểm tra nếu lỗi là chưa xác nhận email
         if (error is AppError && error.code == 'email_not_confirmed') {
           final email = emailController.text.trim();
-          
+
           if (mounted) {
             // Tự động gửi lại mã xác nhận
             ref.read(resendEmailProvider(email).notifier).resendEmail();
-            
+
             // Thông báo cho user
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Tài khoản chưa xác thực. Đang gửi lại mã xác nhận...'),
+                content: Text(
+                  'Tài khoản chưa xác thực. Đang gửi lại mã xác nhận...',
+                ),
                 backgroundColor: AppColors.info,
               ),
             );
@@ -95,12 +99,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } catch (e) {
       if (mounted) {
         final errorMessage = e is AppError ? e.userMessage : e.toString();
-        
+
         // Tương tự, kiểm tra lỗi ném ra từ catch (nếu có)
         if (e is AppError && e.code == 'email_not_confirmed') {
-           final email = emailController.text.trim();
-           ref.read(resendEmailProvider(email).notifier).resendEmail();
-           Navigator.of(context).push(
+          final email = emailController.text.trim();
+          ref.read(resendEmailProvider(email).notifier).resendEmail();
+          Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => EmailConfirmationScreen(email: email),
             ),

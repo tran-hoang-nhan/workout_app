@@ -3,11 +3,8 @@ import '../../../constants/app_constants.dart';
 
 class AchievementsSection extends StatelessWidget {
   final int totalWorkouts;
-  
-  const AchievementsSection({
-    super.key,
-    required this.totalWorkouts,
-  });
+
+  const AchievementsSection({super.key, required this.totalWorkouts});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +14,10 @@ class AchievementsSection extends StatelessWidget {
 
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -58,7 +58,11 @@ class AchievementsSection extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.workspace_premium, color: Colors.white, size: 30),
+                        child: const Icon(
+                          Icons.workspace_premium,
+                          color: Colors.white,
+                          size: 30,
+                        ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -92,7 +96,9 @@ class AchievementsSection extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: progressInLevel,
                       backgroundColor: Colors.white.withValues(alpha: 0.2),
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.white,
+                      ),
                       minHeight: 10,
                     ),
                   ),
@@ -137,11 +143,36 @@ class AchievementsSection extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
                 children: [
-                  _buildBadge('Người mới', Icons.star, Colors.amber, totalWorkouts >= 1),
-                  _buildBadge('Kiên trì', Icons.bolt, Colors.orange, totalWorkouts >= 5),
-                  _buildBadge('Kỷ luật', Icons.shield, Colors.blue, totalWorkouts >= 10),
-                  _buildBadge('Vô địch', Icons.emoji_events, Colors.purple, totalWorkouts >= 20),
-                  _buildBadge('Huyền thoại', Icons.local_fire_department, Colors.red, totalWorkouts >= 50),
+                  _buildBadge(
+                    'Người mới',
+                    Icons.star,
+                    Colors.amber,
+                    totalWorkouts >= 1,
+                  ),
+                  _buildBadge(
+                    'Kiên trì',
+                    Icons.bolt,
+                    Colors.orange,
+                    totalWorkouts >= 5,
+                  ),
+                  _buildBadge(
+                    'Kỷ luật',
+                    Icons.shield,
+                    Colors.blue,
+                    totalWorkouts >= 10,
+                  ),
+                  _buildBadge(
+                    'Vô địch',
+                    Icons.emoji_events,
+                    Colors.purple,
+                    totalWorkouts >= 20,
+                  ),
+                  _buildBadge(
+                    'Huyền thoại',
+                    Icons.local_fire_department,
+                    Colors.red,
+                    totalWorkouts >= 50,
+                  ),
                 ],
               ),
             ),
@@ -160,14 +191,18 @@ class AchievementsSection extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: unlocked ? color.withValues(alpha: 0.1) : Colors.grey.shade100,
+              color: unlocked
+                  ? color.withValues(alpha: 0.1)
+                  : Colors.grey.shade100,
               shape: BoxShape.circle,
-              border: unlocked ? Border.all(color: color.withValues(alpha: 0.3), width: 2) : null,
+              border: unlocked
+                  ? Border.all(color: color.withValues(alpha: 0.3), width: 2)
+                  : null,
             ),
             child: Icon(
-              icon, 
-              color: unlocked ? color : Colors.grey.shade400, 
-              size: 24
+              icon,
+              color: unlocked ? color : Colors.grey.shade400,
+              size: 24,
             ),
           ),
           const SizedBox(height: 8),

@@ -11,10 +11,12 @@ class PasswordRecoveryScreen extends ConsumerStatefulWidget {
   const PasswordRecoveryScreen({super.key, required this.email});
 
   @override
-  ConsumerState<PasswordRecoveryScreen> createState() => _PasswordRecoveryScreenState();
+  ConsumerState<PasswordRecoveryScreen> createState() =>
+      _PasswordRecoveryScreenState();
 }
 
-class _PasswordRecoveryScreenState extends ConsumerState<PasswordRecoveryScreen> {
+class _PasswordRecoveryScreenState
+    extends ConsumerState<PasswordRecoveryScreen> {
   final _otpController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
@@ -53,7 +55,9 @@ class _PasswordRecoveryScreenState extends ConsumerState<PasswordRecoveryScreen>
       return;
     }
 
-    final success = await ref.read(authControllerProvider.notifier).verifyRecoveryOTP(widget.email, otp);
+    final success = await ref
+        .read(authControllerProvider.notifier)
+        .verifyRecoveryOTP(widget.email, otp);
     if (success) {
       setState(() => _otpVerified = true);
     } else {
@@ -81,11 +85,13 @@ class _PasswordRecoveryScreenState extends ConsumerState<PasswordRecoveryScreen>
     try {
       await ref.read(authControllerProvider.notifier).updatePassword(password);
       await ref.read(authControllerProvider.notifier).signOut();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Mật khẩu đã được cập nhật thành công! Vui lòng đăng nhập lại.'),
+            content: Text(
+              'Mật khẩu đã được cập nhật thành công! Vui lòng đăng nhập lại.',
+            ),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 3),
           ),
@@ -94,12 +100,9 @@ class _PasswordRecoveryScreenState extends ConsumerState<PasswordRecoveryScreen>
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(
-          content: Text('Lỗi: $e'),
-          backgroundColor: Colors.red,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
+        );
       }
     }
   }
@@ -193,7 +196,9 @@ class _PasswordRecoveryScreenState extends ConsumerState<PasswordRecoveryScreen>
         else
           TextButton(
             onPressed: () {
-              ref.read(authControllerProvider.notifier).resetPassword(widget.email);
+              ref
+                  .read(authControllerProvider.notifier)
+                  .resetPassword(widget.email);
               _startResendCountdown();
             },
             child: const Text('Gửi lại mã xác nhận'),

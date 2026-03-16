@@ -20,7 +20,14 @@ class EditProfileGenderSelector extends StatelessWidget {
           children: [
             Icon(Icons.wc_rounded, size: 18, color: AppColors.primary),
             SizedBox(width: 8),
-            Text('Giới tính', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.black)),
+            Text(
+              'Giới tính',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.black,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 12),
@@ -70,7 +77,9 @@ class _GenderButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected ? AppColors.primary : AppColors.bgLight,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isSelected ? AppColors.primary : AppColors.cardBorder),
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.cardBorder,
+            ),
           ),
           child: Center(
             child: Text(

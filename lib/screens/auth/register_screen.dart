@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
-import '../../models/auth.dart';
+import 'package:shared/shared.dart';
 import '../../utils/app_error.dart';
 import '../../widgets/loading_animation.dart';
 import 'login_screen.dart';
@@ -374,7 +374,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
-  Widget _buildInputField({required String label, required IconData icon, required TextEditingController controller, required String placeholder, TextInputType keyboardType = TextInputType.text, Iterable<String>? autofillHints}) {
+  Widget _buildInputField({
+    required String label,
+    required IconData icon,
+    required TextEditingController controller,
+    required String placeholder,
+    TextInputType keyboardType = TextInputType.text,
+    Iterable<String>? autofillHints,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -414,7 +421,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
-  Widget _buildPasswordField({required String label, required TextEditingController controller, required bool showPassword, required VoidCallback onToggle, Iterable<String>? autofillHints}) {
+  Widget _buildPasswordField({
+    required String label,
+    required TextEditingController controller,
+    required bool showPassword,
+    required VoidCallback onToggle,
+    Iterable<String>? autofillHints,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

@@ -68,7 +68,10 @@ class _NumberFieldWidgetState extends State<NumberFieldWidget> {
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5), width: 2),
+            border: Border.all(
+              color: AppColors.cardBorder.withValues(alpha: 0.5),
+              width: 2,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.03),
@@ -90,8 +93,15 @@ class _NumberFieldWidgetState extends State<NumberFieldWidget> {
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(vertical: 20),
               hintText: 'Nhập giá trị...',
-              hintStyle: TextStyle(color: AppColors.grey.withValues(alpha: 0.5), fontWeight: FontWeight.normal),
-              suffixIcon: Icon(Icons.edit_outlined, color: AppColors.primary.withValues(alpha: 0.5), size: 20),
+              hintStyle: TextStyle(
+                color: AppColors.grey.withValues(alpha: 0.5),
+                fontWeight: FontWeight.normal,
+              ),
+              suffixIcon: Icon(
+                Icons.edit_outlined,
+                color: AppColors.primary.withValues(alpha: 0.5),
+                size: 20,
+              ),
             ),
           ),
         ),

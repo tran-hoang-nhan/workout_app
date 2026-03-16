@@ -32,9 +32,9 @@ class GenderSelectorWidget extends StatelessWidget {
           children: ['male', 'female', 'other'].map((g) {
             final labels = {'male': 'Nam', 'female': 'Nữ', 'other': 'Khác'};
             final icons = {
-              'male': Icons.male_rounded, 
-              'female': Icons.female_rounded, 
-              'other': Icons.transgender_rounded
+              'male': Icons.male_rounded,
+              'female': Icons.female_rounded,
+              'other': Icons.transgender_rounded,
             };
             final isSelected = selectedGender == g;
 
@@ -46,10 +46,14 @@ class GenderSelectorWidget extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                   margin: EdgeInsets.only(right: g != 'other' ? 8 : 0),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.white : AppColors.white.withValues(alpha: 0.6),
+                    color: isSelected
+                        ? AppColors.white
+                        : AppColors.white.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: isSelected ? AppColors.primary : AppColors.cardBorder.withValues(alpha: 0.5),
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.cardBorder.withValues(alpha: 0.5),
                       width: 2,
                     ),
                     boxShadow: [
@@ -73,8 +77,12 @@ class GenderSelectorWidget extends StatelessWidget {
                         labels[g] ?? g,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: isSelected ? AppColors.black : AppColors.black.withValues(alpha: 0.6),
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          color: isSelected
+                              ? AppColors.black
+                              : AppColors.black.withValues(alpha: 0.6),
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.w500,
                           fontSize: 14,
                         ),
                       ),

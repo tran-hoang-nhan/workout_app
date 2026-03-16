@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/health_params.dart';
+import 'package:shared/shared.dart';
 
 class HealthAlerts extends StatelessWidget {
   final HealthUpdateParams formState;

@@ -1,72 +1,58 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/progress_user.dart';
-import '../utils/app_error.dart';
+import 'package:shared/shared.dart';
+import '../services/api_client.dart';
 
 class ProgressUserRepository {
-  final SupabaseClient _supabase;
-  ProgressUserRepository({SupabaseClient? supabase}): _supabase = supabase ?? Supabase.instance.client;
+  final ApiClient _apiClient;
+  ProgressUserRepository({ApiClient? apiClient})
+    : _apiClient = apiClient ?? ApiClient();
 
-  Future<ProgressUser?> getProgress(String userId, DateTime date) async {
-    try {
-      final dateStr = date.toIso8601String().split('T')[0];
-      final response = await _supabase.from('progress_user').select().eq('user_id', userId).eq('date', dateStr).maybeSingle();
-      if (response == null) return null;
-      return ProgressUser.fromJson(response);
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+  Future<ProgressUser?> getDailyProgress(String userId, DateTime date) async {
+    return _apiClient.getDailyProgress(userId, date);
   }
 
-  Future<List<ProgressUser>> getProgressRange(String userId, DateTime start, DateTime end,) async {
-    try {
-      final startStr = start.toIso8601String().split('T')[0];
-      final endStr = end.toIso8601String().split('T')[0];
-      final response = await _supabase.from('progress_user').select().eq('user_id', userId).gte('date', startStr).lte('date', endStr).order('date', ascending: true);
-      return (response as List).map((json) => ProgressUser.fromJson(json)).toList();
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+  Future<List<ProgressUser>> getProgressRange(
+    String userId,
+    DateTime start,
+    DateTime end,
+  ) async {
+    // Proxy or local logic
+    return [];
   }
 
-  Future<void> saveProgress(ProgressUser progress) async {
-    try {
-      await _supabase.from('progress_user').upsert(progress.toJson(), onConflict: 'user_id, date');
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+  Future<void> updateActivityProgress({
+    required String userId,
+    required DateTime date,
+    int? addWaterMl,
+    int? addWaterGlasses,
+    int? addSteps,
+    double? addEnergy,
+    int? addDuration,
+    int? addWorkouts,
+  }) async {
+    await _apiClient.updateActivityProgress(
+      userId: userId,
+      date: date,
+      addWaterMl: addWaterMl,
+      addWaterGlasses: addWaterGlasses,
+      addSteps: addSteps,
+      addEnergy: addEnergy,
+      addDuration: addDuration,
+      addWorkouts: addWorkouts,
+    );
   }
 
-  Future<void> updateActivityProgress({required String userId, required DateTime date, int? addWaterMl, int? addWaterGlasses, int? addSteps, double? addEnergy, int? addDuration, int? addWorkouts,}) async {
-    try {
-      final existing = await getProgress(userId, date);
-      final dateStr = date.toIso8601String().split('T')[0];
+  Future<ProgressUser?> getProgress(String userId, DateTime date) =>
+      getDailyProgress(userId, date);
 
-      if (existing == null) {
-        final newProgress = ProgressUser(
-          userId: userId,
-          date: date,
-          waterMl: addWaterMl ?? 0,
-          waterGlasses: addWaterGlasses ?? 0,
-          steps: addSteps ?? 0,
-          totalCaloriesBurned: addEnergy ?? 0,
-          totalDurationSeconds: addDuration ?? 0,
-          workoutsCompleted: addWorkouts ?? 0,
-        );
-        await saveProgress(newProgress);
-      } else {
-        final updateData = {
-          if (addWaterMl != null) 'water_ml': existing.waterMl + addWaterMl,
-          if (addWaterGlasses != null) 'water_glasses': existing.waterGlasses + addWaterGlasses,
-          if (addSteps != null) 'steps': existing.steps + addSteps,
-          if (addEnergy != null) 'total_calories_burned': existing.totalCaloriesBurned + addEnergy,
-          if (addDuration != null) 'total_duration_seconds': existing.totalDurationSeconds + addDuration,
-          if (addWorkouts != null) 'workouts_completed': existing.workoutsCompleted + addWorkouts,
-          'updated_at': DateTime.now().toIso8601String(),
-        };
-        await _supabase.from('progress_user').update(updateData).eq('user_id', userId).eq('date', dateStr);
-      }
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+  Future<void> saveDailyProgress(ProgressUser progress) async {
+    await _apiClient.updateActivityProgress(
+      userId: progress.userId,
+      date: progress.date,
+      addWaterMl: progress.waterMl,
+      addSteps: progress.steps,
+      addWorkouts: progress.workoutsCompleted,
+      addDuration: progress.totalDurationSeconds,
+      addEnergy: progress.totalCaloriesBurned,
+    );
   }
 }

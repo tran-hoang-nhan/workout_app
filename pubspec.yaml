@@ -40,6 +40,13 @@ dependencies:
   # Supabase
   supabase_flutter: ^2.12.0
   
+  # HTTP
+  http: ^1.1.0
+
+  # Shared package
+  shared:
+    path: ../shared
+  
   # State management
   riverpod: ^3.1.0
   flutter_riverpod: ^3.1.0

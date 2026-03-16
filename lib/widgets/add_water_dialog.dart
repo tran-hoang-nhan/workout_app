@@ -88,7 +88,10 @@ class _AddWaterDialogState extends State<AddWaterDialog> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                  borderSide: const BorderSide(
+                    color: AppColors.primary,
+                    width: 2,
+                  ),
                 ),
                 prefixIcon: const Icon(Icons.edit, color: AppColors.primary),
               ),
@@ -127,12 +130,16 @@ class _AddWaterDialogState extends State<AddWaterDialog> {
                   selectedColor: AppColors.primary.withValues(alpha: 0.1),
                   labelStyle: TextStyle(
                     color: isSelected ? AppColors.primary : AppColors.black,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
-                      color: isSelected ? AppColors.primary : Colors.blue.shade100,
+                      color: isSelected
+                          ? AppColors.primary
+                          : Colors.blue.shade100,
                     ),
                   ),
                   showCheckmark: false,
@@ -153,7 +160,10 @@ class _AddWaterDialogState extends State<AddWaterDialog> {
                     ),
                     child: const Text(
                       'Hủy',
-                      style: TextStyle(color: AppColors.grey, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: AppColors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),

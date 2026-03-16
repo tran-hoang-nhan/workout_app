@@ -14,23 +14,35 @@ class BottomNav extends StatelessWidget {
 
   int _getSelectedIndex() {
     switch (activeTab) {
-      case 'home': return 0;
-      case 'workouts': return 1;
-      case 'progress': return 2;
-      case 'health': return 3;
-      case 'profile': return 4;
-      default: return 0;
+      case 'home':
+        return 0;
+      case 'workouts':
+        return 1;
+      case 'progress':
+        return 2;
+      case 'health':
+        return 3;
+      case 'profile':
+        return 4;
+      default:
+        return 0;
     }
   }
 
   String _getTabId(int index) {
     switch (index) {
-      case 0: return 'home';
-      case 1: return 'workouts';
-      case 2: return 'progress';
-      case 3: return 'health';
-      case 4: return 'profile';
-      default: return 'home';
+      case 0:
+        return 'home';
+      case 1:
+        return 'workouts';
+      case 2:
+        return 'progress';
+      case 3:
+        return 'health';
+      case 4:
+        return 'profile';
+      default:
+        return 'home';
     }
   }
 
@@ -49,7 +61,7 @@ class BottomNav extends StatelessWidget {
               blurRadius: 15,
               color: Colors.black.withValues(alpha: .08),
               offset: const Offset(0, 4),
-            )
+            ),
           ],
         ),
         child: Padding(
@@ -70,26 +82,11 @@ class BottomNav extends StatelessWidget {
               color: AppColors.primary,
             ),
             tabs: const [
-              GButton(
-                icon: Icons.home_rounded,
-                text: 'Trang chủ',
-              ),
-              GButton(
-                icon: Icons.fitness_center_rounded,
-                text: 'Bài tập',
-              ),
-              GButton(
-                icon: Icons.trending_up_rounded,
-                text: 'Tiến độ',
-              ),
-              GButton(
-                icon: Icons.local_activity_rounded,
-                text: 'Sức khỏe',
-              ),
-              GButton(
-                icon: Icons.person_rounded,
-                text: 'Cá nhân',
-              ),
+              GButton(icon: Icons.home_rounded, text: 'Trang chủ'),
+              GButton(icon: Icons.fitness_center_rounded, text: 'Bài tập'),
+              GButton(icon: Icons.trending_up_rounded, text: 'Tiến độ'),
+              GButton(icon: Icons.local_activity_rounded, text: 'Sức khỏe'),
+              GButton(icon: Icons.person_rounded, text: 'Cá nhân'),
             ],
             selectedIndex: _getSelectedIndex(),
             onTabChange: (index) {

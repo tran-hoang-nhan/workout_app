@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import '../../../constants/app_constants.dart';
 import '../../../providers/progress_user_provider.dart';
 import '../../../providers/auth_provider.dart';
-import '../../../models/progress_user.dart';
+import 'package:shared/shared.dart';
 
 class RunningCard extends ConsumerStatefulWidget {
   const RunningCard({super.key});
@@ -21,7 +21,7 @@ class _RunningCardState extends ConsumerState<RunningCard> {
   StreamSubscription<Position>? _positionStream;
   Timer? _timer;
   int _secondsElapsed = 0;
-  
+
   // Approximate conversion: 1 meter = 1.3 steps
   static const double _stepsPerMeter = 1.31;
 
@@ -89,7 +89,11 @@ class _RunningCardState extends ConsumerState<RunningCard> {
       if (permission == LocationPermission.deniedForever) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Quyền vị trí bị từ chối vĩnh viễn. Vui lòng bật trong cài đặt.')),
+            const SnackBar(
+              content: Text(
+                'Quyền vị trí bị từ chối vĩnh viễn. Vui lòng bật trong cài đặt.',
+              ),
+            ),
           );
         }
         _resetTrackingState();
@@ -103,30 +107,31 @@ class _RunningCardState extends ConsumerState<RunningCard> {
         });
       });
 
-      _positionStream = Geolocator.getPositionStream(
-        locationSettings: AndroidSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: 5,
-          foregroundNotificationConfig: const ForegroundNotificationConfig(
-            notificationText: "Đang theo dõi quãng đường chạy bộ của bạn",
-            notificationTitle: "Chạy bộ đang hoạt động",
-            enableWakeLock: true,
-          ),
-        ),
-      ).listen((Position position) {
-        if (_lastPosition != null) {
-          double distance = Geolocator.distanceBetween(
-            _lastPosition!.latitude,
-            _lastPosition!.longitude,
-            position.latitude,
-            position.longitude,
-          );
-          setState(() {
-            _totalDistance += distance;
+      _positionStream =
+          Geolocator.getPositionStream(
+            locationSettings: AndroidSettings(
+              accuracy: LocationAccuracy.high,
+              distanceFilter: 5,
+              foregroundNotificationConfig: const ForegroundNotificationConfig(
+                notificationText: "Đang theo dõi quãng đường chạy bộ của bạn",
+                notificationTitle: "Chạy bộ đang hoạt động",
+                enableWakeLock: true,
+              ),
+            ),
+          ).listen((Position position) {
+            if (_lastPosition != null) {
+              double distance = Geolocator.distanceBetween(
+                _lastPosition!.latitude,
+                _lastPosition!.longitude,
+                position.latitude,
+                position.longitude,
+              );
+              setState(() {
+                _totalDistance += distance;
+              });
+            }
+            _lastPosition = position;
           });
-        }
-        _lastPosition = position;
-      });
     } catch (e) {
       debugPrint('Error starting location tracking: $e');
       _resetTrackingState();
@@ -164,24 +169,24 @@ class _RunningCardState extends ConsumerState<RunningCard> {
   Future<void> _saveProgress(int steps) async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
+
     try {
       final repo = ref.read(progressUserRepositoryProvider);
       final userId = (await ref.read(currentUserIdProvider.future));
-      
+
       if (userId == null) return;
 
-      final existingProgress = await repo.getProgress(userId, today);
-      
-      final updatedProgress = (existingProgress ?? ProgressUser(userId: userId, date: today)).copyWith(
-        steps: (existingProgress?.steps ?? 0) + steps,
-      );
+      final existingProgress = await repo.getDailyProgress(userId, today);
 
-      await repo.saveProgress(updatedProgress);
-      
+      final updatedProgress =
+          (existingProgress ?? ProgressUser(userId: userId, date: today))
+              .copyWith(steps: (existingProgress?.steps ?? 0) + steps);
+
+      await repo.saveDailyProgress(updatedProgress);
+
       // Invalidate provider to refresh UI
       ref.invalidate(progressDailyProvider(today));
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Đã lưu thêm $steps bước chân!')),
@@ -197,17 +202,22 @@ class _RunningCardState extends ConsumerState<RunningCard> {
     return SliverToBoxAdapter(
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+        margin: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: _isTracking ? Colors.teal.shade50 : AppColors.white,
           borderRadius: BorderRadius.circular(24),
-          border: _isTracking ? Border.all(color: Colors.teal.withValues(alpha: 0.3), width: 2) : null,
+          border: _isTracking
+              ? Border.all(color: Colors.teal.withValues(alpha: 0.3), width: 2)
+              : null,
           boxShadow: [
             BoxShadow(
-              color: _isTracking 
-                ? Colors.teal.withValues(alpha: 0.1) 
-                : Colors.black.withValues(alpha: 0.05),
+              color: _isTracking
+                  ? Colors.teal.withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.05),
               blurRadius: 15,
               offset: const Offset(0, 5),
             ),
@@ -221,11 +231,13 @@ class _RunningCardState extends ConsumerState<RunningCard> {
                   duration: const Duration(milliseconds: 300),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: _isTracking ? Colors.teal : Colors.teal.withValues(alpha: 0.1),
+                    color: _isTracking
+                        ? Colors.teal
+                        : Colors.teal.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
-                    Icons.directions_run, 
+                    Icons.directions_run,
                     color: _isTracking ? Colors.white : Colors.teal,
                   ),
                 ),
@@ -243,7 +255,9 @@ class _RunningCardState extends ConsumerState<RunningCard> {
                         ),
                       ),
                       Text(
-                        _isTracking ? 'Duy trì tốc độ nhé!' : 'Theo dõi quãng đường di chuyển',
+                        _isTracking
+                            ? 'Duy trì tốc độ nhé!'
+                            : 'Theo dõi quãng đường di chuyển',
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.grey,
@@ -293,7 +307,11 @@ class _RunningCardState extends ConsumerState<RunningCard> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(_isTracking ? Icons.stop_circle : Icons.play_circle_filled),
+                    Icon(
+                      _isTracking
+                          ? Icons.stop_circle
+                          : Icons.play_circle_filled,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       _isTracking ? 'Kết thúc chạy bộ' : 'Bắt đầu chạy bộ',
@@ -317,10 +335,7 @@ class _RunningCardState extends ConsumerState<RunningCard> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.grey,
-          ),
+          style: const TextStyle(fontSize: 12, color: AppColors.grey),
         ),
         const SizedBox(height: 4),
         Row(

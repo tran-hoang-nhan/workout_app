@@ -1,5 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/health_params.dart';
+import 'package:shared/shared.dart';
 import '../utils/app_error.dart';
 import './auth_provider.dart';
 import './health_base_provider.dart';
@@ -15,44 +16,34 @@ class HealthController extends AsyncNotifier<void> {
   Future<void> saveFullProfile(HealthUpdateParams params) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      try {
-        final service = ref.read(healthServiceProvider);
-        await service.updateFullProfile(params);
-        ref.invalidate(healthDataProvider);
-      } catch (e, st) {
-        final handled = handleException(e, st);
-        throw handled;
-      }
+      final service = ref.read(healthServiceProvider);
+      await service.updateFullProfile(params);
+      ref.invalidate(healthDataProvider);
     });
-    if (state.hasError) {
-      throw state.error!;
-    }
   }
 
   Future<void> saveQuickMetrics({double? weight, double? height}) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      try {
-        final userId = await ref.read(currentUserIdProvider.future);
-        if (userId == null) throw UnauthorizedException('Chưa đăng nhập');
-        final service = ref.read(healthServiceProvider);
-        await service.updateQuickMetrics(
-          userId: userId,
-          weight: weight,
-          height: height,
-        );
-        ref.invalidate(healthDataProvider);
-      } catch (e, st) {
-        throw handleException(e, st);
-      }
+      final userId = await ref.read(currentUserIdProvider.future);
+      if (userId == null) throw UnauthorizedException('Chưa đăng nhập');
+      final service = ref.read(healthServiceProvider);
+      await service.updateQuickMetrics(
+        userId: userId,
+        weight: weight,
+        height: height,
+      );
+      ref.invalidate(healthDataProvider);
     });
-    if (state.hasError) {
-      throw state.error!;
-    }
   }
 }
 
 final hasHealthDataProvider = FutureProvider<bool>((ref) async {
+  debugPrint('[hasHealthDataProvider] Initializing...');
   final healthData = await ref.watch(healthDataProvider.future);
-  return healthData != null;
+  debugPrint('[hasHealthDataProvider] Awaited healthDataProvider: ${healthData != null}');
+  if (healthData == null) return false;
+  // If height or weight is 0, they haven't onboarded fully yet
+  if (healthData.weight == 0.0 || healthData.height == 0.0) return false;
+  return true;
 });

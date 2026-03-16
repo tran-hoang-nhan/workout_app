@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/health_params.dart';
+import 'package:shared/shared.dart';
 
 class HealthValidationCard extends StatelessWidget {
   final HealthUpdateParams healthData;
@@ -140,12 +140,12 @@ class HealthValidationCard extends StatelessWidget {
   }
 
   String _mapDietType(String type) => switch (type) {
-    'normal'     => 'Bình thường',
-    'vegan'      => 'Thuần chay',
+    'normal' => 'Bình thường',
+    'vegan' => 'Thuần chay',
     'vegetarian' => 'Ăn chay',
-    'keto'       => 'Keto',
-    'paleo'      => 'Paleo',
-    'low_carb'   => 'Low Carb',
-    _            => type,
+    'keto' => 'Keto',
+    'paleo' => 'Paleo',
+    'low_carb' => 'Low Carb',
+    _ => type,
   };
 }

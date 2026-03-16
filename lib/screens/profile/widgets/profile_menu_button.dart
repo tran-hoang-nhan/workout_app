@@ -72,7 +72,11 @@ class ProfileMenuButton extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_right_rounded, color: AppColors.grey.withValues(alpha: 0.3), size: 20),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.grey.withValues(alpha: 0.3),
+                  size: 20,
+                ),
               ],
             ),
           ),

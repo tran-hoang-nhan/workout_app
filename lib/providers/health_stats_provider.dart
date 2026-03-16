@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/health_calculations.dart';
-import './health_base_provider.dart';
-import './health_form_provider.dart';
+import 'package:shared/shared.dart';
+import 'health_provider.dart';
 
 final healthCalculationsProvider = Provider<HealthCalculations>((ref) {
   final form = ref.watch(healthFormProvider);
@@ -12,7 +11,7 @@ final healthCalculationsProvider = Provider<HealthCalculations>((ref) {
     form.weight,
     form.height,
     form.age,
-    form.gender,
+    form.gender ?? 'male',
   );
   final tdee = service.calculateTDEE(bmr, form.activityLevel);
   final maxHR = service.calculateMaxHeartRate(form.age);
@@ -25,8 +24,8 @@ final healthCalculationsProvider = Provider<HealthCalculations>((ref) {
   return HealthCalculations(
     bmi: bmi,
     bmiCategory: bmiCategory,
-    bmr: bmr,
-    tdee: tdee,
+    bmr: bmr.toDouble(),
+    tdee: tdee.toDouble(),
     maxHeartRate: maxHR,
     zone1: zone1,
     zone2: zone2,

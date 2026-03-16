@@ -4,10 +4,7 @@ import '../../../constants/app_constants.dart';
 class AddWeightForm extends StatefulWidget {
   final Function(String) onAddWeight;
 
-  const AddWeightForm({
-    super.key,
-    required this.onAddWeight,
-  });
+  const AddWeightForm({super.key, required this.onAddWeight});
 
   @override
   State<AddWeightForm> createState() => _AddWeightFormState();
@@ -47,11 +44,14 @@ class _AddWeightFormState extends State<AddWeightForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Thêm cân nặng mới',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black)),
+          const Text(
+            'Thêm cân nặng mới',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.black,
+            ),
+          ),
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
@@ -61,28 +61,23 @@ class _AddWeightFormState extends State<AddWeightForm> {
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     hintText: 'Nhập cân nặng (kg)',
-                    hintStyle: const TextStyle(
-                        color: AppColors.grey),
+                    hintStyle: const TextStyle(color: AppColors.grey),
                     filled: true,
                     fillColor: Colors.grey.shade50,
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppBorderRadius.md),
-                      borderSide: BorderSide(
-                          color: AppColors.cardBorder),
+                      borderRadius: BorderRadius.circular(AppBorderRadius.md),
+                      borderSide: BorderSide(color: AppColors.cardBorder),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(20),
-                      borderSide: const BorderSide(
-                          color: AppColors.primary),
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: AppColors.primary),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.md),
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.md,
+                    ),
                   ),
-                  style: const TextStyle(
-                      color: AppColors.black, fontSize: 14),
+                  style: const TextStyle(color: AppColors.black, fontSize: 14),
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -96,8 +91,9 @@ class _AddWeightFormState extends State<AddWeightForm> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFF97316),
                   padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                      vertical: AppSpacing.md),
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.md,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -106,8 +102,7 @@ class _AddWeightFormState extends State<AddWeightForm> {
                   children: [
                     Icon(Icons.add, size: 20),
                     SizedBox(width: AppSpacing.sm),
-                    Text('Thêm',
-                        style: TextStyle(fontSize: 14)),
+                    Text('Thêm', style: TextStyle(fontSize: 14)),
                   ],
                 ),
               ),

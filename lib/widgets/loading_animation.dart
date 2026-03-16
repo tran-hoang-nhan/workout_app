@@ -7,26 +7,20 @@ class AppLoading extends StatefulWidget {
   final Color? color;
   final String? message;
 
-  const AppLoading({
-    super.key,
-    this.size = 50.0,
-    this.color,
-    this.message,
-  });
+  const AppLoading({super.key, this.size = 50.0, this.color, this.message});
 
   @override
   State<AppLoading> createState() => _AppLoadingState();
   static Widget fullScreen({String? message}) {
     return Container(
       color: Colors.white.withValues(alpha: 0.8),
-      child: Center(
-        child: AppLoading(message: message),
-      ),
+      child: Center(child: AppLoading(message: message)),
     );
   }
 }
 
-class _AppLoadingState extends State<AppLoading> with SingleTickerProviderStateMixin {
+class _AppLoadingState extends State<AppLoading>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   @override
   void initState() {
@@ -83,7 +77,9 @@ class _AppLoadingState extends State<AppLoading> with SingleTickerProviderStateM
                     curve: Curves.easeInOut,
                     builder: (context, scale, child) {
                       return Transform.scale(
-                        scale: scale + (0.1 * math.sin(_controller.value * 2 * math.pi)),
+                        scale:
+                            scale +
+                            (0.1 * math.sin(_controller.value * 2 * math.pi)),
                         child: Container(
                           width: widget.size * 0.3,
                           height: widget.size * 0.3,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/body_metric.dart';
-import '../../../utils/health_utils.dart';
+import 'package:shared/shared.dart';
 
 class WeightHistoryCard extends StatelessWidget {
   final List<BodyMetric> weightHistory;
@@ -20,25 +19,25 @@ class WeightHistoryCard extends StatelessWidget {
       return {
         'label': 'Thiếu cân',
         'color': const Color(0xFF60A5FA),
-        'range': '< 18.5'
+        'range': '< 18.5',
       };
     } else if (bmi < 25) {
       return {
         'label': 'Bình thường',
         'color': const Color(0xFF34D399),
-        'range': '18.5 - 24.9'
+        'range': '18.5 - 24.9',
       };
     } else if (bmi < 30) {
       return {
         'label': 'Thừa cân',
         'color': const Color(0xFFFBBF24),
-        'range': '25 - 29.9'
+        'range': '25 - 29.9',
       };
     } else {
       return {
         'label': 'Béo phì',
         'color': const Color(0xFFF87171),
-        'range': '≥ 30'
+        'range': '≥ 30',
       };
     }
   }
@@ -71,7 +70,9 @@ class WeightHistoryCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.black)),
+              color: AppColors.black,
+            ),
+          ),
           const SizedBox(height: AppSpacing.lg),
           if (weightHistory.isEmpty)
             Center(
@@ -79,9 +80,16 @@ class WeightHistoryCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                 child: Column(
                   children: [
-                    Icon(Icons.calendar_today, size: 36, color: Colors.grey.shade700),
+                    Icon(
+                      Icons.calendar_today,
+                      size: 36,
+                      color: Colors.grey.shade700,
+                    ),
                     const SizedBox(height: AppSpacing.sm),
-                    const Text('Chưa có dữ liệu cân nặng', style: TextStyle(color: AppColors.grey)),
+                    const Text(
+                      'Chưa có dữ liệu cân nặng',
+                      style: TextStyle(color: AppColors.grey),
+                    ),
                   ],
                 ),
               ),
@@ -93,7 +101,10 @@ class WeightHistoryCard extends StatelessWidget {
               itemCount: weightHistory.length,
               itemBuilder: (context, index) {
                 final record = weightHistory[index];
-                final recordBMI = calculateBMI(record.weight, height);
+                final recordBMI = HealthUtils.calculateBMI(
+                  record.weight,
+                  height,
+                );
                 final recordCategory = _getBMICategory(recordBMI);
                 double? change;
                 if (index + 1 < weightHistory.length) {
@@ -107,7 +118,9 @@ class WeightHistoryCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5)),
+                      border: Border.all(
+                        color: AppColors.cardBorder.withValues(alpha: 0.5),
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.02),
@@ -125,7 +138,11 @@ class WeightHistoryCard extends StatelessWidget {
                             color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(Icons.monitor_weight_outlined, color: AppColors.primary, size: 24),
+                          child: const Icon(
+                            Icons.monitor_weight_outlined,
+                            color: AppColors.primary,
+                            size: 24,
+                          ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -148,18 +165,31 @@ class WeightHistoryCard extends StatelessWidget {
                                   children: [
                                     Text(
                                       'BMI: ${recordBMI.toStringAsFixed(1)}',
-                                      style: const TextStyle(fontSize: 12, color: AppColors.grey, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.grey,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                     const SizedBox(width: 8),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 1,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: (recordCategory['color'] as Color).withValues(alpha: 0.1),
+                                        color:
+                                            (recordCategory['color'] as Color)
+                                                .withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
                                         recordCategory['label'],
-                                        style: TextStyle(fontSize: 9, color: recordCategory['color'], fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          color: recordCategory['color'],
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -185,9 +215,13 @@ class WeightHistoryCard extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
-                                    change > 0 ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+                                    change > 0
+                                        ? Icons.arrow_upward_rounded
+                                        : Icons.arrow_downward_rounded,
                                     size: 12,
-                                    color: change > 0 ? Colors.red : Colors.green,
+                                    color: change > 0
+                                        ? Colors.red
+                                        : Colors.green,
                                   ),
                                   const SizedBox(width: 2),
                                   Text(
@@ -195,7 +229,9 @@ class WeightHistoryCard extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
-                                      color: change > 0 ? Colors.red : Colors.green,
+                                      color: change > 0
+                                          ? Colors.red
+                                          : Colors.green,
                                     ),
                                   ),
                                 ],
@@ -205,7 +241,11 @@ class WeightHistoryCard extends StatelessWidget {
                         const SizedBox(width: 12),
                         GestureDetector(
                           onTap: () => onDelete(index),
-                          child: Icon(Icons.close, size: 18, color: Colors.grey.shade400),
+                          child: Icon(
+                            Icons.close,
+                            size: 18,
+                            color: Colors.grey.shade400,
+                          ),
                         ),
                       ],
                     ),

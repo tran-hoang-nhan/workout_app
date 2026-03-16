@@ -4,24 +4,26 @@ class AppColors {
   static const Color primary = Color(0xFFF97316); // Orange-500
   static const Color primaryLight = Color(0xFFFB923C); // Orange-400
   static const Color primaryDark = Color(0xFFEA580C); // Orange-600
-  
+
   static const Color secondary = Color(0xFF10B981);
   static const Color secondaryLight = Color(0xFF34D399);
   static const Color secondaryDark = Color(0xFF059669);
-  
+
   static const Color danger = Color(0xFFEF4444);
   static const Color warning = Color(0xFFF59E0B);
   static const Color success = Color(0xFF10B981);
   static const Color info = Color(0xFF3B82F6);
-  
+
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF111827); // Gray-900
   static const Color grey = Color(0xFF6B7280);
   static const Color greyLight = Color(0xFFF3F4F6);
   static const Color greyDark = Color(0xFF374151);
-  
+
   // Background colors
-  static const Color bgLight = Color(0xFFF8F9FD); // Premium light neutral background
+  static const Color bgLight = Color(
+    0xFFF8F9FD,
+  ); // Premium light neutral background
   static const Color bgWhite = Color(0xFFFFFFFF);
   static const Color cardBg = Color(0xFFFFFFFF);
   static const Color cardBorder = Color(0xFFE5E7EB); // Gray-200
@@ -69,7 +71,7 @@ class AppStrings {
   static const String signOut = 'Đăng Xuất';
   static const String dontHaveAccount = 'Bạn chưa có tài khoản?';
   static const String alreadyHaveAccount = 'Bạn đã có tài khoản?';
-  
+
   // General
   static const String ok = 'OK';
   static const String cancel = 'Hủy';

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shared/shared.dart';
 import '../../../constants/app_constants.dart';
-import '../../../providers/health_provider.dart';
 
 class CalorieGoals extends StatelessWidget {
   final HealthCalculations calculations;
 
-  const CalorieGoals({
-    super.key,
-    required this.calculations,
-  });
+  const CalorieGoals({super.key, required this.calculations});
 
   @override
   Widget build(BuildContext context) {

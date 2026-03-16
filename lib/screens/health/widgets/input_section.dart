@@ -5,7 +5,7 @@ import '../../../providers/auth_provider.dart';
 import '../../../providers/health_provider.dart';
 import '../../../providers/weight_provider.dart';
 
-import '../../../models/health_params.dart';
+import 'package:shared/shared.dart';
 
 class InputSection extends ConsumerWidget {
   final HealthUpdateParams formState;
@@ -173,16 +173,26 @@ class InputSection extends ConsumerWidget {
                     }
                     if (weight != null || height != null) {
                       try {
-                        await ref.read(healthControllerProvider.notifier).saveQuickMetrics(weight: weight, height: height);
+                        await ref
+                            .read(healthControllerProvider.notifier)
+                            .saveQuickMetrics(weight: weight, height: height);
                         if (weight != null) {
                           try {
-                            final userId = ref.read(currentUserIdProvider).value;
+                            final userId = ref
+                                .read(currentUserIdProvider)
+                                .value;
                             if (userId != null) {
-                              await ref.read(weightServiceProvider).logNewWeight(userId: userId, weight: weight);
-                              debugPrint('[InputSection] Weight saved to body_metrics');
+                              await ref
+                                  .read(weightServiceProvider)
+                                  .logNewWeight(userId: userId, weight: weight);
+                              debugPrint(
+                                '[InputSection] Weight saved to body_metrics',
+                              );
                             }
                           } catch (e) {
-                            debugPrint('[InputSection] Warning: Could not save to body_metrics: $e');
+                            debugPrint(
+                              '[InputSection] Warning: Could not save to body_metrics: $e',
+                            );
                           }
                         }
 

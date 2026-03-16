@@ -11,7 +11,7 @@ extension ContextExtensions on BuildContext {
     } else {
       message = error.toString();
     }
-    
+
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
         content: Row(
@@ -19,10 +19,7 @@ extension ContextExtensions on BuildContext {
             const Icon(Icons.error_outline, color: Colors.white),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(color: Colors.white),
-              ),
+              child: Text(message, style: const TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -43,10 +40,7 @@ extension ContextExtensions on BuildContext {
             const Icon(Icons.check_circle_outline, color: Colors.white),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(color: Colors.white),
-              ),
+              child: Text(message, style: const TextStyle(color: Colors.white)),
             ),
           ],
         ),
