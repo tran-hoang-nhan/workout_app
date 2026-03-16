@@ -1,146 +1,84 @@
-import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../config/supabase_config.dart';
-import '../models/user.dart';
-import '../models/auth.dart';
-import '../utils/app_error.dart';
+import 'package:shared/shared.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
+import '../services/api_client.dart';
 
 class AuthRepository {
+  final ApiClient _apiClient;
   final SupabaseClient _supabase;
-  AuthRepository({SupabaseClient? supabase}): _supabase = supabase ?? Supabase.instance.client;
-  Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
-  User? get currentUser => _supabase.auth.currentUser;
-  Session? get currentSession => _supabase.auth.currentSession;
 
-  Future<AuthResponse> signIn(SignInParams params) async {
-    try {
-      return await _supabase.auth.signInWithPassword(
-        email: params.email,
-        password: params.password,
-      );
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+  AuthRepository({ApiClient? apiClient, SupabaseClient? supabase})
+    : _apiClient = apiClient ?? ApiClient(),
+      _supabase = supabase ?? Supabase.instance.client;
+
+  AppUser? get currentUser {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return null;
+    return AppUser(
+      id: user.id,
+      email: user.email ?? '',
+      fullName: user.userMetadata?['full_name'] ?? '',
+      createdAt: DateTime.tryParse(user.createdAt) ?? DateTime.now(),
+    );
   }
 
-  Future<AuthResponse> signUp(SignUpParams params) async {
-    try {
-      return await _supabase.auth.signUp(email: params.email, password: params.password, data: {'full_name': params.fullName});
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+  Stream<AuthState> get onAuthStateChange {
+    return _supabase.auth.onAuthStateChange.map((state) {
+      return AuthState(session: state.session, event: state.event);
+    });
+  }
+
+  Future<Map<String, dynamic>> signIn(SignInParams params) async {
+    final response = await _supabase.auth.signInWithPassword(
+      email: params.email,
+      password: params.password,
+    );
+    return {
+      'user': response.user?.toJson(),
+      'session': response.session?.toJson(),
+    };
+  }
+
+  Future<Map<String, dynamic>> signUp(SignUpParams params) async {
+    final response = await _supabase.auth.signUp(
+      email: params.email,
+      password: params.password,
+      data: params.toJson(),
+    );
+    return {
+      'user': response.user?.toJson(),
+      'session': response.session?.toJson(),
+    };
   }
 
   Future<void> signOut() async {
     await _supabase.auth.signOut();
   }
 
-  Future<void> resetPassword(String email, {String? redirectTo}) async {
-    try {
-      await _supabase.auth.resetPasswordForEmail(email, redirectTo: null,);
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+  Future<Map<String, dynamic>> verifyOTP({
+    required String email,
+    required String token,
+    required String type,
+  }) async {
+    return _apiClient.verifyOtp(email, token, type);
   }
 
-  Future<void> updatePassword(String newPassword) async {
-    try {
-      debugPrint('[AuthRepository] Attempting password update for current user...',);
-      final response = await _supabase.auth.updateUser(UserAttributes(password: newPassword),);
-      debugPrint('[AuthRepository] Password update response: ${response.user != null ? "Success (User details returned)" : "Failure (No user returned in response)"}',);
-    } catch (e, st) {
-      debugPrint('[AuthRepository] Error updating password: $e');
-      throw handleException(e, st);
-    }
-  }
-
-  Future<void> createUserProfile({required String id, required SignUpParams params,}) async {
-    try {
-      await _supabase.from(SupabaseConfig.profilesTable).insert({
-        'id': id,
-        'email': params.email,
-        'full_name': params.fullName,
-        'avatar_url': params.avatarUrl,
-        'gender': params.gender ?? 'male',
-        'date_of_birth': params.dateOfBirth?.toIso8601String().split('T')[0],
-        'goal': params.goal ?? 'maintain',
-        'created_at': DateTime.now().toIso8601String(),
-      });
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+  Future<void> resendOTP({required String email, required String type}) async {
+    await _apiClient.resendOtp(email, type);
   }
 
   Future<AppUser?> getUserProfile(String userId) async {
-    try {
-      final response = await _supabase.from(SupabaseConfig.profilesTable).select().eq('id', userId).maybeSingle();
-      if (response == null) return null;
-      return AppUser.fromJson(response);
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+    return _apiClient.getProfile(userId);
   }
 
-  Future<void> updateUserProfile(UpdateProfileParams params) async {
-    try {
-      await _supabase.from(SupabaseConfig.profilesTable).update(params.toUpdateMap()).eq('id', params.userId);
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+  Future<void> updateProfile(String userId, UpdateProfileParams params) async {
+    await _apiClient.updateProfile(userId, params);
   }
 
-  Future<AuthResponse> verifyOTP({required String email, required String token, required OtpType type,}) async {
-    try {
-      return await _supabase.auth.verifyOTP(
-        email: email,
-        token: token,
-        type: type,
-      );
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+  Future<void> resetPassword(String email) async {
+    await _supabase.auth.resetPasswordForEmail(email);
   }
 
-  Future<ResendResponse> resendOTP({required String email, required OtpType type,}) async {
-    try {
-      return await _supabase.auth.resend(type: type, email: email);
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
-  }
-
-  bool get isEmailVerified {
-    final user = _supabase.auth.currentUser;
-    return user?.emailConfirmedAt != null;
-  }
-
-  Future<AppUser?> signUpWithTransaction(SignUpParams params) async {
-    User? createdUser;
-    try {
-      final authResponse = await signUp(params);
-      if (authResponse.user == null) {
-        throw AppError('Failed to create auth user');
-      }
-      createdUser = authResponse.user;
-      await createUserProfile(id: createdUser!.id, params: params);
-      return await getUserProfile(createdUser.id);
-    } catch (e, st) {
-      if (createdUser != null) {
-        try {
-          await _deleteAuthUser(createdUser.id);
-        } catch (deleteError) {
-          debugPrint('⚠️ Failed to rollback auth user: $deleteError');
-        }
-      }
-      throw handleException(e, st);
-    }
-  }
-
-  Future<void> _deleteAuthUser(String userId) async {
-    try {
-      await _supabase.from(SupabaseConfig.profilesTable).delete().eq('id', userId);
-    } catch (e, st) {
-      throw handleException(e, st);
-    }
+  Future<void> updatePassword(String password) async {
+    await _supabase.auth.updateUser(UserAttributes(password: password));
   }
 }

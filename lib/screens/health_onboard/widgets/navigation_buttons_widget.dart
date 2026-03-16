@@ -33,7 +33,9 @@ class NavigationButtonsWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5)),
+                    border: Border.all(
+                      color: AppColors.cardBorder.withValues(alpha: 0.5),
+                    ),
                   ),
                   child: Center(
                     child: Text(
@@ -57,10 +59,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      AppColors.primary,
-                      AppColors.primaryDark,
-                    ],
+                    colors: [AppColors.primary, AppColors.primaryDark],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),

@@ -1,64 +1,16 @@
-import 'package:flutter/cupertino.dart';
-import '../models/auth.dart';
-import '../models/health_params.dart';
-import '../models/user.dart';
-import '../repositories/auth_repository.dart';
-import '../repositories/health_repository.dart';
-import '../utils/app_error.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared/shared.dart';
+import '../services/api_client.dart';
 
 class RegistrationTransactionService {
-  final AuthRepository _authRepo;
-  final HealthRepository _healthRepo;
-  final SupabaseClient _supabase;
+  final ApiClient _apiClient;
 
-  RegistrationTransactionService({AuthRepository? authRepo, HealthRepository? healthRepo,}): 
-    _authRepo = authRepo ?? AuthRepository(),
-    _healthRepo = healthRepo ?? HealthRepository(),
-    _supabase = Supabase.instance.client;
+  RegistrationTransactionService({ApiClient? apiClient}): _apiClient = apiClient ?? ApiClient();
 
-  Future<AppUser?> completeRegistration({required SignUpParams signUpParams, required HealthUpdateParams healthParams,}) async {
-    String? createdUserId;
-    bool profileCreated = false;
-    try {
-      final user = await _authRepo.signUpWithTransaction(signUpParams);
-      if (user == null) {
-        throw AppError('Failed to create user');
-      }
-      createdUserId = user.id;
-      profileCreated = true;
-      debugPrint('User and profile created with ID: $createdUserId');
-
-      final healthParamsWithUserId = HealthUpdateParams(
-        userId: createdUserId,
-        age: healthParams.age,
-        weight: healthParams.weight,
-        height: healthParams.height,
-        gender: healthParams.gender,
-        activityLevel: healthParams.activityLevel,
-        goal: healthParams.goal,
-        dietType: healthParams.dietType,
-        waterIntake: healthParams.waterIntake,
-        injuries: healthParams.injuries,
-        medicalConditions: healthParams.medicalConditions,
-        allergies: healthParams.allergies,
-        waterReminderEnabled: healthParams.waterReminderEnabled,
-        waterReminderInterval: healthParams.waterReminderInterval,
-      );
-      await _healthRepo.updateFullProfile(healthParamsWithUserId);
-      debugPrint('✅ Health data created');
-      return user;
-    } catch (e, st) {
-      if (profileCreated && createdUserId != null) {
-        try {
-          await _supabase.from('profiles').delete().eq('id', createdUserId);
-          await _supabase.from('health').delete().eq('user_id', createdUserId);
-          debugPrint('Rolled back profile and health');
-        } catch (rollbackError) {
-          debugPrint('⚠️ Rollback failed: $rollbackError');
-        }
-      }
-      throw handleException(e, st);
+  Future<AppUser?> completeRegistration({required SignUpParams signUpParams,required HealthUpdateParams healthParams,}) async {
+    final response = await _apiClient.completeRegistration(signUpParams, healthParams);
+    if (response['user'] != null) {
+      return AppUser.fromJson(response['user'] as Map<String, dynamic>);
     }
+    return null;
   }
 }

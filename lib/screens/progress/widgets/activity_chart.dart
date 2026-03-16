@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/daily_stats.dart';
+import 'package:shared/shared.dart';
 import '../../../utils/app_error.dart';
 import '../../../widgets/loading_animation.dart';
 

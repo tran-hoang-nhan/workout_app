@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared/shared.dart' as shared;
 import 'dart:async';
 import 'config/supabase_config.dart';
 import 'constants/app_constants.dart';
@@ -231,11 +232,14 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildHome(AsyncValue<bool> authState, AsyncValue<bool> hasHealthData) {
+  Widget _buildHome(
+    AsyncValue<shared.AuthState> authState,
+    AsyncValue<bool> hasHealthData,
+  ) {
     if (authState.isLoading && !authState.hasValue) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    final isAuthenticated = authState.value ?? false;
+    final isAuthenticated = authState.value?.session != null;
     if (!isAuthenticated) {
       return LoginScreen(
         onLoginSuccess: () async {

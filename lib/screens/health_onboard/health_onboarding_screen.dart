@@ -8,10 +8,7 @@ import 'widgets/index.dart';
 class HealthOnboardingScreen extends ConsumerStatefulWidget {
   final Future<void> Function() onComplete;
 
-  const HealthOnboardingScreen({
-    super.key,
-    required this.onComplete,
-  });
+  const HealthOnboardingScreen({super.key, required this.onComplete});
 
   @override
   ConsumerState<HealthOnboardingScreen> createState() =>
@@ -55,7 +52,10 @@ class _HealthOnboardingScreenState
               // Header
               HeaderWidget(currentStep: currentStep, totalSteps: totalSteps),
               // Progress Bar
-              ProgressBarWidget(currentStep: currentStep, totalSteps: totalSteps),
+              ProgressBarWidget(
+                currentStep: currentStep,
+                totalSteps: totalSteps,
+              ),
               // Content
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -71,7 +71,9 @@ class _HealthOnboardingScreenState
                       totalSteps: totalSteps,
                       isSaving: isSaving,
                       onBack: () => setState(() => currentStep--),
-                      onNext: currentStep < totalSteps ? _handleNext : _handleComplete,
+                      onNext: currentStep < totalSteps
+                          ? _handleNext
+                          : _handleComplete,
                     ),
                   ],
                 ),
@@ -212,7 +214,7 @@ class _HealthOnboardingScreenState
             'keto',
             'paleo',
             'low_carb',
-            'halal'
+            'halal',
           ],
           onChanged: (val) => setState(() => dietType = val ?? dietType),
         ),
@@ -238,25 +240,17 @@ class _HealthOnboardingScreenState
           padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
             color: AppColors.primaryLight.withValues(alpha: 0.1),
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             children: [
-              const Text(
-                '💡',
-                style: TextStyle(fontSize: 16),
-              ),
+              const Text('💡', style: TextStyle(fontSize: 16)),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text(
                   'Bạn có thể bỏ qua bước này và hoàn thành sau',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.grey,
-                  ),
+                  style: TextStyle(fontSize: 13, color: AppColors.grey),
                 ),
               ),
             ],
@@ -319,7 +313,8 @@ class _HealthOnboardingScreenState
             ],
           ),
           child: TextField(
-            controller: TextEditingController(text: value)..selection = TextSelection.collapsed(offset: value.length),
+            controller: TextEditingController(text: value)
+              ..selection = TextSelection.collapsed(offset: value.length),
             onChanged: onChanged,
             style: const TextStyle(color: AppColors.black),
             maxLines: 2,
@@ -346,13 +341,23 @@ class _HealthOnboardingScreenState
     try {
       final userId = Supabase.instance.client.auth.currentUser?.id;
       if (userId == null) return;
-      await ref.read(healthFormProvider.notifier).saveHealthOnboarding(
-        userId: userId, age: age, weight: weight, height: height, gender: gender,
-        activityLevel: activityLevel, goal: goal, 
-        dietType: dietType, waterIntake: waterIntake,
-        injuries: injuries, medicalConditions: medicalConditions,allergies: allergies,
-      );
-      
+      await ref
+          .read(healthFormProvider.notifier)
+          .saveHealthOnboarding(
+            userId: userId,
+            age: age,
+            weight: weight,
+            height: height,
+            gender: gender,
+            activityLevel: activityLevel,
+            goal: goal,
+            dietType: dietType,
+            waterIntake: waterIntake,
+            injuries: injuries,
+            medicalConditions: medicalConditions,
+            allergies: allergies,
+          );
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('✅ Hoàn thành thông tin sức khỏe!')),
@@ -361,12 +366,12 @@ class _HealthOnboardingScreenState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
       }
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
-  }  
+  }
 }

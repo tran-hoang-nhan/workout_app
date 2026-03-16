@@ -26,7 +26,9 @@ class NotificationService {
     if (!isActive) {
       debugPrint("💤 Outside active hours ($wakeTime - $sleepTime). Scheduling for next wake time.");
       DateTime nextWake = DateTime(now.year, now.month, now.day, wakeHour, 0);
-      if (nowHour >= sleepHour) nextWake = nextWake.add(const Duration(days: 1));
+      if (nowHour >= sleepHour) {
+        nextWake = nextWake.add(const Duration(days: 1));
+      }
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: 10,
@@ -53,8 +55,7 @@ class NotificationService {
         id: 10,
         channelKey: waterChannelKey,
         title: 'Thời gian uống nước! 💧',
-        body:
-            'Đã đến lúc bổ sung nước rồi. Hãy uống một cốc nước để cơ thể khỏe mạnh nhé!',
+        body:'Đã đến lúc bổ sung nước rồi. Hãy uống một cốc nước để cơ thể khỏe mạnh nhé!',
         notificationLayout: NotificationLayout.Default,
         category: NotificationCategory.Reminder,
         wakeUpScreen: true,
@@ -77,7 +78,9 @@ class NotificationService {
     );
 
     if (created) {
-      debugPrint("✅ Water reminder scheduled successfully for every $safeInterval hours");
+      debugPrint(
+        "✅ Water reminder scheduled successfully for every $safeInterval hours",
+      );
     } else {
       debugPrint("⚠️ Schedule returned false.");
     }
@@ -97,5 +100,9 @@ class NotificationService {
 
   Future<void> cancelAllReminders() async {
     await AwesomeNotifications().cancelAll();
+  }
+
+  Future<void> cancelAllWaterReminders() async {
+    await AwesomeNotifications().cancel(10);
   }
 }

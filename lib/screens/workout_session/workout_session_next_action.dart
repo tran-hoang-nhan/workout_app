@@ -1,4 +1,4 @@
-import '../../models/workout_item.dart';
+import 'package:shared/shared.dart';
 
 enum WorkoutSessionNextActionType { enterRest, advance, complete }
 

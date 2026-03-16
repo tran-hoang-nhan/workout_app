@@ -19,7 +19,7 @@ class ValidationUtils {
     if (value.length < 6) {
       return 'Mật khẩu phải có ít nhất 6 ký tự';
     }
-    
+
     return null;
   }
 

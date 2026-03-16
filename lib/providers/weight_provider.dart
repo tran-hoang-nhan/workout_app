@@ -1,9 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared/shared.dart';
 import '../repositories/weight_repository.dart';
 import '../services/weight_service.dart';
-import '../models/body_metric.dart';
-import '../utils/app_error.dart';
-import './auth_provider.dart'; 
+import './auth_provider.dart';
 
 final weightRepositoryProvider = Provider<WeightRepository>((ref) {
   return WeightRepository();
@@ -14,8 +14,9 @@ final weightServiceProvider = Provider<WeightService>((ref) {
   return WeightService(repository: repo);
 });
 
-
-final weightHistoryProvider = FutureProvider.autoDispose<List<BodyMetric>>((ref) async {
+final weightHistoryProvider = FutureProvider.autoDispose<List<BodyMetric>>((
+  ref,
+) async {
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) return [];
   final service = ref.watch(weightServiceProvider);
@@ -29,38 +30,60 @@ final userHeightProvider = FutureProvider.autoDispose<double>((ref) async {
   return (await repo.getUserHeight(userId)) ?? 0.0;
 });
 
-final loadWeightDataProvider = FutureProvider.autoDispose<WeightData>((ref) async {
+final loadWeightDataProvider = FutureProvider.autoDispose<WeightData>((
+  ref,
+) async {
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) {
+    debugPrint('[loadWeightDataProvider] No userId found');
     return WeightData(weight: 0, height: 0, weightHistory: []);
   }
 
+  debugPrint('[loadWeightDataProvider] Fetching data for user: $userId');
   final service = ref.watch(weightServiceProvider);
   final repo = ref.watch(weightRepositoryProvider);
-  
-  final results = await Future.wait([
-    service.loadHistory(userId),
-    repo.getLatestMetrics(userId),
-  ]);
 
-  final history = results[0] as List<BodyMetric>;
-  final healthMetrics = results[1] as ({double? weight, double? height});
-  
-  double currentWeight = healthMetrics.weight ?? 0.0;
-  if (history.isNotEmpty) {
-    currentWeight = history.first.weight;
+  try {
+    final results = await Future.wait([
+      service.loadHistory(userId),
+      repo.getLatestMetrics(userId),
+    ]);
+
+    final history = results[0] as List<BodyMetric>;
+    final latestMetric = results[1] as BodyMetric?;
+
+    debugPrint('[loadWeightDataProvider] History count: ${history.length}');
+    debugPrint('[loadWeightDataProvider] Latest metric: $latestMetric');
+
+    double currentWeight = latestMetric?.weight ?? 0.0;
+    if (history.isNotEmpty && currentWeight == 0.0) {
+      currentWeight = history.first.weight;
+    }
+
+    final height = (await repo.getUserHeight(userId)) ?? 0.0;
+    debugPrint('[loadWeightDataProvider] User height: $height');
+
+    return WeightData(
+      weight: currentWeight,
+      height: height,
+      weightHistory: history,
+    );
+  } catch (e) {
+    debugPrint('[loadWeightDataProvider] Error: $e');
+    rethrow;
   }
-  
-  return WeightData(
-    weight: currentWeight,
-    height: healthMetrics.height ?? 0.0,
-    weightHistory: history,
-  );
 });
 
-final weightControllerProvider = AsyncNotifierProvider<WeightController, void>(() {
-  return WeightController();
-});
+class WeightData {
+  final double weight;
+  final double height;
+  final List<BodyMetric> weightHistory;
+  WeightData({
+    required this.weight,
+    required this.height,
+    required this.weightHistory,
+  });
+}
 
 class WeightController extends AsyncNotifier<void> {
   @override
@@ -71,26 +94,25 @@ class WeightController extends AsyncNotifier<void> {
     final userId = await ref.read(currentUserIdProvider.future);
     if (userId == null) return;
     state = await AsyncValue.guard(() async {
-      try {
-        final service = ref.read(weightServiceProvider);
-        await service.logNewWeight(userId: userId, weight: weight, date: date);
-        ref.invalidate(weightHistoryProvider);
-        ref.invalidate(loadWeightDataProvider);
-      } catch (e, st) {
-        throw handleException(e, st);
-      }
+      final service = ref.read(weightServiceProvider);
+      await service.logNewWeight(userId: userId, weight: weight, date: date);
+      ref.invalidate(weightHistoryProvider);
+      ref.invalidate(loadWeightDataProvider);
     });
   }
 
   Future<void> deleteWeight(int id) async {
+    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      try {
-        await ref.read(weightServiceProvider).deleteEntry(id);
-        ref.invalidate(weightHistoryProvider);
-        ref.invalidate(loadWeightDataProvider);
-      } catch (e, st) {
-        throw handleException(e, st);
-      }
+      await ref.read(weightServiceProvider).deleteEntry(id);
+      ref.invalidate(weightHistoryProvider);
+      ref.invalidate(loadWeightDataProvider);
     });
   }
 }
+
+final weightControllerProvider = AsyncNotifierProvider<WeightController, void>(
+  () {
+    return WeightController();
+  },
+);

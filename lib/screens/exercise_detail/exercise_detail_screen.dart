@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../models/exercise.dart';
+import 'package:shared/shared.dart';
 import '../exercises/widgets/exercise_animation_widget.dart';
 import 'widgets/exercise_info_row.dart';
 import '../../utils/label_utils.dart';

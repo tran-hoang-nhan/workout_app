@@ -53,8 +53,14 @@ class ActivityCalendar extends StatelessWidget {
             formatButtonVisible: false,
             titleCentered: true,
             titleTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-            leftChevronIcon: const Icon(Icons.chevron_left, color: AppColors.primary),
-            rightChevronIcon: const Icon(Icons.chevron_right, color: AppColors.primary),
+            leftChevronIcon: const Icon(
+              Icons.chevron_left,
+              color: AppColors.primary,
+            ),
+            rightChevronIcon: const Icon(
+              Icons.chevron_right,
+              color: AppColors.primary,
+            ),
           ),
         ),
       ),

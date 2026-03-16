@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/notification.dart';
+import 'package:shared/shared.dart';
 import '../../../providers/notification_provider.dart';
 import '../../../providers/health_provider.dart';
 import './water_countdown_circle.dart';
@@ -14,6 +14,37 @@ class NotificationListItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final timeStr = _formatDateTime(notification.createdAt);
+
+    Color colorFromHex(String hexString) {
+      var hexColor = hexString.toUpperCase().replaceAll('#', '');
+      if (hexColor.startsWith('0X')) {
+        hexColor = hexColor.substring(2);
+      }
+      if (hexColor.length == 6) {
+        hexColor = 'FF$hexColor';
+      }
+      return Color(int.parse(hexColor, radix: 16));
+    }
+
+    IconData iconFromString(String iconString) {
+      switch (iconString) {
+        case 'fitness_center':
+          return Icons.fitness_center;
+        case 'water_drop':
+          return Icons.water_drop;
+        case 'emoji_events':
+          return Icons.emoji_events;
+        case 'notifications_active':
+          return Icons.notifications_active;
+        case 'info':
+          return Icons.info;
+        default:
+          return Icons.notifications;
+      }
+    }
+
+    final notifColor = colorFromHex(notification.color);
+    final notifIcon = iconFromString(notification.icon);
 
     return GestureDetector(
       onTap: () {
@@ -41,14 +72,10 @@ class NotificationListItem extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: notification.color.withValues(alpha: 0.1),
+                color: notifColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                notification.icon,
-                color: notification.color,
-                size: 20,
-              ),
+              child: Icon(notifIcon, color: notifColor, size: 20),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -109,18 +136,20 @@ class NotificationListItem extends ConsumerWidget {
   }
 
   Widget _buildActionArea(BuildContext context, WidgetRef ref) {
-    if (notification.type != NotificationType.water) return const SizedBox.shrink();
+    if (notification.type != NotificationType.water) {
+      return const SizedBox.shrink();
+    }
 
     if (notification.drankAt != null) {
       final healthDataAsync = ref.watch(healthDataProvider);
-      
+
       return healthDataAsync.when(
         data: (healthData) {
           final interval = healthData?.waterReminderInterval ?? 1;
           final duration = Duration(hours: interval);
           final now = DateTime.now();
           final limit = notification.drankAt!.add(duration);
-          
+
           if (now.isBefore(limit)) {
             return Padding(
               padding: const EdgeInsets.only(top: AppSpacing.md),
@@ -142,7 +171,8 @@ class NotificationListItem extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.md),
       child: ElevatedButton.icon(
-        onPressed: () => ref.read(notificationProvider.notifier).drinkWater(notification.id),
+        onPressed: () =>
+            ref.read(notificationProvider.notifier).drinkWater(notification.id),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
@@ -155,10 +185,7 @@ class NotificationListItem extends ConsumerWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        icon: const Icon(
-          Icons.shopping_basket,
-          size: 16,
-        ),
+        icon: const Icon(Icons.shopping_basket, size: 16),
         label: const Text(
           'Đã uống',
           style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../models/body_metric.dart';
-// Import file chứa các hàm tính toán
-import '../../../utils/health_utils.dart'; 
+import 'package:shared/shared.dart';
 
 class CurrentWeightCard extends StatelessWidget {
   final double weight;
@@ -17,15 +15,15 @@ class CurrentWeightCard extends StatelessWidget {
 
   Color _getBMIColor(double bmi) {
     if (bmi < 18.5) return const Color(0xFF60A5FA); // Blue
-    if (bmi < 25) return const Color(0xFF34D399);   // Green
-    if (bmi < 30) return const Color(0xFFFBBF24);   // Yellow
-    return const Color(0xFFF87171);                 // Red
+    if (bmi < 25) return const Color(0xFF34D399); // Green
+    if (bmi < 30) return const Color(0xFFFBBF24); // Yellow
+    return const Color(0xFFF87171); // Red
   }
 
   @override
   Widget build(BuildContext context) {
-    final bmi = calculateBMI(weight, height);
-    final bmiLabel = getBMICategory(bmi); 
+    final bmi = HealthUtils.calculateBMI(weight, height);
+    final bmiLabel = HealthUtils.getBMICategory(bmi);
     final bmiColor = _getBMIColor(bmi);
 
     final weightChange = weightHistory.length >= 2
@@ -48,8 +46,14 @@ class CurrentWeightCard extends StatelessWidget {
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Cân nặng hiện tại', style: TextStyle(fontSize: 11, color: Color(0xFFFFEDD5))),
-              Text('BMI', style: TextStyle(fontSize: 11, color: Color(0xFFFFEDD5))),
+              Text(
+                'Cân nặng hiện tại',
+                style: TextStyle(fontSize: 11, color: Color(0xFFFFEDD5)),
+              ),
+              Text(
+                'BMI',
+                style: TextStyle(fontSize: 11, color: Color(0xFFFFEDD5)),
+              ),
             ],
           ),
 
@@ -58,28 +62,30 @@ class CurrentWeightCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text('${weight.toStringAsFixed(1)} kg',
+                child: Text(
+                  '${weight.toStringAsFixed(1)} kg',
                   style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white
-                  )
+                    color: Colors.white,
+                  ),
                 ),
               ),
               Expanded(
-                child: Text(bmi.toStringAsFixed(1),
+                child: Text(
+                  bmi.toStringAsFixed(1),
                   style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white
+                    color: Colors.white,
                   ),
-                  textAlign: TextAlign.right
+                  textAlign: TextAlign.right,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 4),
-          
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -92,11 +98,11 @@ class CurrentWeightCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    bmiLabel, 
+                    bmiLabel,
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: bmiColor
+                      color: bmiColor,
                     ),
                     textAlign: TextAlign.right,
                   ),
@@ -112,17 +118,17 @@ class CurrentWeightCard extends StatelessWidget {
   Widget _buildWeightChangeIndicator(double change) {
     final isIncrease = change > 0;
     final isDecrease = change < 0;
-    final color = isIncrease 
+    final color = isIncrease
         ? const Color(0xFFFCA5A5)
-        : isDecrease 
-            ? const Color(0xFFA7F3D0) 
-            : const Color(0xFFFFEDD5); 
+        : isDecrease
+        ? const Color(0xFFA7F3D0)
+        : const Color(0xFFFFEDD5);
 
-    final icon = isIncrease 
-        ? Icons.trending_up 
-        : isDecrease 
-            ? Icons.trending_down 
-            : Icons.remove;
+    final icon = isIncrease
+        ? Icons.trending_up
+        : isDecrease
+        ? Icons.trending_down
+        : Icons.remove;
 
     return Row(
       children: [

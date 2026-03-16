@@ -68,17 +68,22 @@ class ForgotPasswordScreen extends ConsumerWidget {
                       if (formKey.currentState!.validate()) {
                         final email = emailController.text.trim();
                         try {
-                          await ref.read(authControllerProvider.notifier).resetPassword(email);
+                          await ref
+                              .read(authControllerProvider.notifier)
+                              .resetPassword(email);
                           if (context.mounted) {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => PasswordRecoveryScreen(email: email),
+                                builder: (context) =>
+                                    PasswordRecoveryScreen(email: email),
                               ),
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Mã xác nhận đã được gửi đến email của bạn!'),
+                                content: Text(
+                                  'Mã xác nhận đã được gửi đến email của bạn!',
+                                ),
                                 backgroundColor: Colors.green,
                               ),
                             );

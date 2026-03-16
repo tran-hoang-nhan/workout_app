@@ -1,51 +1,23 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/exercise.dart';
-import '../utils/storage_utils.dart';
-import '../utils/text_utils.dart';
+import 'package:shared/shared.dart';
+import '../services/api_client.dart';
 
 class ExerciseRepository {
-  final SupabaseClient _supabase = Supabase.instance.client;
-  
-  Future<List<Exercise>> getExercises() async {
-    try {
-      final response = await _supabase.from('exercises').select().order('id', ascending: true);
-      return (response as List).map((json) => Exercise.fromJson(processExerciseJson(_supabase, json as Map<String, dynamic>),),).toList();
-    } catch (e) {
-      throw Exception('Lỗi khi tải danh sách bài tập: $e');
-    }
-  }
+  final ApiClient _apiClient;
+  ExerciseRepository({ApiClient? apiClient})
+    : _apiClient = apiClient ?? ApiClient();
 
-  Future<Exercise?> getExerciseById(int id) async {
-    try {
-      final response = await _supabase.from('exercises').select().eq('id', id).single();
-      return Exercise.fromJson(processExerciseJson(_supabase, response));
-    } catch (e) {
-      throw Exception('Lỗi khi tải bài tập: $e');
-    }
+  Future<List<Exercise>> getExercises() => _apiClient.getExercises();
+
+  Future<Exercise?> getExerciseById(String id) async {
+    // Implement proxy if needed
+    return null;
   }
 
   Future<List<Exercise>> searchExercises(String query) async {
-    try {
-      final all = await getExercises();
-      final trimmed = query.trim();
-      if (trimmed.isEmpty) return all;
-
-      return all
-          .where(
-            (e) => TextUtils.containsQuery(text: e.name, query: trimmed),
-          )
-          .toList();
-    } catch (e) {
-      throw Exception('Lỗi khi tìm kiếm bài tập: $e');
-    }
+    return [];
   }
 
   Future<List<Exercise>> getExercisesByMuscleGroup(String muscleGroup) async {
-    try {
-      final response = await _supabase.from('exercises').select().ilike('muscle_group', '%$muscleGroup%').order('id', ascending: true);
-      return (response as List).map((json) => Exercise.fromJson(processExerciseJson(_supabase, json as Map<String, dynamic>),),).toList();
-    } catch (e) {
-      throw Exception('Lỗi khi tải bài tập theo nhóm cơ: $e');
-    }
+    return [];
   }
 }

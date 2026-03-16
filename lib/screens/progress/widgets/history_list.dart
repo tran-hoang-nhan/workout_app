@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../constants/app_constants.dart';
 import '../../../utils/app_error.dart';
 import '../../../widgets/loading_animation.dart';
-import '../../../models/workout_history.dart';
+import 'package:shared/shared.dart';
 
 class WorkoutHistoryList extends StatelessWidget {
   final AsyncValue<List<dynamic>> historyAsync;

@@ -43,25 +43,43 @@ class EditProfileAvatar extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(3),
               child: Container(
-                decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.bgLight),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.bgLight,
+                ),
                 padding: const EdgeInsets.all(2),
                 child: ClipOval(
                   child: displayAvatarUrl.isNotEmpty
                       ? Image.network(
                           displayAvatarUrl,
                           fit: BoxFit.cover,
-                          loadingBuilder: (context, child, lp) => lp == null ? child : const Center(child: AppLoading(size: 20)),
-                          errorBuilder: (context, e, st) => const Icon(Icons.person, size: 50, color: AppColors.grey),
+                          loadingBuilder: (context, child, lp) => lp == null
+                              ? child
+                              : const Center(child: AppLoading(size: 20)),
+                          errorBuilder: (context, e, st) => const Icon(
+                            Icons.person,
+                            size: 50,
+                            color: AppColors.grey,
+                          ),
                         )
-                      : const Icon(Icons.person, size: 50, color: AppColors.grey),
+                      : const Icon(
+                          Icons.person,
+                          size: 50,
+                          color: AppColors.grey,
+                        ),
                 ),
               ),
             ),
             if (isUploading)
               Positioned.fill(
                 child: Container(
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.black.withValues(alpha: 0.6)),
-                  child: const Center(child: AppLoading(size: 30, color: Colors.white)),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black.withValues(alpha: 0.6),
+                  ),
+                  child: const Center(
+                    child: AppLoading(size: 30, color: Colors.white),
+                  ),
                 ),
               ),
             GestureDetector(
@@ -73,7 +91,11 @@ class EditProfileAvatar extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: AppColors.white, width: 3),
                 ),
-                child: const Icon(Icons.camera_alt_rounded, size: 18, color: AppColors.white),
+                child: const Icon(
+                  Icons.camera_alt_rounded,
+                  size: 18,
+                  color: AppColors.white,
+                ),
               ),
             ),
           ],
@@ -83,7 +105,11 @@ class EditProfileAvatar extends StatelessWidget {
             onPressed: isUploading ? null : onRemoveImage,
             child: const Text(
               'Xóa ảnh hiện tại',
-              style: TextStyle(color: AppColors.danger, fontSize: 13, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: AppColors.danger,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
       ],

@@ -4,9 +4,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import '../../../constants/app_constants.dart';
 import '../../../providers/weight_provider.dart';
-import '../../../models/body_metric.dart';
+import 'package:shared/shared.dart';
 
 enum ChartType { weight, bmi }
+
 enum TimeRange { days7, days30, all }
 
 class WeightProgressChart extends StatefulWidget {
@@ -76,7 +77,8 @@ class _WeightProgressChartState extends State<WeightProgressChart> {
                     }
                     return _buildLineChart(filteredData);
                   },
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (_, _) => const Center(child: Text('Lỗi tải biểu đồ')),
                 );
               },
@@ -113,7 +115,12 @@ class _WeightProgressChartState extends State<WeightProgressChart> {
           color: isSelected ? AppColors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           boxShadow: isSelected
-              ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)]
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 4,
+                  ),
+                ]
               : null,
         ),
         child: Text(
@@ -148,7 +155,9 @@ class _WeightProgressChartState extends State<WeightProgressChart> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : Colors.transparent,
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.cardBorder,
@@ -168,15 +177,20 @@ class _WeightProgressChartState extends State<WeightProgressChart> {
 
   List<BodyMetric> _filterData(List<BodyMetric> data) {
     if (data.isEmpty) return [];
-    
-    final sortedData = data.toList()..sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
-    
+
+    final sortedData = data.toList()
+      ..sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
+
     final now = DateTime.now();
     switch (_selectedRange) {
       case TimeRange.days7:
-        return sortedData.where((m) => now.difference(m.recordedAt).inDays <= 7).toList();
+        return sortedData
+            .where((m) => now.difference(m.recordedAt).inDays <= 7)
+            .toList();
       case TimeRange.days30:
-        return sortedData.where((m) => now.difference(m.recordedAt).inDays <= 30).toList();
+        return sortedData
+            .where((m) => now.difference(m.recordedAt).inDays <= 30)
+            .toList();
       case TimeRange.all:
         return sortedData;
     }
@@ -184,8 +198,8 @@ class _WeightProgressChartState extends State<WeightProgressChart> {
 
   Widget _buildLineChart(List<BodyMetric> data) {
     final spots = data.asMap().entries.map((entry) {
-      final value = _selectedChart == ChartType.weight 
-          ? entry.value.weight 
+      final value = _selectedChart == ChartType.weight
+          ? entry.value.weight
           : (entry.value.bmi ?? 0.0);
       return FlSpot(entry.key.toDouble(), value);
     }).toList();
@@ -202,22 +216,33 @@ class _WeightProgressChartState extends State<WeightProgressChart> {
         ),
         titlesData: FlTitlesData(
           show: true,
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 30,
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
-                if (index < 0 || index >= data.length) return const SizedBox.shrink();
-                
-                if (index == 0 || index == data.length - 1 || (data.length > 5 && index == (data.length / 2).floor())) {
+                if (index < 0 || index >= data.length) {
+                  return const SizedBox.shrink();
+                }
+
+                if (index == 0 ||
+                    index == data.length - 1 ||
+                    (data.length > 5 && index == (data.length / 2).floor())) {
                   return Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
                       DateFormat('dd/MM').format(data[index].recordedAt),
-                      style: const TextStyle(fontSize: 10, color: AppColors.grey),
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: AppColors.grey,
+                      ),
                     ),
                   );
                 }

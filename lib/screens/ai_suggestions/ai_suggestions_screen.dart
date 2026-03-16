@@ -3,12 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/health_provider.dart';
 import '../../providers/workout_provider.dart';
-import '../../models/workout.dart';
+import 'package:shared/shared.dart';
 import 'widgets/health_validation_card.dart';
 import 'widgets/health_edit_form.dart';
 import 'widgets/chat_message_bubble.dart';
 import 'widgets/workout_suggestion_card.dart';
-import '../../models/health_params.dart';
 
 enum AISuggestionStep { validating, editing, generating, results }
 
@@ -283,8 +282,7 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
               ),
               child: IconButton(
                 icon: const Icon(Icons.send, color: Colors.white, size: 20),
-                onPressed: () {
-                },
+                onPressed: () {},
               ),
             ),
           ],

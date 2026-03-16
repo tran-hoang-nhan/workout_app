@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/user.dart';
+import 'package:shared/shared.dart';
 import '../../../utils/label_utils.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
@@ -81,12 +81,19 @@ class ProfileHeaderCard extends StatelessWidget {
                                     fit: BoxFit.cover,
                                     loadingBuilder:
                                         (context, child, loadingProgress) {
-                                          if (loadingProgress == null) return child;
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
                                           return Center(
                                             child: CircularProgressIndicator(
                                               value:
-                                                  loadingProgress.expectedTotalBytes != null
-                                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                  loadingProgress
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
                                                   : null,
                                               strokeWidth: 2,
                                             ),

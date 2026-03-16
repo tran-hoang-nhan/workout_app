@@ -4,10 +4,7 @@ import '../../../constants/app_constants.dart';
 class ProfileLogoutButton extends StatelessWidget {
   final VoidCallback onLogoutConfirmed;
 
-  const ProfileLogoutButton({
-    super.key,
-    required this.onLogoutConfirmed,
-  });
+  const ProfileLogoutButton({super.key, required this.onLogoutConfirmed});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +22,10 @@ class ProfileLogoutButton extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('Đăng xuất', style: TextStyle(color: Color(0xFFEF4444))),
+                child: const Text(
+                  'Đăng xuất',
+                  style: TextStyle(color: Color(0xFFEF4444)),
+                ),
               ),
             ],
           ),
@@ -37,7 +37,10 @@ class ProfileLogoutButton extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
         decoration: BoxDecoration(
           color: AppColors.bgLight,
           border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
@@ -52,7 +55,11 @@ class ProfileLogoutButton extends StatelessWidget {
                 color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppBorderRadius.sm),
               ),
-              child: const Icon(Icons.logout, color: Color(0xFFEF4444), size: 20),
+              child: const Icon(
+                Icons.logout,
+                color: Color(0xFFEF4444),
+                size: 20,
+              ),
             ),
             const SizedBox(width: AppSpacing.md),
             const Expanded(

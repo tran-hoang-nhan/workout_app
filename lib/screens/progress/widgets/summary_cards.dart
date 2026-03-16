@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/progress_user.dart';
+import 'package:shared/shared.dart';
 import '../../../utils/app_error.dart';
 import '../../../widgets/loading_animation.dart';
 

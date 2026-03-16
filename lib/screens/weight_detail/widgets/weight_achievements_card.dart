@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
 import '../../../providers/weight_provider.dart';
-import '../../../models/body_metric.dart';
+import 'package:shared/shared.dart';
 
 class WeightAchievementsCard extends ConsumerWidget {
   const WeightAchievementsCard({super.key});
@@ -37,10 +37,18 @@ class WeightAchievementsCard extends ConsumerWidget {
               child: Row(
                 children: [
                   _buildStreakCard(streak),
-                  if (milestones.isNotEmpty) ...milestones.map((m) => Padding(
-                    padding: const EdgeInsets.only(left: AppSpacing.md),
-                    child: _buildMilestoneCard(m.title, m.subtitle, m.icon, m.color),
-                  )),
+                  if (milestones.isNotEmpty)
+                    ...milestones.map(
+                      (m) => Padding(
+                        padding: const EdgeInsets.only(left: AppSpacing.md),
+                        child: _buildMilestoneCard(
+                          m.title,
+                          m.subtitle,
+                          m.icon,
+                          m.color,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -54,25 +62,40 @@ class WeightAchievementsCard extends ConsumerWidget {
 
   int _calculateStreak(List<BodyMetric> history) {
     if (history.isEmpty) return 0;
-    
-    final sorted = history.toList()..sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
-    
+
+    final sorted = history.toList()
+      ..sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
+
     int streak = 0;
     DateTime lastDate = DateTime.now();
-    
+
     final firstDiff = DateTime(lastDate.year, lastDate.month, lastDate.day)
-        .difference(DateTime(sorted[0].recordedAt.year, sorted[0].recordedAt.month, sorted[0].recordedAt.day))
+        .difference(
+          DateTime(
+            sorted[0].recordedAt.year,
+            sorted[0].recordedAt.month,
+            sorted[0].recordedAt.day,
+          ),
+        )
         .inDays;
-        
+
     if (firstDiff > 1) return 0;
 
-    DateTime currentStreakDate = DateTime(sorted[0].recordedAt.year, sorted[0].recordedAt.month, sorted[0].recordedAt.day);
+    DateTime currentStreakDate = DateTime(
+      sorted[0].recordedAt.year,
+      sorted[0].recordedAt.month,
+      sorted[0].recordedAt.day,
+    );
     streak = 1;
 
     for (int i = 1; i < sorted.length; i++) {
-      final itemDate = DateTime(sorted[i].recordedAt.year, sorted[i].recordedAt.month, sorted[i].recordedAt.day);
+      final itemDate = DateTime(
+        sorted[i].recordedAt.year,
+        sorted[i].recordedAt.month,
+        sorted[i].recordedAt.day,
+      );
       final diff = currentStreakDate.difference(itemDate).inDays;
-      
+
       if (diff == 1) {
         streak++;
         currentStreakDate = itemDate;
@@ -90,33 +113,40 @@ class WeightAchievementsCard extends ConsumerWidget {
     final List<_MilestoneData> milestones = [];
     if (history.length < 2) return [];
 
-    final sorted = history.toList()..sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
+    final sorted = history.toList()
+      ..sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
     final initialWeight = sorted.first.weight;
     final currentWeight = sorted.last.weight;
     final weightDiff = initialWeight - currentWeight;
 
     if (weightDiff >= 5) {
-      milestones.add(_MilestoneData(
-        title: 'Giảm ${weightDiff.toStringAsFixed(1)}kg',
-        subtitle: 'Thành tích tuyệt vời!',
-        icon: Icons.emoji_events_rounded,
-        color: Colors.orange,
-      ));
+      milestones.add(
+        _MilestoneData(
+          title: 'Giảm ${weightDiff.toStringAsFixed(1)}kg',
+          subtitle: 'Thành tích tuyệt vời!',
+          icon: Icons.emoji_events_rounded,
+          color: Colors.orange,
+        ),
+      );
     } else if (weightDiff > 0) {
-       milestones.add(_MilestoneData(
-        title: 'Đang tiến bộ',
-        subtitle: 'Đã giảm ${weightDiff.toStringAsFixed(1)}kg',
-        icon: Icons.trending_down_rounded,
-        color: Colors.green,
-      ));
+      milestones.add(
+        _MilestoneData(
+          title: 'Đang tiến bộ',
+          subtitle: 'Đã giảm ${weightDiff.toStringAsFixed(1)}kg',
+          icon: Icons.trending_down_rounded,
+          color: Colors.green,
+        ),
+      );
     }
 
-    milestones.add(_MilestoneData(
-      title: 'Kiên trì',
-      subtitle: 'Đã cập nhật ${history.length} lần',
-      icon: Icons.verified_rounded,
-      color: Colors.blue,
-    ));
+    milestones.add(
+      _MilestoneData(
+        title: 'Kiên trì',
+        subtitle: 'Đã cập nhật ${history.length} lần',
+        icon: Icons.verified_rounded,
+        color: Colors.blue,
+      ),
+    );
 
     return milestones;
   }
@@ -167,7 +197,12 @@ class WeightAchievementsCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildMilestoneCard(String title, String subtitle, IconData icon, Color color) {
+  Widget _buildMilestoneCard(
+    String title,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -212,7 +247,12 @@ class _MilestoneData {
   final String subtitle;
   final IconData icon;
   final Color color;
-  _MilestoneData({required this.title, required this.subtitle, required this.icon, required this.color});
+  _MilestoneData({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+  });
 }
 
 extension ColorExtension on Color {

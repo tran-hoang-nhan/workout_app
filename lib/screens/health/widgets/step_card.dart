@@ -7,11 +7,7 @@ class StepCard extends ConsumerWidget {
   final double height;
   static const int stepsGoal = 10000;
 
-  const StepCard({
-    super.key,
-    required this.steps,
-    required this.height,
-  });
+  const StepCard({super.key, required this.steps, required this.height});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -54,7 +50,9 @@ class StepCard extends ConsumerWidget {
                     value: progress,
                     strokeWidth: 10,
                     backgroundColor: Colors.orange.shade50,
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      AppColors.primary,
+                    ),
                     strokeCap: StrokeCap.round,
                   ),
                 ),

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
 import '../../../providers/health_provider.dart';
 
-import '../../../models/health_params.dart';
+import 'package:shared/shared.dart';
 
 class WaterIntakeCard extends StatelessWidget {
   final HealthUpdateParams formState;
@@ -174,13 +174,23 @@ class WaterIntakeCard extends StatelessWidget {
 
   Future<void> _saveSettings(WidgetRef ref) async {
     try {
-      await ref.read(saveHealthProfileProvider((height: formState.height, gender: null)).future);
+      await ref.read(
+        saveHealthProfileProvider((
+          height: formState.height,
+          gender: null,
+        )).future,
+      );
     } catch (e) {
       debugPrint('Error saving water times: $e');
     }
   }
 
-  Widget _buildTimeSelector(BuildContext context, String label, String currentTime, Function(String) onChanged) {
+  Widget _buildTimeSelector(
+    BuildContext context,
+    String label,
+    String currentTime,
+    Function(String) onChanged,
+  ) {
     return InkWell(
       onTap: () async {
         final parts = currentTime.split(':');
@@ -208,7 +218,8 @@ class WaterIntakeCard extends StatelessWidget {
         );
 
         if (picked != null) {
-          final formattedTime = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+          final formattedTime =
+              '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
           onChanged(formattedTime);
         }
       },

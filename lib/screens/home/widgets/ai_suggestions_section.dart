@@ -53,11 +53,7 @@ class AISuggestionsSection extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: AppSpacing.xs),
-                  Icon(
-                    Icons.chevron_right,
-                    color: Color(0xFFFF7F00),
-                    size: 18,
-                  ),
+                  Icon(Icons.chevron_right, color: Color(0xFFFF7F00), size: 18),
                 ],
               ),
             ),
@@ -106,7 +102,9 @@ class AISuggestionsSection extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFFFF7F00).withValues(alpha: 0.15),
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFFFF7F00).withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: const Color(0xFFFF7F00).withValues(alpha: 0.3),
+                        ),
                       ),
                       child: const Icon(
                         Icons.auto_awesome,

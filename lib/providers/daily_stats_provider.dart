@@ -1,13 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared/shared.dart';
 import '../repositories/daily_stats_repository.dart';
-import '../models/daily_stats.dart';
 import './auth_provider.dart';
 
 final dailyStatsRepositoryProvider = Provider<DailyStatsRepository>((ref) {
   return DailyStatsRepository();
 });
 
-final dailyStatsProvider = FutureProvider.family<DailyStats?, DateTime>((ref, rawDate) async {
+final dailyStatsProvider = FutureProvider.family<DailyStats?, DateTime>((
+  ref,
+  rawDate,
+) async {
   final date = DateTime(rawDate.year, rawDate.month, rawDate.day);
   final userId = ref.watch(currentUserIdProvider).value;
   if (userId == null) return null;
@@ -25,7 +28,10 @@ final weeklyStatsProvider = FutureProvider<List<DailyStats>>((ref) async {
   return await repo.getStatsRange(userId, startOfWeek, endOfWeek);
 });
 
-final monthStatsProvider = FutureProvider.family<List<DailyStats>, DateTime>((ref, month) async {
+final monthStatsProvider = FutureProvider.family<List<DailyStats>, DateTime>((
+  ref,
+  month,
+) async {
   final userId = ref.watch(currentUserIdProvider).value;
   if (userId == null) return [];
   final repo = ref.watch(dailyStatsRepositoryProvider);

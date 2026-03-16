@@ -29,7 +29,8 @@ class HeartRateDetailScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             ZoneDetailCard(
               title: 'Vùng 1: Khởi động (50-60%)',
-              range: '${calculations.zone1.min} - ${calculations.zone1.max} bpm',
+              range:
+                  '${calculations.zone1.min} - ${calculations.zone1.max} bpm',
               percentage: '50-60%',
               description: 'Tốt cho phục hồi và làm nóng cơ thể.',
               color: Colors.grey[400]!,
@@ -38,7 +39,8 @@ class HeartRateDetailScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             ZoneDetailCard(
               title: 'Vùng 2: Đốt mỡ (60-70%)',
-              range: '${calculations.zone2.min} - ${calculations.zone2.max} bpm',
+              range:
+                  '${calculations.zone2.min} - ${calculations.zone2.max} bpm',
               percentage: '60-70%',
               description: 'Tăng cường sức bền cơ bản và đốt cháy chất béo.',
               color: Colors.blue,
@@ -47,7 +49,8 @@ class HeartRateDetailScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             ZoneDetailCard(
               title: 'Vùng 3: Aerobic (70-80%)',
-              range: '${calculations.zone3.min} - ${calculations.zone3.max} bpm',
+              range:
+                  '${calculations.zone3.min} - ${calculations.zone3.max} bpm',
               percentage: '70-80%',
               description: 'Cải thiện hệ thống tim mạch và sức mạnh cơ bắp.',
               color: Colors.green,
@@ -56,7 +59,8 @@ class HeartRateDetailScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             ZoneDetailCard(
               title: 'Vùng 4: Anaerobic (80-90%)',
-              range: '${calculations.zone4.min} - ${calculations.zone4.max} bpm',
+              range:
+                  '${calculations.zone4.min} - ${calculations.zone4.max} bpm',
               percentage: '80-90%',
               description: 'Tăng cường hiệu suất tối đa và ngưỡng lactate.',
               color: Colors.orange,
@@ -65,7 +69,8 @@ class HeartRateDetailScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             ZoneDetailCard(
               title: 'Vùng 5: Redline (90-100%)',
-              range: '${calculations.zone5.min} - ${calculations.zone5.max} bpm',
+              range:
+                  '${calculations.zone5.min} - ${calculations.zone5.max} bpm',
               percentage: '90-100%',
               description: 'Dùng cho các khoảng thời gian tập luyện cực ngắn.',
               color: Colors.red,

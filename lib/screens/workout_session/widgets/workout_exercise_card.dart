@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/exercise.dart';
-import '../../../models/workout_item.dart';
+import 'package:shared/shared.dart';
 import '../../exercises/widgets/exercise_animation_widget.dart';
 import 'workout_session_countdown_ring.dart';
 import 'workout_session_info_chip.dart';

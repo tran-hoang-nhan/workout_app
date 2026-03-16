@@ -5,7 +5,7 @@ import 'dart:io';
 
 class HealthIntegrationService {
   final Health _health = Health();
-  final types = [HealthDataType.STEPS,];
+  final types = [HealthDataType.STEPS];
   List<HealthDataAccess> get permissions => types.map((e) => HealthDataAccess.READ).toList();
 
   Future<bool> requestPermissions() async {
@@ -14,7 +14,10 @@ class HealthIntegrationService {
       if (!status.isGranted) return false;
     }
 
-    bool requested = await _health.requestAuthorization(types, permissions: permissions);
+    bool requested = await _health.requestAuthorization(
+      types,
+      permissions: permissions,
+    );
     return requested;
   }
 
@@ -24,10 +27,12 @@ class HealthIntegrationService {
       final now = DateTime.now();
       final midnight = DateTime(now.year, now.month, now.day);
       bool? hasPermissions = await _health.hasPermissions(types, permissions: permissions);
+
       if (hasPermissions != true) {
         bool authorized = await requestPermissions();
         if (!authorized) return 0;
       }
+      
       int? steps = await _health.getTotalStepsInInterval(midnight, now);
       return steps ?? 0;
     } catch (e) {

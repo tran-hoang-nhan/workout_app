@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/workout_provider.dart';
-import '../../models/workout.dart';
+import 'package:shared/shared.dart';
 import '../../utils/app_error.dart';
 import 'widgets/workout_search_bar.dart';
 import 'widgets/workout_card.dart';

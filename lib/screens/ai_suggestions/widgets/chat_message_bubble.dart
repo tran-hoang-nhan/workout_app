@@ -18,12 +18,16 @@ class ChatMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAI = type == MessageType.ai;
-    final CrossAxisAlignment alignment = isAI ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+    final CrossAxisAlignment alignment = isAI
+        ? CrossAxisAlignment.start
+        : CrossAxisAlignment.end;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(
-        mainAxisAlignment: isAI ? MainAxisAlignment.start : MainAxisAlignment.end,
+        mainAxisAlignment: isAI
+            ? MainAxisAlignment.start
+            : MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (isAI) _buildAvatar(),

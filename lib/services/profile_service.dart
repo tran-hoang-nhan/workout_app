@@ -14,10 +14,6 @@ class ProfileService {
   Future<void> pickAndUploadAvatar() async {
     try {
       await _ref.read(avatarControllerProvider.notifier).pickAndUploadAvatar();
-      final state = _ref.read(avatarControllerProvider);
-      if (state.hasError) {
-        throw handleException(state.error!);
-      }
       _ref.invalidate(currentUserProvider);
     } catch (e) {
       throw handleException(e);
@@ -27,17 +23,20 @@ class ProfileService {
   Future<void> removeAvatar() async {
     try {
       await _ref.read(avatarControllerProvider.notifier).removeAvatar();
-
-      final state = _ref.read(avatarControllerProvider);
-      if (state.hasError) {
-        throw handleException(state.error!);
-      }
+      _ref.invalidate(currentUserProvider);
     } catch (e) {
       throw handleException(e);
     }
   }
 
-  Future<void> saveProfile({required String userId, required String fullName, String? gender, String? goal, double? weight, DateTime? dateOfBirth,}) async {
+  Future<void> saveProfile({
+    required String userId,
+    required String fullName,
+    String? gender,
+    String? goal,
+    double? weight,
+    DateTime? dateOfBirth,
+  }) async {
     if (fullName.isEmpty) {
       throw ValidationException('Vui lòng nhập tên');
     }
@@ -50,6 +49,7 @@ class ProfileService {
         goal: goal,
         dateOfBirth: dateOfBirth,
       );
+
       _ref.invalidate(currentUserProvider);
       _ref.invalidate(fullUserProfileProvider);
       _ref.invalidate(healthDataProvider);

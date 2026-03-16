@@ -1,12 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/health_data.dart';
-import '../models/health_params.dart';
-import './health_controller_provider.dart';
+import 'package:shared/shared.dart';
+import 'health_provider.dart';
+import 'auth_provider.dart';
 
 class HealthFormNotifier extends Notifier<HealthUpdateParams> {
   @override
   HealthUpdateParams build() {
-    return HealthUpdateParams.initial();
+    final userId = ref.watch(currentUserIdProvider).value ?? '';
+    return HealthUpdateParams.initial(userId);
   }
 
   void setAge(int age) => state = state.copyWith(age: age);
@@ -14,8 +15,10 @@ class HealthFormNotifier extends Notifier<HealthUpdateParams> {
   void setHeight(double height) => state = state.copyWith(height: height);
   void setGender(String gender) => state = state.copyWith(gender: gender);
   void setGoal(String goal) => state = state.copyWith(goal: goal);
-  void setWaterReminderEnabled(bool enabled) => state = state.copyWith(waterReminderEnabled: enabled);
-  void setWaterReminderInterval(int interval) => state = state.copyWith(waterReminderInterval: interval);
+  void setWaterReminderEnabled(bool enabled) =>
+      state = state.copyWith(waterReminderEnabled: enabled);
+  void setWaterReminderInterval(int interval) =>
+      state = state.copyWith(waterReminderInterval: interval);
   void setWakeTime(String time) => state = state.copyWith(wakeTime: time);
   void setSleepTime(String time) => state = state.copyWith(sleepTime: time);
 
@@ -45,8 +48,10 @@ class HealthFormNotifier extends Notifier<HealthUpdateParams> {
     state = state.copyWith(medicalConditions: list);
   }
 
-  void setActivityLevel(String level) => state = state.copyWith(activityLevel: level);
-  void setWaterIntake(double ml) => state = state.copyWith(waterIntake: ml.toInt());
+  void setActivityLevel(String level) =>
+      state = state.copyWith(activityLevel: level);
+  void setWaterIntake(double ml) =>
+      state = state.copyWith(waterIntake: ml.toInt());
   void setDietType(String type) => state = state.copyWith(dietType: type);
 
   void addAllergy(String allergy) {
@@ -66,9 +71,9 @@ class HealthFormNotifier extends Notifier<HealthUpdateParams> {
       userId: data.userId,
       age: data.age,
       weight: data.weight,
-      height: data.height ?? state.height,
-      gender: data.gender ?? state.gender,
-      goal: state.goal,
+      height: data.height,
+      gender: data.gender,
+      goal: data.goal,
       injuries: data.injuries,
       medicalConditions: data.medicalConditions,
       activityLevel: data.activityLevel,
@@ -77,8 +82,8 @@ class HealthFormNotifier extends Notifier<HealthUpdateParams> {
       allergies: data.allergies,
       waterReminderEnabled: data.waterReminderEnabled,
       waterReminderInterval: data.waterReminderInterval,
-      wakeTime: data.wakeTime,
-      sleepTime: data.sleepTime,
+      wakeTime: data.wakeTime ?? state.wakeTime,
+      sleepTime: data.sleepTime ?? state.sleepTime,
     );
   }
 
@@ -100,9 +105,21 @@ class HealthFormNotifier extends Notifier<HealthUpdateParams> {
   }) async {
     final activityKey = _mapActivityLevel(activityLevel);
     final goalKey = _mapGoal(goal);
-    final injuriesList = injuries.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-    final conditionsList = medicalConditions.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-    final allergiesList = allergies.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    final injuriesList = injuries
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+    final conditionsList = medicalConditions
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+    final allergiesList = allergies
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
 
     final params = HealthUpdateParams(
       userId: userId,

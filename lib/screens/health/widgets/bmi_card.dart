@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared/shared.dart';
 import '../../../constants/app_constants.dart';
-import '../../../providers/health_provider.dart';
 import '../../weight_detail/weight_detail_screen.dart';
 
 class BMICard extends StatefulWidget {
   final HealthCalculations calculations;
 
-  const BMICard({
-    super.key,
-    required this.calculations,
-  });
+  const BMICard({super.key, required this.calculations});
 
   @override
   State<BMICard> createState() => _BMICardState();
@@ -26,9 +23,10 @@ class _BMICardState extends State<BMICard> with SingleTickerProviderStateMixin {
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.02,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -40,7 +38,7 @@ class _BMICardState extends State<BMICard> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final bmiCategory = _getBMICategory(widget.calculations.bmi);
-    
+
     return GestureDetector(
       onTap: () {
         Navigator.push(

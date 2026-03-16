@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/notification.dart';
-import './health_provider.dart';
+import 'package:shared/shared.dart';
+import 'health_base_provider.dart';
 import './progress_user_provider.dart';
 import '../utils/logger.dart';
 
@@ -24,7 +24,8 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
       NotificationModel(
         id: 'w1',
         title: 'Đã đến giờ uống nước! 💧',
-        message: 'Hãy bổ sung 250ml nước để cơ thể khỏe mạnh và tràn đầy năng lượng nhé.',
+        message:
+            'Hãy bổ sung 250ml nước để cơ thể khỏe mạnh và tràn đầy năng lượng nhé.',
         createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
         type: NotificationType.water,
         isRead: false,
@@ -67,7 +68,9 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
     bool updated = false;
     state = [
       for (final notification in state)
-        if (!updated && notification.type == NotificationType.water && notification.drankAt == null)
+        if (!updated &&
+            notification.type == NotificationType.water &&
+            notification.drankAt == null)
           () {
             updated = true;
             return notification.copyWith(isRead: true, drankAt: now);
@@ -88,7 +91,9 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
   }
 
   void markAllAsRead() {
-    state = [for (final notification in state) notification.copyWith(isRead: true)];
+    state = [
+      for (final notification in state) notification.copyWith(isRead: true),
+    ];
   }
 
   void addNotification(NotificationModel notification) {

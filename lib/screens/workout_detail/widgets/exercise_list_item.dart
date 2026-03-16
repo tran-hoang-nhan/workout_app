@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../models/exercise.dart';
-import '../../../models/workout_item.dart';
+import 'package:shared/shared.dart';
 
 class ExerciseListItem extends StatelessWidget {
   final Exercise exercise;
@@ -196,7 +195,8 @@ class ExerciseListItem extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
-                if (exercise.description != null && exercise.description!.isNotEmpty) ...[
+                if (exercise.description != null &&
+                    exercise.description!.isNotEmpty) ...[
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
