@@ -1,0 +1,93 @@
+﻿Analyzing workout_backend...
+
+warning - routes\api\user\avatar.dart:8:9 - The value of the local variable 'repository' isn't used. Try removing the variable or using it. - unused_local_variable
+   info - lib\repositories\auth_repository.dart:4:7 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:5:3 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:8:24 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:15:24 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:27:16 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:28:56 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - lib\repositories\auth_repository.dart:41:20 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:63:16 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:69:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - lib\repositories\health_repository.dart:129:28 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\health_repository.dart:140:16 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:4:7 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:5:3 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:9:32 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:20:32 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:23:16 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:28:25 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:40:30 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:41:50 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - lib\repositories\progress_repository.dart:56:16 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:62:16 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:7:7 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:8:3 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:12:23 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:30:69 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - lib\repositories\workout_repository.dart:45:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\repositories\workout_repository.dart:50:25 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:58:25 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:69:25 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:81:5 - Unnecessary duplication of receiver. Try using a cascade to avoid the duplication. - cascade_invocations
+   info - lib\repositories\workout_repository.dart:97:25 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:109:25 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:116:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:126:5 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - lib\repositories\workout_repository.dart:134:48 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - lib\repositories\workout_repository.dart:142:26 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - lib\repositories\workout_repository.dart:163:22 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - pubspec.yaml:12:3 - Dependencies not sorted alphabetically. Try sorting the dependencies alphabetically (A to Z). - sort_pub_dependencies
+   info - routes\api\auth\complete-registration.dart:16:29 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\complete-registration.dart:18:35 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\complete-registration.dart:30:51 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\auth\complete-registration.dart:61:38 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\auth\login.dart:29:75 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\auth\profile\[id].dart:19:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\auth\profile\[id].dart:41:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\auth\register.dart:29:73 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\auth\resend-otp.dart:11:17 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\resend-otp.dart:12:19 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\resend-otp.dart:25:73 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\auth\verify-otp.dart:11:17 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\verify-otp.dart:12:17 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\verify-otp.dart:13:19 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\verify-otp.dart:32:73 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\health\daily-stats.dart:17:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - routes\api\health\daily-stats.dart:26:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\health\daily-stats.dart:39:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\health\index.dart:23:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\health\index.dart:36:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\health\weight-history\[id].dart:17:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\health\weight.dart:14:17 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\health\weight.dart:15:18 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\health\weight.dart:16:15 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\health\weight.dart:17:30 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\health\weight.dart:23:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\health\weight\[id].dart:18:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\progress\daily.dart:15:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - routes\api\progress\daily.dart:24:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\progress\daily.dart:32:17 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:33:30 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:34:21 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:35:26 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:36:19 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:37:21 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:38:22 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:39:22 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:45:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\progress\history\[id].dart:17:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\progress\workout-history\[id].dart:17:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\progress\workout-log.dart:25:38 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\user\avatar.dart:12:20 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\user\avatar.dart:13:23 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\user\avatar.dart:24:40 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\workouts\[id].dart:14:73 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\workouts\[id].dart:26:38 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\workouts\category\[category].dart:20:38 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\workouts\index.dart:30:38 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\workouts\search.dart:15:53 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\workouts\search.dart:27:38 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+
+89 issues found.

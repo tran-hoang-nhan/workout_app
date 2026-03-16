@@ -1,0 +1,158 @@
+﻿Analyzing workout_backend...
+
+  error - lib\repositories\progress_repository.dart:80:1 - Expected to find '}'. - expected_token
+  error - routes\api\progress\daily.dart:17:41 - The method 'getProgress' isn't defined for the type 'ProgressRepository'. Try correcting the name to the name of an existing method, or defining a method named 'getProgress'. - undefined_method
+  error - routes\api\progress\daily.dart:27:24 - The method 'updateActivityProgress' isn't defined for the type 'ProgressRepository'. Try correcting the name to the name of an existing method, or defining a method named 'updateActivityProgress'. - undefined_method
+  error - routes\api\progress\history\[id].dart:13:40 - The method 'getProgressHistory' isn't defined for the type 'ProgressRepository'. Try correcting the name to the name of an existing method, or defining a method named 'getProgressHistory'. - undefined_method
+  error - routes\api\progress\workout-log.dart:19:22 - The method 'logWorkout' isn't defined for the type 'ProgressRepository'. Try correcting the name to the name of an existing method, or defining a method named 'logWorkout'. - undefined_method
+warning - lib\repositories\progress_repository.dart:16:3 - Dead code. Try removing the code, or fixing the code before it so that it can be reached. - dead_code
+warning - lib\repositories\progress_repository.dart:16:32 - The declaration 'getProgressHistory' isn't referenced. Try removing the declaration of 'getProgressHistory'. - unused_element
+warning - lib\repositories\progress_repository.dart:18:16 - The declaration 'logWorkout' isn't referenced. Try removing the declaration of 'logWorkout'. - unused_element
+warning - lib\repositories\progress_repository.dart:27:34 - Unnecessary cast. Try removing the cast. - unnecessary_cast
+warning - lib\repositories\progress_repository.dart:30:30 - The declaration 'getProgressRange' isn't referenced. Try removing the declaration of 'getProgressRange'. - unused_element
+warning - lib\repositories\progress_repository.dart:41:16 - The declaration 'updateActivityProgress' isn't referenced. Try removing the declaration of 'updateActivityProgress'. - unused_element
+warning - routes\api\progress\history\[id].dart:5:8 - Unused import: 'package:shared/shared.dart'. Try removing the import directive. - unused_import
+warning - routes\api\progress\history\[id].dart:14:47 - The type of 'e' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter. - inference_failure_on_untyped_parameter
+warning - routes\api\user\avatar.dart:8:9 - The value of the local variable 'repository' isn't used. Try removing the variable or using it. - unused_local_variable
+   info - lib\repositories\auth_repository.dart:2:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - lib\repositories\auth_repository.dart:4:7 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:6:3 - Constructor declarations should be before non-constructor declarations. Try moving the constructor declaration before all other members. - sort_constructors_first
+   info - lib\repositories\auth_repository.dart:6:3 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:8:24 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:15:24 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:27:16 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:27:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\auth_repository.dart:40:20 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:41:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\auth_repository.dart:44:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\auth_repository.dart:54:16 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\auth_repository.dart:55:11 - Unnecessary type annotation on a local variable. Try removing the type annotation. - omit_local_variable_types
+   info - lib\repositories\auth_repository.dart:59:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\health_repository.dart:81:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\health_repository.dart:131:28 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\health_repository.dart:137:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\health_repository.dart:140:16 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\health_repository.dart:144:23 - Required named parameters should be before optional named parameters. Try moving the required named parameter to be before any optional named parameters. - always_put_required_named_parameters_first
+   info - lib\repositories\progress_repository.dart:2:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - lib\repositories\progress_repository.dart:4:7 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:6:3 - Constructor declarations should be before non-constructor declarations. Try moving the constructor declaration before all other members. - sort_constructors_first
+   info - lib\repositories\progress_repository.dart:6:3 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:9:32 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\progress_repository.dart:15:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\progress_repository.dart:16:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\progress_repository.dart:25:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\progress_repository.dart:30:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\progress_repository.dart:33:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\progress_repository.dart:34:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\progress_repository.dart:38:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\progress_repository.dart:69:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\progress_repository.dart:71:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\progress_repository.dart:72:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\progress_repository.dart:73:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\progress_repository.dart:76:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:4:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - lib\repositories\workout_repository.dart:6:7 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:10:3 - Constructor declarations should be before non-constructor declarations. Try moving the constructor declaration before all other members. - sort_constructors_first
+   info - lib\repositories\workout_repository.dart:10:3 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:12:23 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:29:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:44:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\repositories\workout_repository.dart:49:25 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:54:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:57:25 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:63:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:66:25 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:78:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:79:5 - Unnecessary duplication of receiver. Try using a cascade to avoid the duplication. - cascade_invocations
+   info - lib\repositories\workout_repository.dart:90:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:95:25 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:102:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:105:25 - Missing documentation for a public member. Try adding documentation for the member. - public_member_api_docs
+   info - lib\repositories\workout_repository.dart:112:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:121:35 - The variable 'json' should be final. Try making the variable final. - prefer_final_in_for_each
+   info - lib\repositories\workout_repository.dart:121:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:123:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:129:64 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - lib\repositories\workout_repository.dart:129:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:136:65 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - lib\repositories\workout_repository.dart:136:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:142:22 - The variable 'json' should be final. Try making the variable final. - prefer_final_in_for_each
+   info - lib\repositories\workout_repository.dart:143:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:148:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:152:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - lib\repositories\workout_repository.dart:156:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - pubspec.yaml:12:3 - Dependencies not sorted alphabetically. Try sorting the dependencies alphabetically (A to Z). - sort_pub_dependencies
+   info - routes\_middleware.dart:16:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\complete-registration.dart:6:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - routes\api\auth\complete-registration.dart:14:46 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\complete-registration.dart:14:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\complete-registration.dart:15:52 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\complete-registration.dart:15:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\complete-registration.dart:25:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\complete-registration.dart:50:6 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\auth\complete-registration.dart:52:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\login.dart:5:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - routes\api\auth\login.dart:23:6 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\auth\login.dart:25:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\profile\[id].dart:5:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - routes\api\auth\profile\[id].dart:16:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\profile\[id].dart:29:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\profile\[id].dart:35:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\register.dart:5:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - routes\api\auth\register.dart:23:6 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\auth\register.dart:25:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\resend-otp.dart:11:17 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\resend-otp.dart:12:19 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\resend-otp.dart:19:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\resend-otp.dart:23:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\verify-otp.dart:11:17 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\verify-otp.dart:12:17 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\verify-otp.dart:13:19 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\auth\verify-otp.dart:21:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\auth\verify-otp.dart:26:6 - Missing a required trailing comma. Try adding a trailing comma. - require_trailing_commas
+   info - routes\api\auth\verify-otp.dart:28:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\health\daily-stats.dart:5:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - routes\api\health\daily-stats.dart:15:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\health\daily-stats.dart:18:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\health\daily-stats.dart:21:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\health\daily-stats.dart:32:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\health\index.dart:5:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - routes\api\health\index.dart:20:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\health\index.dart:31:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\health\weight-history\[id].dart:15:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\health\weight.dart:14:17 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\health\weight.dart:15:18 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\health\weight.dart:16:15 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\health\weight.dart:17:30 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\health\weight.dart:21:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\health\weight\[id].dart:16:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\progress\daily.dart:14:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\progress\daily.dart:17:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\progress\daily.dart:20:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\progress\daily.dart:28:17 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:29:30 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:30:21 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:31:26 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:32:19 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:33:21 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:34:22 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:35:22 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\daily.dart:39:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\progress\history\[id].dart:5:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - routes\api\progress\history\[id].dart:14:53 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\progress\history\[id].dart:16:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\progress\workout-history\[id].dart:15:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\progress\workout-log.dart:5:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - routes\api\progress\workout-log.dart:22:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\user\avatar.dart:12:20 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\user\avatar.dart:13:23 - Method invocation or property access on a 'dynamic' target. Try giving the target a type. - avoid_dynamic_calls
+   info - routes\api\user\avatar.dart:22:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\workouts\[id].dart:13:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\workouts\[id].dart:23:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\workouts\category\[category].dart:18:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\workouts\index.dart:5:1 - Sort directive sections alphabetically. Try sorting the directives. - directives_ordering
+   info - routes\api\workouts\index.dart:27:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\workouts\search.dart:13:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+   info - routes\api\workouts\search.dart:23:81 - The line length exceeds the 80-character limit. Try breaking the line across multiple lines. - lines_longer_than_80_chars
+
+154 issues found.
