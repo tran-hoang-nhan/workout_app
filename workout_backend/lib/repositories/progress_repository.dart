@@ -122,41 +122,51 @@ class ProgressRepository {
   Future<ProgressStats?> getProgressStats(String userId) async {
     final response = await _supabase
         .from('progress_user')
-        .select('workouts_completed, total_duration_seconds, total_calories_burned, date')
+        .select(
+          'workouts_completed, total_duration_seconds, '
+          'total_calories_burned, date',
+        )
         .eq('user_id', userId)
         .order('date', ascending: false);
 
     final data = response as List;
     if (data.isEmpty) return null;
 
-    int totalWorkouts = 0;
-    int totalDurationSeconds = 0;
-    double totalCalories = 0.0;
-    int streak = 0;
+    var totalWorkouts = 0;
+    var totalDurationSeconds = 0;
+    var totalCalories = 0.0;
+    var streak = 0;
     DateTime? lastDate;
 
     for (var i = 0; i < data.length; i++) {
       final row = data[i] as Map<String, dynamic>;
-      totalWorkouts += (row['workouts_completed'] as int? ?? 0);
-      totalDurationSeconds += (row['total_duration_seconds'] as int? ?? 0);
-      totalCalories += ((row['total_calories_burned'] as num?)?.toDouble() ?? 0.0);
+        totalWorkouts += row['workouts_completed'] as int? ?? 0;
+        totalDurationSeconds += row['total_duration_seconds'] as int? ?? 0;
+        totalCalories +=
+          (row['total_calories_burned'] as num?)?.toDouble() ?? 0.0;
 
       final dateStr = row['date'] as String?;
       if (dateStr != null) {
         final currentDate = DateTime.parse(dateStr);
-        final currentDateOnly = DateTime(currentDate.year, currentDate.month, currentDate.day);
-        
+        final currentDateOnly = DateTime(
+          currentDate.year,
+          currentDate.month,
+          currentDate.day,
+        );
+
         if (lastDate == null) {
           final now = DateTime.now();
           final today = DateTime(now.year, now.month, now.day);
           final diff = today.difference(currentDateOnly).inDays;
-          if (diff <= 1) { // active today or yesterday
+          if (diff <= 1) {
+            // active today or yesterday
             streak = 1;
             lastDate = currentDateOnly;
           }
         } else {
           final diff = lastDate.difference(currentDateOnly).inDays;
-          if (diff == 1) { // Consecutive day
+          if (diff == 1) {
+            // Consecutive day
             streak++;
             lastDate = currentDateOnly;
           }
@@ -165,7 +175,8 @@ class ProgressRepository {
     }
 
     final totalDurationMinutes = totalDurationSeconds ~/ 60;
-    final avgCalories = totalWorkouts > 0 ? (totalCalories / totalWorkouts) : 0.0;
+    final avgCalories =
+      totalWorkouts > 0 ? totalCalories / totalWorkouts : 0.0;
 
     return ProgressStats(
       totalWorkouts: totalWorkouts,

@@ -133,7 +133,10 @@ class HealthRepository {
         .from('body_metrics')
         .select()
         .eq('user_id', userId)
-        .order('recorded_at', ascending: false); // Changed from 'date' to 'recorded_at'
+        .order(
+          'recorded_at',
+          ascending: false,
+        ); // Changed from 'date' to 'recorded_at'
     return (response as List)
         .map((json) => BodyMetric.fromJson(json as Map<String, dynamic>))
         .toList();
