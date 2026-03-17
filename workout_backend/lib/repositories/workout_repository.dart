@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:http/http.dart' as http;
 import 'package:shared/shared.dart';
@@ -11,7 +12,8 @@ class WorkoutRepository {
   final SupabaseClient _supabase;
   final String _aiApiUrl = 'https://api.your-python-ai.com/generate';
 
-  void _log(String msg) => print('[WorkoutRepository] $msg');
+  void _log(String msg) =>
+      developer.log(msg, name: 'WorkoutRepository');
 
   /// Generates a workout plan via AI and stores the workout metadata.
   Future<WorkoutPlan> generateAndSaveWorkout({
@@ -121,8 +123,12 @@ class WorkoutRepository {
   /// Returns workouts matching a localized category filter.
   String _simplify(String s) {
     var str = s.toLowerCase();
-    const vietnamese = 'aáàảãạâấầẩẫậăắằẳẵặeéèẻẽẹêếềểễệiíìỉĩịoóòỏõọôốồổỗộơớờởỡợuúùủũụưứừửữựyýỳỷỹỵdđ';
-    const latin = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeeiiiiiiioooooooooooooooooouuuuuuuuuuuuyyyyyydd';
+    const vietnamese =
+      'aáàảãạâấầẩẫậăắằẳẵặeéèẻẽẹêếềểễệiíìỉĩị'
+      'oóòỏõọôốồổỗộơớờởỡợuúùủũụưứừửữựyýỳỷỹỵdđ';
+    const latin =
+      'aaaaaaaaaaaaaaaaaeeeeeeeeeeeeiiiiiii'
+      'ooooooooooooooooooouuuuuuuuuuuuyyyyyydd';
     // Both now have 72 chars
     for (var i = 0; i < vietnamese.length; i++) {
       if (i < latin.length) {
@@ -132,31 +138,42 @@ class WorkoutRepository {
     return str;
   }
 
+  /// Returns workouts filtered by localized category keywords.
   Future<List<Workout>> getWorkoutsByCategory(String category) async {
     final rawKey = category.trim().toLowerCase();
     final key = _simplify(rawKey);
-    _log('getWorkoutsByCategory (Robust) called with: "$category" (simple: "$key")');
-    
-    if (key.isEmpty || key == 'all' || key.contains('tatca') || key.contains('all')) {
+    _log(
+      'getWorkoutsByCategory (Robust) called with: '
+      '"$category" (simple: "$key")',
+    );
+
+    if (
+        key.isEmpty ||
+        key == 'all' ||
+        key.contains('tatca') ||
+        key.contains('all')) {
       _log('Matching "Tất cả" - returning all');
       return getAllWorkouts();
     }
 
     final (titleKeywords, _) = _mapFilterKeywords(category);
     final simpleKeywords = titleKeywords.map(_simplify).toList();
-    
+
     final allWorkouts = await getAllWorkouts();
-    _log('Starting in-memory match for ${allWorkouts.length} workouts against $simpleKeywords');
-    
+    _log(
+      'Starting in-memory match for ${allWorkouts.length} workouts '
+      'against $simpleKeywords',
+    );
+
     final results = <Workout>[];
 
     for (final workout in allWorkouts) {
       final simpleTitle = _simplify(workout.title);
       final simpleDesc = _simplify(workout.description ?? '');
-      
+
       _log('Checking ID ${workout.id}: "$simpleTitle"');
       
-      bool matched = false;
+      var matched = false;
       for (final kw in simpleKeywords) {
         if (simpleTitle.contains(kw) || simpleDesc.contains(kw)) {
           _log('  MATCHED! kw="$kw"');
