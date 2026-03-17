@@ -2,17 +2,24 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
 import 'package:shared/shared.dart';
 
+/// A card that displays health data for user validation before AI generation.
 class HealthValidationCard extends StatelessWidget {
-  final HealthUpdateParams healthData;
-  final VoidCallback onConfirm;
-  final VoidCallback onEdit;
-
+  /// Creates a [HealthValidationCard].
   const HealthValidationCard({
-    super.key,
     required this.healthData,
     required this.onConfirm,
     required this.onEdit,
+    super.key,
   });
+
+  /// The health data to validate.
+  final HealthUpdateParams healthData;
+
+  /// Callback when the user confirms the data.
+  final VoidCallback onConfirm;
+
+  /// Callback when the user wants to edit the data.
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {

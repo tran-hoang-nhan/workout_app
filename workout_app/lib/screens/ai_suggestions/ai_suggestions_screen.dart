@@ -1,17 +1,38 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared/shared.dart';
+
 import '../../constants/app_constants.dart';
 import '../../providers/health_provider.dart';
 import '../../providers/workout_provider.dart';
-import 'package:shared/shared.dart';
-import 'widgets/health_validation_card.dart';
-import 'widgets/health_edit_form.dart';
 import 'widgets/chat_message_bubble.dart';
+import 'widgets/health_edit_form.dart';
+import 'widgets/health_validation_card.dart';
 import 'widgets/workout_suggestion_card.dart';
 
-enum AISuggestionStep { validating, editing, generating, results }
+/// The steps in the AI workout suggestion flow.
+enum AISuggestionStep {
+  /// User confirms/edits health data.
+  validating,
 
+  /// User is editing health data manually.
+  editing,
+
+  /// AI is asking for specific workout requirements.
+  askingRequirement,
+
+  /// AI is generating the workout plan.
+  generating,
+
+  /// AI has provided the results.
+  results,
+}
+
+/// A screen that provides AI-powered workout suggestions.
 class AISuggestionsScreen extends ConsumerStatefulWidget {
+  /// Creates an [AISuggestionsScreen].
   const AISuggestionsScreen({super.key});
 
   @override
@@ -23,13 +44,21 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
   AISuggestionStep _currentStep = AISuggestionStep.validating;
   final List<Map<String, dynamic>> _messages = [];
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _chatController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _addSystemMessage(
-      'Hệ thống AI đã sẵn sàng. Trước khi bắt đầu, hãy xác nhận thông tin sức khỏe của bạn để tôi có thể đưa ra gợi ý chính xác nhất.',
+      'Hệ thống AI đã sẵn sàng. Trước khi bắt đầu, hãy xác nhận thông tin '
+      'sức khỏe của bạn để tôi có thể đưa ra gợi ý chính xác nhất.',
     );
+  }
+
+  @override
+  void dispose() {
+    _chatController.dispose();
+    super.dispose();
   }
 
   void _addSystemMessage(String content, {Workout? workout}) {
@@ -64,39 +93,86 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
 
   Future<void> _handleValidationConfirm() async {
     _addUserMessage('Tôi đã xác nhận thông tin.');
-    setState(() => _currentStep = AISuggestionStep.generating);
-    try {
-      final workouts = await ref.read(workoutsProvider.future);
+    setState(() => _currentStep = AISuggestionStep.askingRequirement);
+    
+    await Future.delayed(const Duration(milliseconds: 500));
+    _addSystemMessage(
+      'Cảm ơn bạn. Bạn có yêu cầu gì đặc biệt cho buổi tập hôm nay không? (Ví dụ: Tập nhanh 10 phút, không dùng thiết bị, tập trung vào x, ...)',
+    );
+  }
 
-      await Future.delayed(const Duration(seconds: 2));
+  /// Submits the user's specific workout requirements and triggers generation.
+  Future<void> _handleRequirementSubmit(String requirement) async {
+    if (requirement.trim().isEmpty) {
+      _addUserMessage('Không có yêu cầu đặc biệt.');
+    } else {
+      _addUserMessage(requirement);
+    }
+
+    setState(() => _currentStep = AISuggestionStep.generating);
+    _chatController.clear();
+
+    try {
+      final healthState = ref.read(healthFormProvider);
+      debugPrint(
+        '[AISuggestionsScreen] Requesting workout for: '
+        'weight=${healthState.weight}, height=${healthState.height}, '
+        'goal=${healthState.goal}, diet=${healthState.dietType}, '
+        'conditions=${healthState.medicalConditions.join(", ")}, '
+        'requirement=$requirement',
+      );
+
+      final workoutPlan = await ref
+          .read(workoutRepositoryProvider)
+          .createWorkoutSuggestion(
+            weight: healthState.weight,
+            height: healthState.height,
+            goal: healthState.goal,
+            dietType: healthState.dietType,
+            medicalConditions: healthState.medicalConditions,
+            requirement: requirement.trim().isEmpty ? null : requirement,
+          );
+
+      final encoder = JsonEncoder.withIndent('  ');
+      debugPrint('[AISuggestionsScreen] Received WorkoutPlan:');
+      debugPrint(encoder.convert(workoutPlan.toJson()));
 
       if (mounted) {
         setState(() => _currentStep = AISuggestionStep.results);
         _addSystemMessage(
-          'Tuyệt vời! Dựa trên thông tin của bạn, tôi đã phân tích và chuẩn bị một lộ trình cá nhân hóa.',
+          'Tuyệt vời! Dựa trên thông tin và yêu cầu của bạn, '
+          'tôi đã phân tích và chuẩn bị một lộ trình cá nhân hóa.',
         );
 
-        if (workouts.isNotEmpty) {
-          final suggestedWorkout = workouts.first;
-          _addSystemMessage(
-            'Tôi gợi ý bạn nên thực hiện bài tập: ${suggestedWorkout.title}. Đây là bài tập tối ưu nhất cho thể trạng hiện tại của bạn.',
-            workout: suggestedWorkout,
-          );
-        } else {
-          _addSystemMessage(
-            'Rất tiếc, tôi chưa tìm thấy bài tập phù hợp ngay lúc này. Hãy thử lại sau nhé!',
-          );
+        final suggestedWorkout = Workout(
+          id: 0,
+          title: workoutPlan.title,
+          description: workoutPlan.notes,
+          level: workoutPlan.level,
+        );
+
+        _addSystemMessage(
+          'Tôi gợi ý bạn nên thực hiện lộ trình: ${workoutPlan.title}. '
+          'đây là kế hoạch tối ưu cho mục tiêu ${workoutPlan.goal}.',
+          workout: suggestedWorkout,
+        );
+
+        if (workoutPlan.exercises.isNotEmpty) {
+          final exercisesText =
+              workoutPlan.exercises.map((e) => '- ${e.name}').join('\n');
+          _addSystemMessage('Các bài tập bao gồm:\n$exercisesText');
         }
 
-        _addSystemMessage(
-          'Dinh dưỡng: Tăng cường Protein, nên dùng ức gà và rau xanh vào bữa trưa.',
-        );
+        if (workoutPlan.notes != null) {
+          _addSystemMessage('Lưu ý: ${workoutPlan.notes}');
+        }
       }
     } catch (e) {
+      debugPrint('[AISuggestionsScreen] ERROR creating workout: $e');
       if (mounted) {
         setState(() => _currentStep = AISuggestionStep.results);
         _addSystemMessage(
-          'Đã có lỗi xảy ra khi lấy dữ liệu bài tập. Vui lòng thử lại sau.',
+          'Đã có lỗi xảy ra khi tạo gợi ý từ AI: $e',
         );
       }
     }
@@ -159,7 +235,7 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
                 valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF7F00)),
               ),
               SizedBox(height: 16),
-              Text('Đang tải thông tin sức khỏe...'),
+              const Text('Đang tải thông tin sức khỏe...'),
             ],
           ),
         ),
@@ -190,16 +266,20 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
                   }
                   final msg = _messages[index];
                   return ChatMessageBubble(
-                    content: msg['content'],
-                    type: msg['type'],
+                    content: msg['content'] as String,
+                    type: msg['type'] as MessageType,
                     child: msg['workout'] != null
-                        ? WorkoutSuggestionCard(workout: msg['workout'])
+                        ? WorkoutSuggestionCard(
+                            workout: msg['workout'] as Workout,
+                          )
                         : null,
                   );
                 },
               ),
             ),
-            if (_currentStep == AISuggestionStep.results) _buildChatInput(),
+            if (_currentStep == AISuggestionStep.askingRequirement ||
+                _currentStep == AISuggestionStep.results)
+              _buildChatInput(),
           ],
         ),
       ),
@@ -221,6 +301,8 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
           onCancel: () =>
               setState(() => _currentStep = AISuggestionStep.validating),
         );
+      case AISuggestionStep.askingRequirement:
+        return const SizedBox.shrink();
       case AISuggestionStep.generating:
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
@@ -265,8 +347,10 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
                   color: AppColors.bgLight,
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const TextField(
-                  decoration: InputDecoration(
+                child: TextField(
+                  controller: _chatController,
+                  onSubmitted: _handleRequirementSubmit,
+                  decoration: const InputDecoration(
                     hintText: 'Hỏi thêm điều gì đó...',
                     border: InputBorder.none,
                     hintStyle: TextStyle(fontSize: 14),
@@ -282,7 +366,7 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
               ),
               child: IconButton(
                 icon: const Icon(Icons.send, color: Colors.white, size: 20),
-                onPressed: () {},
+                onPressed: () => _handleRequirementSubmit(_chatController.text),
               ),
             ),
           ],

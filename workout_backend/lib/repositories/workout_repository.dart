@@ -5,21 +5,22 @@ import 'package:http/http.dart' as http;
 import 'package:shared/shared.dart';
 import 'package:supabase/supabase.dart';
 
-/// Repository for workout retrieval and AI-assisted generation.
+/// Repository for workout-related data operations and AI generation.
 class WorkoutRepository {
-  /// Creates a workout repository backed by Supabase.
+  /// Creates a [WorkoutRepository] with a Supabase client.
   WorkoutRepository(this._supabase);
+
   final SupabaseClient _supabase;
   final String _aiApiUrl = 'https://api.your-python-ai.com/generate';
 
-  void _log(String msg) =>
-      developer.log(msg, name: 'WorkoutRepository');
-
-  /// Generates a workout plan via AI and stores the workout metadata.
+  /// Generates a workout plan using an external AI service and saves metadata.
   Future<WorkoutPlan> generateAndSaveWorkout({
     required double weight,
     required double height,
     required String goal,
+    required String dietType,
+    required List<String> medicalConditions,
+    String? requirement,
   }) async {
     try {
       final aiResponse = await http.post(
@@ -29,8 +30,29 @@ class WorkoutRepository {
           'weight': weight,
           'height': height,
           'goal': goal,
+          'requirement': requirement,
+          'diet_type': dietType,
+          'medical_conditions': medicalConditions,
         }),
       );
+
+      developer.log(
+        'AI Response Status: ${aiResponse.statusCode}',
+        name: 'WorkoutRepository',
+      );
+      try {
+        final dynamic decoded = jsonDecode(aiResponse.body);
+        final encoder = JsonEncoder.withIndent('  ');
+        developer.log(
+          'AI Response Body:\n${encoder.convert(decoded)}',
+          name: 'WorkoutRepository',
+        );
+      } catch (_) {
+        developer.log(
+          'AI Response Body (Raw): ${aiResponse.body}',
+          name: 'WorkoutRepository',
+        );
+      }
 
       if (aiResponse.statusCode != 200) {
         throw Exception(
@@ -50,23 +72,27 @@ class WorkoutRepository {
 
       return workoutPlan;
     } catch (e) {
+      developer.log(
+        'Error in generateAndSaveWorkout: $e',
+        name: 'WorkoutRepository',
+        error: e,
+      );
       rethrow;
     }
   }
 
-  /// Returns all workouts ordered by id ascending.
+  /// Returns all workouts ordered by ID ascending.
   Future<List<Workout>> getAllWorkouts() async {
-    _log('getAllWorkouts called');
-    final response =
-        await _supabase.from('workouts').select().order('id', ascending: true);
-    final workouts = (response as List)
-        .map((json) => Workout.fromJson(json as Map<String, dynamic>))
+    final response = await _supabase
+        .from('workouts')
+        .select()
+        .order('id', ascending: true);
+    return (response as List)
+        .map((dynamic json) => Workout.fromJson(json as Map<String, dynamic>))
         .toList();
-    _log('getAllWorkouts returning ${workouts.length} items');
-    return workouts;
   }
 
-  /// Returns workouts filtered by level.
+  /// Returns workouts filtered by workout level.
   Future<List<Workout>> getWorkoutsByLevel(String level) async {
     final response = await _supabase
         .from('workouts')
@@ -74,157 +100,138 @@ class WorkoutRepository {
         .eq('level', level)
         .order('id', ascending: true);
     return (response as List)
-        .map((json) => Workout.fromJson(json as Map<String, dynamic>))
+        .map((dynamic json) => Workout.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 
-  /// Returns workout details including ordered items and related exercises.
+  /// Returns detailed information for a specific workout.
   Future<WorkoutDetail> getWorkoutDetail(int workoutId) async {
-    final workoutData =
-        await _supabase.from('workouts').select().eq('id', workoutId).single();
-    final workout = Workout.fromJson(workoutData);
+    final workoutData = await _supabase
+        .from('workouts')
+        .select()
+        .eq('id', workoutId)
+        .single();
+    final workout = Workout.fromJson(workoutData as Map<String, dynamic>);
 
     final itemsData = await _supabase
         .from('workout_items')
         .select()
         .eq('workout_id', workoutId);
     final items = (itemsData as List)
-        .map((data) => WorkoutItem.fromJson(data as Map<String, dynamic>))
-        .toList()
-      ..sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
+        .map((dynamic data) => WorkoutItem.fromJson(data as Map<String, dynamic>))
+        .toList();
+    items.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
 
     if (items.isEmpty) {
       return WorkoutDetail(workout: workout, items: [], exercises: []);
     }
 
     final exerciseIds = items.map((item) => item.exerciseId).toSet().toList();
-    final exercisesData =
-        await _supabase.from('exercises').select().inFilter('id', exerciseIds);
+    final exercisesData = await _supabase
+        .from('exercises')
+        .select()
+        .inFilter('id', exerciseIds);
     final exercises = (exercisesData as List)
-        .map((data) => Exercise.fromJson(data as Map<String, dynamic>))
+        .map((dynamic data) => Exercise.fromJson(data as Map<String, dynamic>))
         .toList();
 
     return WorkoutDetail(workout: workout, items: items, exercises: exercises);
   }
 
-  /// Searches workouts by title or description.
+  /// Searches workouts by title or description matching the query.
   Future<List<Workout>> searchWorkouts(String query) async {
-    // Simplified search logic for backend
     final response = await _supabase
         .from('workouts')
         .select()
         .or('title.ilike.*$query*,description.ilike.*$query*')
         .order('id', ascending: true);
     return (response as List)
-        .map((json) => Workout.fromJson(json as Map<String, dynamic>))
+        .map((dynamic json) => Workout.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 
-  /// Returns workouts matching a localized category filter.
-  String _simplify(String s) {
-    var str = s.toLowerCase();
-    const vietnamese =
-      'aáàảãạâấầẩẫậăắằẳẵặeéèẻẽẹêếềểễệiíìỉĩị'
-      'oóòỏõọôốồổỗộơớờởỡợuúùủũụưứừửữựyýỳỷỹỵdđ';
-    const latin =
-      'aaaaaaaaaaaaaaaaaeeeeeeeeeeeeiiiiiii'
-      'ooooooooooooooooooouuuuuuuuuuuuyyyyyydd';
-    // Both now have 72 chars
-    for (var i = 0; i < vietnamese.length; i++) {
-      if (i < latin.length) {
-        str = str.replaceAll(vietnamese[i], latin[i]);
-      }
-    }
-    return str;
-  }
-
-  /// Returns workouts filtered by localized category keywords.
+  /// Returns workouts matching a specific category label.
   Future<List<Workout>> getWorkoutsByCategory(String category) async {
-    final rawKey = category.trim().toLowerCase();
-    final key = _simplify(rawKey);
-    _log(
-      'getWorkoutsByCategory (Robust) called with: '
-      '"$category" (simple: "$key")',
-    );
+    final key = category.trim().toLowerCase();
+    if (key == 'tất cả' || key == 'all') return getAllWorkouts();
 
-    if (
-        key.isEmpty ||
-        key == 'all' ||
-        key.contains('tatca') ||
-        key.contains('all')) {
-      _log('Matching "Tất cả" - returning all');
-      return getAllWorkouts();
-    }
+    final (titleKeywords, muscleKeywords) = _mapFilterKeywords(category);
 
-    final (titleKeywords, _) = _mapFilterKeywords(category);
-    final simpleKeywords = titleKeywords.map(_simplify).toList();
+    final titleOr = titleKeywords.map((k) => 'title.ilike.*$k*').join(',');
+    final descOr = titleKeywords.map((k) => 'description.ilike.*$k*').join(',');
 
-    final allWorkouts = await getAllWorkouts();
-    _log(
-      'Starting in-memory match for ${allWorkouts.length} workouts '
-      'against $simpleKeywords',
-    );
+    final byTitleDesc = await _supabase
+        .from('workouts')
+        .select()
+        .or('$titleOr,$descOr');
 
-    final results = <Workout>[];
+    final resultsMap = {
+      for (final dynamic json in byTitleDesc as List)
+        (json as Map<String, dynamic>)['id'] as int: Workout.fromJson(json)
+    };
 
-    for (final workout in allWorkouts) {
-      final simpleTitle = _simplify(workout.title);
-      final simpleDesc = _simplify(workout.description ?? '');
+    final muscleOr = muscleKeywords.map((k) => 'muscle_group.ilike.*$k*').join(',');
+    final exercisesByMuscle = await _supabase
+        .from('exercises')
+        .select('id')
+        .or(muscleOr);
 
-      _log('Checking ID ${workout.id}: "$simpleTitle"');
-      
-      var matched = false;
-      for (final kw in simpleKeywords) {
-        if (simpleTitle.contains(kw) || simpleDesc.contains(kw)) {
-          _log('  MATCHED! kw="$kw"');
-          matched = true;
-          break;
+    final exerciseIds = (exercisesByMuscle as List)
+        .map((dynamic e) => (e as Map<String, dynamic>)['id'] as int)
+        .toList();
+    if (exerciseIds.isNotEmpty) {
+      final workoutItems = await _supabase
+          .from('workout_items')
+          .select('workout_id')
+          .inFilter('exercise_id', exerciseIds);
+
+      final workoutIds = (workoutItems as List)
+          .map((dynamic item) => (item as Map<String, dynamic>)['workout_id'] as int)
+          .toSet()
+          .toList();
+      if (workoutIds.isNotEmpty) {
+        final workoutsByIds = await _supabase
+            .from('workouts')
+            .select()
+            .inFilter('id', workoutIds);
+        for (final dynamic json in workoutsByIds as List) {
+          final workoutJson = json as Map<String, dynamic>;
+          resultsMap[workoutJson['id'] as int] = Workout.fromJson(workoutJson);
         }
       }
-
-      if (matched) {
-        results.add(workout);
-      }
     }
 
-    _log('Robust filter returning ${results.length} items for "$category"');
-    return results;
+    final merged = resultsMap.values.toList()
+      ..sort((a, b) => a.id.compareTo(b.id));
+    return merged;
   }
 
-  /// Maps UI category labels to searchable title and muscle keywords.
   (List<String> titleKeywords, List<String> muscleKeywords) _mapFilterKeywords(
     String category,
   ) {
-    final key = _simplify(category.trim());
-
-    if (key.contains('toan') || key.contains('body')) {
-      return (
-        ['toàn thân', 'toan than', 'full body'],
-        ['toàn thân', 'toan than', 'full body'],
-      );
+    final key = category.trim().toLowerCase();
+    switch (key) {
+      case 'toàn thân':
+        return (
+          ['toàn thân', 'toan than', 'full body'],
+          ['toàn thân', 'toan than', 'full body']
+        );
+      case 'ngực':
+        return (['ngực', 'nguc', 'chest'], ['ngực', 'nguc', 'chest']);
+      case 'lưng':
+        return (['lưng', 'lung', 'back'], ['lưng', 'lung', 'back']);
+      case 'chân':
+        return (['chân', 'chan', 'legs'], ['chân', 'chan', 'legs']);
+      case 'tay':
+        return (['tay', 'arms', 'arm'], ['tay', 'arms', 'arm']);
+      case 'cardio':
+        return (['cardio'], ['cardio']);
+      case 'yoga':
+        return (['yoga'], ['yoga']);
+      case 'hiit':
+        return (['hiit'], ['hiit']);
+      default:
+        return ([key], [key]);
     }
-    if (key.contains('nguc') || key.contains('chest')) {
-      return (['ngực', 'nguc', 'chest'], ['ngực', 'nguc', 'chest']);
-    }
-    if (key.contains('lung') || key.contains('back')) {
-      return (['lưng', 'lung', 'back'], ['lưng', 'lung', 'back']);
-    }
-    if (key.contains('chan') || key.contains('leg')) {
-      return (['chân', 'chan', 'legs'], ['chân', 'chan', 'legs']);
-    }
-    if (key.contains('tay') || key.contains('arm')) {
-      return (['tay', 'arms', 'arm'], ['tay', 'arms', 'arm']);
-    }
-    if (key.contains('cardio')) {
-      return (['cardio'], ['cardio']);
-    }
-    if (key.contains('yoga')) {
-      return (['yoga'], ['yoga']);
-    }
-    if (key.contains('hiit')) {
-      return (['hiit'], ['hiit']);
-    }
-
-    return ([category.toLowerCase()], [category.toLowerCase()]);
   }
 }
