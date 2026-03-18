@@ -61,7 +61,7 @@ class ProgressUser {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id != null) 'id': id,
       'user_id': userId,
       'date': date.toIso8601String().split('T')[0],
       'workouts_completed': workoutsCompleted,
@@ -75,7 +75,7 @@ class ProgressUser {
 }
 
 class WorkoutHistory {
-  final int id;
+  final int? id;
   final String userId;
   final int? workoutId;
   final String? workoutTitleSnapshot;
@@ -84,7 +84,7 @@ class WorkoutHistory {
   final DateTime completedAt;
 
   WorkoutHistory({
-    required this.id,
+    this.id,
     required this.userId,
     this.workoutId,
     this.workoutTitleSnapshot,
@@ -97,7 +97,7 @@ class WorkoutHistory {
 
   factory WorkoutHistory.fromJson(Map<String, dynamic> json) {
     return WorkoutHistory(
-      id: json['id'] ?? 0,
+      id: json['id'] as int?,
       userId: json['user_id'] ?? '',
       workoutId: json['workout_id'],
       workoutTitleSnapshot: json['workout_title_snapshot'],
@@ -109,7 +109,7 @@ class WorkoutHistory {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id != null) 'id': id,
       'user_id': userId,
       'workout_id': workoutId,
       'workout_title_snapshot': workoutTitleSnapshot,

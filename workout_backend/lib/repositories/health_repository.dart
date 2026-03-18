@@ -46,7 +46,15 @@ class HealthRepository {
         'user_id': userId,
         'updated_at': DateTime.now().toIso8601String(),
       };
-      if (weight != null) healthData['weight'] = weight;
+      if (weight != null) {
+        healthData['weight'] = weight;
+        // Automatically log weight record to body_metrics
+        await addWeightRecord(
+          userId: userId,
+          weight: weight,
+          date: DateTime.now(),
+        );
+      }
       if (height != null) healthData['height'] = height;
       await _supabase.from('health').upsert(healthData, onConflict: 'user_id');
     }
@@ -133,7 +141,10 @@ class HealthRepository {
         .from('body_metrics')
         .select()
         .eq('user_id', userId)
-        .order('recorded_at', ascending: false); // Changed from 'date' to 'recorded_at'
+        .order(
+          'recorded_at',
+          ascending: false,
+        ); // Changed from 'date' to 'recorded_at'
     return (response as List)
         .map((json) => BodyMetric.fromJson(json as Map<String, dynamic>))
         .toList();
@@ -152,7 +163,6 @@ class HealthRepository {
       'weight': weight,
       if (bmi != null) 'bmi': bmi,
       'recorded_at': dateStr, // Changed from 'date' to 'recorded_at'
-      'created_at': DateTime.now().toIso8601String(),
     });
   }
 }

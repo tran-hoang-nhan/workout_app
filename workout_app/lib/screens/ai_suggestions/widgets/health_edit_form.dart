@@ -3,17 +3,24 @@ import '../../../constants/app_constants.dart';
 
 import 'package:shared/shared.dart';
 
+/// A form to edit health information for AI workout recommendations.
 class HealthEditForm extends StatefulWidget {
-  final HealthUpdateParams initialState;
-  final Function(HealthUpdateParams) onSave;
-  final VoidCallback onCancel;
-
+  /// Creates a [HealthEditForm].
   const HealthEditForm({
-    super.key,
     required this.initialState,
     required this.onSave,
     required this.onCancel,
+    super.key,
   });
+
+  /// The initial health state to populate the form.
+  final HealthUpdateParams initialState;
+
+  /// Callback when the user saves the changes.
+  final void Function(HealthUpdateParams) onSave;
+
+  /// Callback when the user cancels editing.
+  final VoidCallback onCancel;
 
   @override
   State<HealthEditForm> createState() => _HealthEditFormState();
