@@ -14,11 +14,8 @@ Future<Response> onRequest(RequestContext context) async {
 
   final rawBody = await context.request.body();
   final body = json.decode(rawBody) as Map<String, dynamic>;
-  final signUpParams =
-      SignUpParams.fromJson(body['signUpParams'] as Map<String, dynamic>);
-  final healthParams =
-      HealthUpdateParams.fromJson(body['healthParams'] as Map<String, dynamic>);
-
+  final signUpParams = SignUpParams.fromJson(body['signUpParams'] as Map<String, dynamic>);
+  final healthParams = HealthUpdateParams.fromJson(body['healthParams'] as Map<String, dynamic>);
   final supabase = context.read<SupabaseClient>();
   final authRepo = AuthRepository(supabase);
   final healthRepo = HealthRepository(supabase);
@@ -28,8 +25,9 @@ Future<Response> onRequest(RequestContext context) async {
     final authResponse = await authRepo.signUp(signUpParams);
     if (authResponse.user == null) {
       return Response.json(
-          statusCode: HttpStatus.badRequest,
-          body: {'error': 'Failed to create user'},);
+        statusCode: HttpStatus.badRequest,
+        body: {'error': 'Failed to create user'},
+      );
     }
 
     // 2. Initialize Health Profile
