@@ -105,11 +105,10 @@ class WeightDetailScreen extends ConsumerWidget {
                     weightHistory: weightData.weightHistory,
                     height: weightData.height,
                     onDelete: (index) {
-                      _deleteWeight(
-                        context,
-                        ref,
-                        weightData.weightHistory[index].id,
-                      );
+                      final recordId = weightData.weightHistory[index].id;
+                      if (recordId != null) {
+                        _deleteWeight(context, ref, recordId);
+                      }
                     },
                   ),
               ],

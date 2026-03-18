@@ -1,20 +1,38 @@
+import 'dart:convert';
+
 import 'package:shared/shared.dart';
+
 import '../services/api_client.dart';
 
+/// Repository responsible for interacting with workout-related API endpoints.
 class WorkoutRepository {
+  /// Creates a [WorkoutRepository] instance.
+  WorkoutRepository({ApiClient? apiClient})
+      : _apiClient = apiClient ?? ApiClient();
+
   final ApiClient _apiClient;
 
-  WorkoutRepository({ApiClient? apiClient})
-    : _apiClient = apiClient ?? ApiClient();
-
+  /// Requests a workout suggestion from the AI based on health metrics.
   Future<WorkoutPlan> createWorkoutSuggestion({
     required double weight,
     required double height,
     required String goal,
+    required String dietType,
+    required List<String> medicalConditions,
+    String? requirement,
   }) async {
-    return _apiClient.generateWorkout(
-      WorkoutGenerationRequest(weight: weight, height: height, goal: goal),
+    final req = WorkoutGenerationRequest(
+      weight: weight,
+      height: height,
+      goal: goal,
+      dietType: dietType,
+      medicalConditions: medicalConditions,
+      requirement: requirement,
     );
+    final encoder = JsonEncoder.withIndent('  ');
+    print('[WorkoutRepository] Creating workout suggestion via API:');
+    print(encoder.convert(req.toJson()));
+    return _apiClient.generateWorkout(req);
   }
 
   Future<List<Workout>> getAllWorkouts() async {

@@ -176,25 +176,6 @@ class InputSection extends ConsumerWidget {
                         await ref
                             .read(healthControllerProvider.notifier)
                             .saveQuickMetrics(weight: weight, height: height);
-                        if (weight != null) {
-                          try {
-                            final userId = ref
-                                .read(currentUserIdProvider)
-                                .value;
-                            if (userId != null) {
-                              await ref
-                                  .read(weightServiceProvider)
-                                  .logNewWeight(userId: userId, weight: weight);
-                              debugPrint(
-                                '[InputSection] Weight saved to body_metrics',
-                              );
-                            }
-                          } catch (e) {
-                            debugPrint(
-                              '[InputSection] Warning: Could not save to body_metrics: $e',
-                            );
-                          }
-                        }
 
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(

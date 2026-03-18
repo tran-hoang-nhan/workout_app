@@ -1,12 +1,12 @@
 class BodyMetric {
-  final int id;
+  final int? id;
   final String userId;
   final double weight;
   final double? bmi;
   final DateTime recordedAt;
 
   BodyMetric({
-    required this.id,
+    this.id,
     required this.userId,
     required this.weight,
     this.bmi,
@@ -15,7 +15,7 @@ class BodyMetric {
 
   factory BodyMetric.fromJson(Map<String, dynamic> json) {
     return BodyMetric(
-      id: json['id'] ?? 0,
+      id: json['id'] as int?,
       userId: json['user_id'] ?? '',
       weight: (json['weight'] ?? 0).toDouble(),
       bmi: (json['bmi'] as num?)?.toDouble(),
@@ -25,7 +25,7 @@ class BodyMetric {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id != null) 'id': id,
       'user_id': userId,
       'weight': weight,
       'bmi': bmi,
@@ -82,7 +82,7 @@ class DailyStats {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id != null) 'id': id,
       'user_id': userId,
       'date': date.toIso8601String().split('T')[0],
       'active_energy_burned': activeEnergyBurned,
