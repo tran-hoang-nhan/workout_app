@@ -36,21 +36,28 @@ class AuthService {
     await _repository.signOut();
   }
 
-  Future<AppUser?> getUserProfile(String userId) => _repository.getUserProfile(userId);
+  Future<AppUser?> getUserProfile(String userId) =>
+      _repository.getUserProfile(userId);
 
-  Future<void> updateUserProfile(String userId, UpdateProfileParams params,) async {
+  Future<void> updateUserProfile(
+    String userId,
+    UpdateProfileParams params,
+  ) async {
     await _repository.updateProfile(userId, params);
-  }
-
-  Future<void> resetPassword(String email) async {
-    await _repository.resetPassword(email);
   }
 
   Future<void> verifyRecoveryOTP(String email, String token) async {
     await _repository.verifyOTP(email: email, token: token, type: 'recovery');
   }
 
-  Future<void> updatePassword(String password, { String? confirmPassword,}) async {
+  Future<void> resetPassword(String email) async {
+    await _repository.resetPassword(email);
+  }
+
+  Future<void> updatePassword(
+    String password, {
+    String? confirmPassword,
+  }) async {
     await _repository.updatePassword(password);
   }
 }
