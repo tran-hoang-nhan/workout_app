@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
-import '../../../providers/auth_provider.dart';
 import '../../../providers/health_provider.dart';
-import '../../../providers/weight_provider.dart';
+
 
 import 'package:shared/shared.dart';
 
