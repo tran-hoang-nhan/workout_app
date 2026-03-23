@@ -9,7 +9,6 @@ Handler middleware(Handler handler) {
     final env = DotEnv(includePlatformEnvironment: true)..load();
     final url = env['SUPABASE_URL'] ?? '';
     final key = env['SUPABASE_ANON_KEY'] ?? '';
-
     _supabaseClient ??= SupabaseClient(url, key);
 
     if (context.request.method == HttpMethod.options) {
@@ -23,8 +22,7 @@ Handler middleware(Handler handler) {
       );
     }
 
-    final authHeader = context.request.headers['Authorization'] ??
-        context.request.headers['authorization'];
+    final authHeader = context.request.headers['Authorization'] ?? context.request.headers['authorization'];
 
     SupabaseClient client;
     if (authHeader != null && authHeader.startsWith('Bearer ')) {
@@ -39,10 +37,7 @@ Handler middleware(Handler handler) {
       client = SupabaseClient(url, key);
     }
 
-    final response =
-        await handler.use(provider<SupabaseClient>((_) => client))(context);
-
-    // Add CORS headers
+    final response = await handler.use(provider<SupabaseClient>((_) => client))(context);
     return response.copyWith(
       headers: {
         ...response.headers,

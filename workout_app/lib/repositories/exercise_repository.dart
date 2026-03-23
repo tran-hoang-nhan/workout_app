@@ -9,15 +9,20 @@ class ExerciseRepository {
   Future<List<Exercise>> getExercises() => _apiClient.getExercises();
 
   Future<Exercise?> getExerciseById(String id) async {
-    // Implement proxy if needed
-    return null;
+    // Note: API returns list for now, we can add getById if needed or find in list
+    final all = await getExercises();
+    try {
+      return all.firstWhere((e) => e.id.toString() == id);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<List<Exercise>> searchExercises(String query) async {
-    return [];
+    return _apiClient.searchExercises(query);
   }
 
   Future<List<Exercise>> getExercisesByMuscleGroup(String muscleGroup) async {
-    return [];
+    return _apiClient.getExercises(muscleGroup: muscleGroup);
   }
 }

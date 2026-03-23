@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:supabase/supabase.dart' hide HttpMethod;
@@ -14,9 +13,6 @@ Future<Response> onRequest(RequestContext context) async {
 
   try {
     final body = await context.request.json() as Map<String, dynamic>;
-    final encoder = JsonEncoder.withIndent('  ');
-    print('[POST /api/workout] Request Body:');
-    print(encoder.convert(body));
 
     final weight = (body['weight'] as num).toDouble();
     final height = (body['height'] as num).toDouble();
@@ -35,12 +31,9 @@ Future<Response> onRequest(RequestContext context) async {
       requirement: requirement,
     );
 
-    print('[POST /api/workout] Generated Plan:');
-    print(encoder.convert(workoutPlan.toJson()));
 
     return Response.json(body: workoutPlan.toJson());
   } catch (e) {
-    print('[POST /api/workout] ERROR: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': e.toString()},

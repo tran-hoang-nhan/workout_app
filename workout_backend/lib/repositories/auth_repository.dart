@@ -75,12 +75,20 @@ class AuthRepository {
     if (params.avatarUrl != null) updates['avatar_url'] = params.avatarUrl;
     if (params.gender != null) updates['gender'] = params.gender;
     if (params.dateOfBirth != null) {
-      updates['date_of_birth'] =
-          params.dateOfBirth!.toIso8601String().split('T')[0];
+      updates['date_of_birth'] = params.dateOfBirth!.toIso8601String().split('T')[0];
     }
     if (params.goal != null) updates['goal'] = params.goal;
     updates['updated_at'] = DateTime.now().toIso8601String();
-
     await _supabase.from('profiles').update(updates).eq('id', params.userId);
+  }
+
+  /// Sends a password reset email.
+  Future<void> resetPassword(String email) async {
+    await _supabase.auth.resetPasswordForEmail(email);
+  }
+
+  /// Updates the user's password.
+  Future<void> updatePassword(String password) async {
+    await _supabase.auth.updateUser(UserAttributes(password: password));
   }
 }

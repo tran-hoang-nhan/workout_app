@@ -1,15 +1,12 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
-
 import 'package:http/http.dart' as http;
 import 'package:shared/shared.dart';
 import 'package:supabase/supabase.dart';
 
 /// Repository for workout-related data operations and AI generation.
 class WorkoutRepository {
-  /// Creates a [WorkoutRepository] with a Supabase client.
   WorkoutRepository(this._supabase);
-
   final SupabaseClient _supabase;
   final String _aiApiUrl = 'https://api.your-python-ai.com/generate';
 
@@ -111,7 +108,7 @@ class WorkoutRepository {
         .select()
         .eq('id', workoutId)
         .single();
-    final workout = Workout.fromJson(workoutData as Map<String, dynamic>);
+    final workout = Workout.fromJson(workoutData);
 
     final itemsData = await _supabase
         .from('workout_items')

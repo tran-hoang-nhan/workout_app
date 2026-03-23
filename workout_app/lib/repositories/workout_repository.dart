@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:shared/shared.dart';
-
 import '../services/api_client.dart';
 
 /// Repository responsible for interacting with workout-related API endpoints.
@@ -29,9 +26,6 @@ class WorkoutRepository {
       medicalConditions: medicalConditions,
       requirement: requirement,
     );
-    final encoder = JsonEncoder.withIndent('  ');
-    print('[WorkoutRepository] Creating workout suggestion via API:');
-    print(encoder.convert(req.toJson()));
     return _apiClient.generateWorkout(req);
   }
 

@@ -28,26 +28,11 @@ class AuthRepository {
   }
 
   Future<Map<String, dynamic>> signIn(SignInParams params) async {
-    final response = await _supabase.auth.signInWithPassword(
-      email: params.email,
-      password: params.password,
-    );
-    return {
-      'user': response.user?.toJson(),
-      'session': response.session?.toJson(),
-    };
+    return _apiClient.login(params);
   }
 
   Future<Map<String, dynamic>> signUp(SignUpParams params) async {
-    final response = await _supabase.auth.signUp(
-      email: params.email,
-      password: params.password,
-      data: params.toJson(),
-    );
-    return {
-      'user': response.user?.toJson(),
-      'session': response.session?.toJson(),
-    };
+    return _apiClient.register(params);
   }
 
   Future<void> signOut() async {
@@ -75,10 +60,10 @@ class AuthRepository {
   }
 
   Future<void> resetPassword(String email) async {
-    await _supabase.auth.resetPasswordForEmail(email);
+    await _apiClient.resetPassword(email);
   }
 
   Future<void> updatePassword(String password) async {
-    await _supabase.auth.updateUser(UserAttributes(password: password));
+    await _apiClient.updatePassword(password);
   }
 }

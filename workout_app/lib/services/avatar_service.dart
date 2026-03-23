@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import '../repositories/avatar_repository.dart';
 
 class AvatarService {
@@ -6,7 +5,7 @@ class AvatarService {
 
   AvatarService({AvatarRepository? repository}): _repository = repository ?? AvatarRepository();
 
-  Future<String> uploadAvatar({required String userId, required Uint8List bytes, required String fileName,}) async {
+  Future<String> uploadAvatar({required String userId, required List<int> bytes, required String fileName,}) async {
     // 1. Upload to storage
     final storagePath = await _repository.uploadImageToStorage(
       userId: userId,

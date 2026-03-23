@@ -86,6 +86,12 @@ class ApiClient {
   Future<void> resendOtp(String email, String type) async => 
       await _request('POST', '/auth/resend-otp', body: {'email': email, 'type': type});
 
+  Future<void> resetPassword(String email) async => 
+      await _request('POST', '/auth/reset-password', body: {'email': email});
+
+  Future<void> updatePassword(String password) async => 
+      await _request('POST', '/auth/update-password', body: {'password': password});
+
   Future<Map<String, dynamic>> completeRegistration(
     SignUpParams s,
     HealthUpdateParams h,
@@ -97,32 +103,32 @@ class ApiClient {
 
   // --- Workouts ---
   Future<WorkoutPlan> generateWorkout(WorkoutGenerationRequest r) async => 
-      WorkoutPlan.fromJson(await _request('POST', '/workout', body: r.toJson()));
+      WorkoutPlan.fromJson(await _request('POST', '/workout', body: r.toJson()) as Map<String, dynamic>);
 
   Future<List<Workout>> getAllWorkouts({String? level}) async {
     final data = await _request('GET', '/workouts',
             queryParams: level != null ? {'level': level} : null)
         as List?;
-    return data?.map((e) => Workout.fromJson(e)).toList() ?? [];
+    return data?.map((e) => Workout.fromJson(e as Map<String, dynamic>)).toList() ?? [];
   }
 
   Future<WorkoutDetail> getWorkoutDetail(int id) async => 
-      WorkoutDetail.fromJson(await _request('GET', '/workouts/$id'));
+      WorkoutDetail.fromJson(await _request('GET', '/workouts/$id') as Map<String, dynamic>);
 
   Future<List<Workout>> searchWorkouts(String query) async {
     final data = await _request('GET', '/workouts/search', queryParams: {'q': query}) as List?;
-    return data?.map((e) => Workout.fromJson(e)).toList() ?? [];
+    return data?.map((e) => Workout.fromJson(e as Map<String, dynamic>)).toList() ?? [];
   }
 
   Future<List<Workout>> getWorkoutsByCategory(String cat) async {
     final data = await _request('GET', '/workouts/category/$cat') as List?;
-    return data?.map((e) => Workout.fromJson(e)).toList() ?? [];
+    return data?.map((e) => Workout.fromJson(e as Map<String, dynamic>)).toList() ?? [];
   }
 
   // --- Health ---
   Future<HealthData?> getHealthData(String userId) async {
     final data = await _request('GET', '/health', queryParams: {'userId': userId});
-    return data != null ? HealthData.fromJson(data) : null;
+    return data != null ? HealthData.fromJson(data as Map<String, dynamic>) : null;
   }
 
   Future<void> updateHealthProfile(HealthUpdateParams p) async => 
@@ -142,7 +148,7 @@ class ApiClient {
   Future<DailyStats?> getDailyStats(String userId, DateTime date) async {
     final data = await _request('GET', '/health/daily-stats',
         queryParams: {'userId': userId, 'date': date.toIso8601String()});
-    return data != null ? DailyStats.fromJson(data) : null;
+    return data != null ? DailyStats.fromJson(data as Map<String, dynamic>) : null;
   }
 
   Future<void> saveDailyStats(DailyStats stats) async => 
@@ -150,7 +156,7 @@ class ApiClient {
 
   Future<List<BodyMetric>> getWeightHistory(String userId) async {
     final data = await _request('GET', '/health/weight-history/$userId') as List?;
-    return data?.map((e) => BodyMetric.fromJson(e)).toList() ?? [];
+    return data?.map((e) => BodyMetric.fromJson(e as Map<String, dynamic>)).toList() ?? [];
   }
 
   Future<void> addWeight( String userId, double weight, double? bmi, DateTime date) async =>
@@ -194,7 +200,7 @@ class ApiClient {
 
   Future<List<WorkoutHistory>> getWorkoutHistory(String userId) async {
     final data = await _request('GET', '/progress/workout-history/$userId') as List?;
-    return data?.map((e) => WorkoutHistory.fromJson(e)).toList() ?? [];
+    return data?.map((e) => WorkoutHistory.fromJson(e as Map<String, dynamic>)).toList() ?? [];
   }
 
   Future<void> logWorkout(WorkoutHistory history) async => 
@@ -202,18 +208,70 @@ class ApiClient {
 
   Future<ProgressStats?> getProgressStats(String userId) async {
     final data = await _request('GET', '/progress/stats/$userId');
-    return data != null ? ProgressStats.fromJson(data) : null;
+    return data != null ? ProgressStats.fromJson(data as Map<String, dynamic>) : null;
   }
 
   // --- Avatar ---
+  Future<Map<String, dynamic>> uploadAvatar(
+    String userId,
+    List<int> bytes,
+    String fileName,
+  ) async {
+    final uri = Uri.parse('$_baseUrl/user/avatar');
+    final session = Supabase.instance.client.auth.currentSession;
+    final token = session?.accessToken;
+
+    final request = http.MultipartRequest('POST', uri);
+    if (token != null) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+    request.fields['user_id'] = userId;
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        'avatar',
+        bytes,
+        filename: fileName,
+      ),
+    );
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    }
+    throw Exception('Upload Error (${response.statusCode}): ${response.body}');
+  }
+
+  Future<void> deleteAvatar(String userId, String path) async {
+    await _request(
+      'DELETE',
+      '/user/avatar',
+      queryParams: {'user_id': userId, 'path': path},
+    );
+  }
+
   Future<void> updateAvatar(String userId, String? avatarUrl) async =>
       await _request('POST', '/user/avatar',
           body: {'user_id': userId, 'avatar_url': avatarUrl});
 
-  // --- Exercises (New for proxy) ---
-  Future<List<Exercise>> getExercises() async {
-    // Implement or proxy to backend
-    return [];
+  // --- Exercises ---
+  Future<List<Exercise>> getExercises({String? muscleGroup}) async {
+    final data = await _request('GET', '/exercises',
+        queryParams: muscleGroup != null ? {'muscle_group': muscleGroup} : null)
+        as List?;
+    return data?.map((e) => Exercise.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+  }
+
+  Future<List<Exercise>> searchExercises(String query) async {
+    final data = await _request('GET', '/exercises/search', queryParams: {'q': query}) as List?;
+    return data?.map((e) => Exercise.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+  }
+
+  // --- Notifications ---
+  Future<List<NotificationModel>> getNotifications(String userId) async {
+    final data = await _request('GET', '/notifications', queryParams: {'userId': userId}) as List?;
+    return data?.map((e) => NotificationModel.fromJson(e as Map<String, dynamic>)).toList() ?? [];
   }
 }
 
