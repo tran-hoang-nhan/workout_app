@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:shared/shared.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 import '../services/api_client.dart';
@@ -28,11 +29,19 @@ class AuthRepository {
   }
 
   Future<Map<String, dynamic>> signIn(SignInParams params) async {
-    return _apiClient.login(params);
+    final response = await _apiClient.login(params);
+    if (response['session'] != null) {
+      await _updateSession(response['session'] as Map<String, dynamic>);
+    }
+    return response;
   }
 
   Future<Map<String, dynamic>> signUp(SignUpParams params) async {
-    return _apiClient.register(params);
+    final response = await _apiClient.register(params);
+    if (response['session'] != null) {
+      await _updateSession(response['session'] as Map<String, dynamic>);
+    }
+    return response;
   }
 
   Future<void> signOut() async {
@@ -44,7 +53,11 @@ class AuthRepository {
     required String token,
     required String type,
   }) async {
-    return _apiClient.verifyOtp(email, token, type);
+    final response = await _apiClient.verifyOtp(email, token, type);
+    if (response['session'] != null) {
+      await _updateSession(response['session'] as Map<String, dynamic>);
+    }
+    return response;
   }
 
   Future<void> resendOTP({required String email, required String type}) async {
@@ -63,7 +76,40 @@ class AuthRepository {
     await _apiClient.resetPassword(email);
   }
 
+  Future<Map<String, dynamic>> completeRegistration({
+    required SignUpParams signUpParams,
+    required HealthUpdateParams healthParams,
+  }) async {
+    final response =
+        await _apiClient.completeRegistration(signUpParams, healthParams);
+    if (response['session'] != null) {
+      await _updateSession(response['session'] as Map<String, dynamic>);
+    }
+    return response;
+  }
+
   Future<void> updatePassword(String password) async {
     await _apiClient.updatePassword(password);
+  }
+
+  Future<void> _updateSession(Map<String, dynamic> sessionData) async {
+    final accessToken = sessionData['access_token'] as String?;
+    
+    if (accessToken != null) {
+      try {
+        await _supabase.auth.signOut(scope: SignOutScope.local);
+        await _supabase.auth.recoverSession(json.encode(sessionData));
+      } catch (_) {
+        try {
+          final minimalSession = Map<String, dynamic>.from(sessionData);
+          minimalSession.remove('refresh_token');
+          await _supabase.auth.recoverSession(json.encode(minimalSession));
+        } catch (_) {
+          try {
+            await _supabase.auth.setSession(accessToken);
+          } catch (_) {}
+        }
+      }
+    }
   }
 }
