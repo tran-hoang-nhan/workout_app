@@ -9,8 +9,6 @@ import 'package:workout_app/screens/workout_session/widgets/workout_countdown_ov
 import 'package:workout_app/screens/workout_session/widgets/exit_workout_dialog.dart';
 import 'package:workout_app/constants/app_constants.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:workout_app/providers/auth_provider.dart';
-import 'package:workout_app/services/api_client.dart';
 
 class WorkoutSessionScreen extends ConsumerStatefulWidget {
   final Workout workout;
@@ -40,7 +38,6 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
 
   Timer? _timer;
   final Stopwatch _sessionStopwatch = Stopwatch();
-  int _restElapsedSeconds = 0;
 
   @override
   void initState() {
@@ -68,7 +65,6 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   void _start() {
     HapticFeedback.lightImpact();
     if (!_sessionStopwatch.isRunning) {
-      _restElapsedSeconds = 0;
       _sessionStopwatch.start();
     }
     final item = _currentItem;
@@ -125,9 +121,6 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
       if (diff != _remainingSeconds) {
         setState(() {
           _remainingSeconds = diff.clamp(0, 9999);
-          if (_inRest && diff >= 0) {
-            _restElapsedSeconds++;
-          }
         });
         
         if (_remainingSeconds <= 3 && _remainingSeconds > 0) {
