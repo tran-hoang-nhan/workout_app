@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
+import 'loading_animation.dart';
 
 class CustomButton extends StatelessWidget {
   final String label;
@@ -41,12 +42,10 @@ class CustomButton extends StatelessWidget {
           elevation: 2,
         ),
         child: isLoading
-            ? const SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
+            ? const Center(
+                child: AppLoading(
+                  size: 20,
+                  color: AppColors.white,
                 ),
               )
             : Row(
