@@ -69,7 +69,7 @@ class _ExitWorkoutDialogContent extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 decoration: const BoxDecoration(
-                  color: AppColors.error,
+                  color: AppColors.danger,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(AppBorderRadius.xxl),
                     topRight: Radius.circular(AppBorderRadius.xxl),
@@ -162,7 +162,7 @@ class _ExitWorkoutDialogContent extends StatelessWidget {
                             onPressed: () => Navigator.of(context).pop(true),
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),
-                              backgroundColor: AppColors.error,
+                              backgroundColor: AppColors.danger,
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
@@ -193,7 +193,7 @@ class _ExitWorkoutDialogContent extends StatelessWidget {
   Widget _buildMiniStat({required IconData icon, required String label, required String value}) {
     return Column(
       children: [
-        Icon(icon, color: AppColors.error.withValues(alpha: 0.7), size: 24),
+        Icon(icon, color: AppColors.danger.withValues(alpha: 0.7), size: 24),
         const SizedBox(height: 8),
         Text(
           value,

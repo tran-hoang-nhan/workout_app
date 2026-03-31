@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:workout_app/constants/app_constants.dart';
 
 class WorkoutCountdownOverlay extends StatefulWidget {
   final String text;
@@ -34,8 +33,8 @@ class _WorkoutCountdownOverlayState extends State<WorkoutCountdownOverlay> with 
     );
 
     _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.2).setCurve(Curves.easeOut), weight: 40),
-      TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0).setCurve(Curves.easeIn), weight: 60),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.2).chain(CurveTween(curve: Curves.easeOut)), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0).chain(CurveTween(curve: Curves.easeIn)), weight: 60),
     ]).animate(_animationController);
 
     _opacityAnimation = TweenSequence<double>([
