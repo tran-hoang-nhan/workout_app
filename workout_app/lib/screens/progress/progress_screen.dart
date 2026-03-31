@@ -8,6 +8,7 @@ import 'widgets/achievements_section.dart';
 import 'widgets/calendar_slider.dart';
 import 'widgets/running_card.dart';
 import 'widgets/stats_section.dart';
+import '../../widgets/loading_animation.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});
@@ -59,7 +60,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
               data: (history) =>
                   AchievementsSection(totalWorkouts: history.length),
               loading: () => const SliverToBoxAdapter(
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(child: AppLoading()),
               ),
               error: (e, _) => SliverToBoxAdapter(
                 child: Center(child: Text('Lỗi tải thành tích: $e')),
