@@ -296,8 +296,6 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
       case AISuggestionStep.askingRequirement:
         return const SizedBox.shrink();
       case AISuggestionStep.generating:
-<<<<<<< HEAD
-      case AISuggestionStep.generating:
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: AppLoading(

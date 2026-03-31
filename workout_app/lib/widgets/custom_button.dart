@@ -41,6 +41,7 @@ class CustomButton extends StatelessWidget {
           ),
           elevation: 2,
         ),
+        child: isLoading
             ? const AppLoading(
                 size: 20,
                 color: AppColors.white,
