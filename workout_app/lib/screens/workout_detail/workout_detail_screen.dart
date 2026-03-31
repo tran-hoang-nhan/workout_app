@@ -7,6 +7,7 @@ import 'widgets/workout_header.dart';
 import 'widgets/workout_description.dart';
 import 'widgets/exercise_list_item.dart';
 import '../workout_session/workout_session_screen.dart';
+import '../../widgets/loading_animation.dart';
 
 class WorkoutDetailScreen extends ConsumerStatefulWidget {
   final Workout workout;
@@ -127,8 +128,7 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                         ],
                       );
                     },
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
+                    loading: () => const Center(child: AppLoading()),
                     error: (err, stack) {
                       return Center(
                         child: Column(
