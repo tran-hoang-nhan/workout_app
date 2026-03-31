@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-import '../../loading_animation.dart';
+import '../../../widgets/loading_animation.dart';
 
 class EditProfileBottomBar extends StatelessWidget {
   final bool isSaving;
