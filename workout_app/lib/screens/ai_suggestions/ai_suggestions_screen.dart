@@ -11,6 +11,7 @@ import 'widgets/chat_message_bubble.dart';
 import 'widgets/health_edit_form.dart';
 import 'widgets/health_validation_card.dart';
 import 'widgets/workout_suggestion_card.dart';
+import '../../widgets/loading_animation.dart';
 
 /// The steps in the AI workout suggestion flow.
 enum AISuggestionStep {
@@ -231,11 +232,8 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF7F00)),
-              ),
+              AppLoading(message: 'Đang tải thông tin sức khỏe...'),
               SizedBox(height: 16),
-              const Text('Đang tải thông tin sức khỏe...'),
             ],
           ),
         ),
@@ -308,14 +306,10 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Column(
             children: [
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF7F00)),
+              AppLoading(
+                message: 'AI đang phân tích dữ liệu của bạn...',
               ),
               const SizedBox(height: 16),
-              Text(
-                'AI đang phân tích dữ liệu của bạn...',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-              ),
             ],
           ),
         );
