@@ -86,7 +86,7 @@ class ProfileHeaderCard extends StatelessWidget {
                                             return child;
                                           }
                                           return const Center(
-                                            child: AppLoading(size: 20),
+                                            child: AppLoading(size: 24),
                                           );
                                         },
                                     errorBuilder:

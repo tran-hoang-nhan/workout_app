@@ -229,13 +229,7 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
       ),
       body: syncAsync.when(
         loading: () => const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AppLoading(message: 'Đang tải thông tin sức khỏe...'),
-              SizedBox(height: 16),
-            ],
-          ),
+          child: AppLoading(message: 'Đang tải thông tin sức khỏe...'),
         ),
         error: (error, stack) => Center(
           child: Column(
@@ -302,15 +296,12 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
       case AISuggestionStep.askingRequirement:
         return const SizedBox.shrink();
       case AISuggestionStep.generating:
+<<<<<<< HEAD
+      case AISuggestionStep.generating:
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            children: [
-              AppLoading(
-                message: 'AI đang phân tích dữ liệu của bạn...',
-              ),
-              const SizedBox(height: 16),
-            ],
+          child: AppLoading(
+            message: 'AI đang phân tích dữ liệu của bạn...',
           ),
         );
       case AISuggestionStep.results:

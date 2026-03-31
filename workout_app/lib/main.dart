@@ -237,24 +237,28 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     AsyncValue<shared.AuthState> authState,
     AsyncValue<bool> hasHealthData,
   ) {
+    // Show loading while checking auth status
     if (authState.isLoading && !authState.hasValue) {
       return AppLoading.fullScreen(message: 'Đang khởi động...');
     }
+
     final isAuthenticated = authState.value?.session != null;
     if (!isAuthenticated) {
       return LoginScreen(
         onLoginSuccess: () async {
           ref.invalidate(healthDataProvider);
           ref.invalidate(hasHealthDataProvider);
-          await ref.read(healthDataProvider.future);
-          await ref.read(hasHealthDataProvider.future);
         },
       );
     }
-    if (hasHealthData.isLoading && !hasHealthData.hasValue) {
-      return AppLoading.fullScreen(message: 'Đang kiểm tra thông tin sức khỏe...');
+
+    // Show loading while checking health data presence
+    if (hasHealthData.isLoading || (isAuthenticated && hasHealthData.isRefreshing)) {
+      return AppLoading.fullScreen(message: 'Đang kiểm tra hồ sơ sức khỏe...');
     }
 
+    // Special case: if we are authenticated but have a stale "false" value 
+    // (potentially from previous session), we should double-check.
     final hasData = hasHealthData.value ?? false;
     if (!hasData) {
       return HealthOnboardingScreen(

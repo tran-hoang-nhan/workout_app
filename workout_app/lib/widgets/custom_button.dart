@@ -41,12 +41,9 @@ class CustomButton extends StatelessWidget {
           ),
           elevation: 2,
         ),
-        child: isLoading
-            ? const Center(
-                child: AppLoading(
-                  size: 20,
-                  color: AppColors.white,
-                ),
+            ? const AppLoading(
+                size: 20,
+                color: AppColors.white,
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
