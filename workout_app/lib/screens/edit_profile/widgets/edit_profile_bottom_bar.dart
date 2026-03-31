@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
+import '../../../widgets/loading_animation.dart';
 
 class EditProfileBottomBar extends StatelessWidget {
   final bool isSaving;
@@ -45,13 +46,9 @@ class EditProfileBottomBar extends StatelessWidget {
               ),
             ),
             child: isSaving
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.white,
-                    ),
+                ? const AppLoading(
+                    size: 20,
+                    color: AppColors.white,
                   )
                 : const Text(
                     'Lưu thay đổi',

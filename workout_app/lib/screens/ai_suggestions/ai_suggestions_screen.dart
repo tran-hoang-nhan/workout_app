@@ -11,6 +11,7 @@ import 'widgets/chat_message_bubble.dart';
 import 'widgets/health_edit_form.dart';
 import 'widgets/health_validation_card.dart';
 import 'widgets/workout_suggestion_card.dart';
+import '../../widgets/loading_animation.dart';
 
 /// The steps in the AI workout suggestion flow.
 enum AISuggestionStep {
@@ -228,16 +229,7 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
       ),
       body: syncAsync.when(
         loading: () => const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF7F00)),
-              ),
-              SizedBox(height: 16),
-              const Text('Đang tải thông tin sức khỏe...'),
-            ],
-          ),
+          child: AppLoading(message: 'Đang tải thông tin sức khỏe...'),
         ),
         error: (error, stack) => Center(
           child: Column(
@@ -304,20 +296,8 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
       case AISuggestionStep.askingRequirement:
         return const SizedBox.shrink();
       case AISuggestionStep.generating:
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            children: [
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF7F00)),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'AI đang phân tích dữ liệu của bạn...',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-              ),
-            ],
-          ),
+        return AppLoading(
+          message: 'AI đang phân tích dữ liệu của bạn...',
         );
       case AISuggestionStep.results:
         return const SizedBox.shrink();
