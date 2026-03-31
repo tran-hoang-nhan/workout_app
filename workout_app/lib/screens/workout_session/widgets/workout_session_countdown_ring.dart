@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workout_app/constants/app_constants.dart';
 
 class WorkoutSessionCountdownRing extends StatelessWidget {
   final int remainingSeconds;
@@ -30,59 +31,27 @@ class WorkoutSessionCountdownRing extends StatelessWidget {
     final progress = (remaining / total).clamp(0.0, 1.0);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+        border: Border.all(color: color.withValues(alpha: 0.15), width: 1),
       ),
       child: Row(
         children: [
           SizedBox(
-            height: 110,
-            width: 110,
+            height: 50, width: 50,
             child: Stack(
               alignment: Alignment.center,
               children: [
                 SizedBox(
-                  height: 110,
-                  width: 110,
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: progress, end: progress),
-                    duration: const Duration(seconds: 1),
-                    curve: Curves.linear,
-                    builder: (context, value, child) {
-                      return CircularProgressIndicator(
-                        value: value,
-                        strokeWidth: 10,
-                        backgroundColor: color.withValues(alpha: 0.18),
-                        valueColor: AlwaysStoppedAnimation<Color>(color),
-                        strokeCap: StrokeCap.round,
-                      );
-                    },
+                  height: 50, width: 50,
+                  child: CircularProgressIndicator(
+                    value: progress, strokeWidth: 5, backgroundColor: color.withValues(alpha: 0.12),
+                    valueColor: AlwaysStoppedAnimation<Color>(color), strokeCap: StrokeCap.round,
                   ),
                 ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _formatTime(remainingSeconds),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black.withValues(alpha: 0.65),
-                      ),
-                    ),
-                  ],
-                ),
+                Text('${remainingSeconds < 0 ? 0 : remainingSeconds}s', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: color)),
               ],
             ),
           ),
@@ -90,52 +59,15 @@ class WorkoutSessionCountdownRing extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      height: 36,
-                      width: 36,
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(icon, color: color, size: 20),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Còn lại ${remainingSeconds < 0 ? 0 : remainingSeconds} giây',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black.withValues(alpha: 0.65),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Tổng ${totalSeconds < 0 ? 0 : totalSeconds} giây',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black.withValues(alpha: 0.45),
-                  ),
-                ),
+                Text(title.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: color, letterSpacing: 0.8)),
+                const SizedBox(height: 1),
+                Text('${_formatTime(remainingSeconds)} / ${_formatTime(totalSeconds)}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.black.withValues(alpha: 0.8))),
               ],
             ),
           ),
+          Icon(icon, color: color.withValues(alpha: 0.4), size: 20),
         ],
       ),
     );
