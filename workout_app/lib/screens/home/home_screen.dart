@@ -4,6 +4,7 @@ import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import 'widgets/ai_suggestions_section.dart';
 import 'widgets/hero_card.dart';
+import '../../widgets/loading_animation.dart';
 
 import '../../providers/notification_provider.dart';
 import '../../providers/health_provider.dart';
@@ -79,13 +80,7 @@ class HomeScreen extends ConsumerWidget {
                               color: AppColors.grey.withValues(alpha: 0.2),
                             ),
                             child: const Center(
-                              child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              ),
+                              child: AppLoading(size: 20),
                             ),
                           ),
                           error: (_, _) => Container(

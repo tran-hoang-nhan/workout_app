@@ -6,6 +6,7 @@ import 'package:shared/shared.dart';
 import '../../utils/app_error.dart';
 import 'widgets/workout_search_bar.dart';
 import 'widgets/workout_card.dart';
+import '../../widgets/loading_animation.dart';
 
 class WorkoutsScreen extends ConsumerStatefulWidget {
   const WorkoutsScreen({super.key});
@@ -97,7 +98,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                 );
               },
               loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(child: AppLoading()),
               ),
               error: (e, stack) => SliverFillRemaining(
                 child: Center(
