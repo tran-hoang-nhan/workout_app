@@ -6,6 +6,7 @@ import '../../constants/app_constants.dart';
 import '../../providers/exercise_provider.dart';
 import '../exercise_detail/exercise_detail_screen.dart';
 import '../../utils/label_utils.dart';
+import '../../widgets/loading_animation.dart';
 
 class ExercisesListScreen extends ConsumerWidget {
   const ExercisesListScreen({super.key});
@@ -33,7 +34,7 @@ class ExercisesListScreen extends ConsumerWidget {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: AppLoading()),
         error: (error, stack) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

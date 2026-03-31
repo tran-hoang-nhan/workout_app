@@ -8,6 +8,7 @@ import 'widgets/add_weight_form.dart';
 import 'widgets/weight_history_card.dart';
 import 'widgets/weight_progress_chart.dart';
 import 'widgets/weight_achievements_card.dart';
+import '../../widgets/loading_animation.dart';
 
 class WeightDetailScreen extends ConsumerWidget {
   const WeightDetailScreen({super.key});
@@ -114,7 +115,7 @@ class WeightDetailScreen extends ConsumerWidget {
               ],
             ),
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(child: AppLoading()),
           error: (error, stack) => Center(
             child: Text(
               'Lỗi: $error',

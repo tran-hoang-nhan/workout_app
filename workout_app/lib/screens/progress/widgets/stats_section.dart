@@ -4,6 +4,7 @@ import '../../../constants/app_constants.dart';
 import '../../../providers/daily_stats_provider.dart';
 import '../../../providers/progress_provider.dart';
 import '../../../providers/health_provider.dart';
+import '../../../widgets/loading_animation.dart';
 
 class StatsSection extends ConsumerWidget {
   final DateTime? date;
@@ -286,7 +287,7 @@ class StatsSection extends ConsumerWidget {
     return const Center(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 20),
-        child: CircularProgressIndicator(),
+        child: AppLoading(size: 30),
       ),
     );
   }

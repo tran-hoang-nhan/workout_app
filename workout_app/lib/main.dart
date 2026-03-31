@@ -23,6 +23,7 @@ import 'services/notification_service.dart';
 import 'providers/progress_user_provider.dart';
 import 'providers/app_state_provider.dart';
 import 'utils/logger.dart';
+import 'widgets/loading_animation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -236,24 +237,31 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     AsyncValue<shared.AuthState> authState,
     AsyncValue<bool> hasHealthData,
   ) {
+    // Show loading while checking auth status
     if (authState.isLoading && !authState.hasValue) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return AppLoading.fullScreen(message: 'Đang khởi động...');
     }
+
     final isAuthenticated = authState.value?.session != null;
     if (!isAuthenticated) {
       return LoginScreen(
         onLoginSuccess: () async {
+          // Explicitly invalidate and wait for health data check
           ref.invalidate(healthDataProvider);
           ref.invalidate(hasHealthDataProvider);
-          await ref.read(healthDataProvider.future);
-          await ref.read(hasHealthDataProvider.future);
+          // This ensures the loading state is triggered
         },
       );
     }
-    if (hasHealthData.isLoading && !hasHealthData.hasValue) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+
+    // Show loading while checking health data presence
+    // Use isRefreshing or isLoading to ensure we catch every transition
+    if (hasHealthData.isLoading || (isAuthenticated && hasHealthData.isRefreshing)) {
+      return AppLoading.fullScreen(message: 'Đang kiểm tra hồ sơ sức khỏe...');
     }
 
+    // Special case: if we are authenticated but have a stale "false" value 
+    // (potentially from previous session), we should double-check.
     final hasData = hasHealthData.value ?? false;
     if (!hasData) {
       return HealthOnboardingScreen(
