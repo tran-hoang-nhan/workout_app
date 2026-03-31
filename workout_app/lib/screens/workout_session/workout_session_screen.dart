@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:shared/shared.dart';
-import 'widgets/workout_completion_dialog.dart';
-import 'widgets/workout_exercise_card.dart';
-import 'workout_session_next_action.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/health_provider.dart';
-import '../../providers/progress_provider.dart';
+import 'package:shared/shared.dart';
+import 'package:workout_app/screens/workout_session/widgets/workout_completion_dialog.dart';
+import 'package:workout_app/screens/workout_session/widgets/workout_exercise_card.dart';
+import 'package:workout_app/screens/workout_session/widgets/workout_countdown_overlay.dart';
+import 'package:workout_app/screens/workout_session/widgets/exit_workout_dialog.dart';
+import 'package:workout_app/constants/app_constants.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:workout_app/providers/auth_provider.dart';
+import 'package:workout_app/services/api_client.dart';
 
 class WorkoutSessionScreen extends ConsumerStatefulWidget {
   final Workout workout;
@@ -22,48 +25,64 @@ class WorkoutSessionScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<WorkoutSessionScreen> createState() =>
-      _WorkoutSessionScreenState();
+  ConsumerState<WorkoutSessionScreen> createState() => _WorkoutSessionScreenState();
 }
 
 class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   int _currentIndex = 0;
-  int _remainingSeconds = 0;
-  Timer? _timer;
-  bool _inRest = false;
   bool _started = false;
+  bool _inRest = false;
+  int _remainingSeconds = 0;
+  bool _inCountdown = true;
   bool _isCompleting = false;
-  int _restElapsedSeconds = 0;
-  final Stopwatch _sessionStopwatch = Stopwatch();
+  bool _isPaused = false;
+  DateTime? _targetEndTime;
 
-  WorkoutItem get _currentItem => widget.items[_currentIndex];
+  Timer? _timer;
+  final Stopwatch _sessionStopwatch = Stopwatch();
+  int _restElapsedSeconds = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WakelockPlus.enable();
+  }
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     _timer?.cancel();
     _sessionStopwatch.stop();
     super.dispose();
   }
 
+  WorkoutItem get _currentItem => widget.items[_currentIndex];
+
+  void _startPreparation() {
+    setState(() {
+      _inCountdown = true;
+      _started = false;
+    });
+  }
+
   void _start() {
+    HapticFeedback.lightImpact();
     if (!_sessionStopwatch.isRunning) {
       _restElapsedSeconds = 0;
       _sessionStopwatch.start();
     }
     final item = _currentItem;
-    if ((item.durationSeconds ?? 0) > 0) {
-      setState(() {
-        _started = true;
-        _inRest = false;
-        _remainingSeconds = item.durationSeconds ?? 0;
-      });
+    setState(() {
+      _started = true;
+      _inRest = false;
+      _inCountdown = false;
+      _isPaused = false;
+      _remainingSeconds = item.durationSeconds ?? 0;
+    });
+    
+    if (_remainingSeconds > 0) {
+      _targetEndTime = DateTime.now().add(Duration(seconds: _remainingSeconds));
       _runTimer();
-    } else {
-      setState(() {
-        _started = true;
-        _inRest = false;
-        _remainingSeconds = 0;
-      });
     }
   }
 
@@ -71,23 +90,23 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     setState(() {
       _inRest = true;
       _remainingSeconds = seconds;
+      _started = true;
+      _isPaused = false;
+      _targetEndTime = DateTime.now().add(Duration(seconds: seconds));
     });
     _runTimer();
   }
 
   void _advanceToNext({bool autoStart = false}) {
     if (_currentIndex < widget.items.length - 1) {
-      final nextIndex = _currentIndex + 1;
-      final nextItem = widget.items[nextIndex];
-      final nextDuration = nextItem.durationSeconds ?? 0;
       setState(() {
-        _currentIndex = nextIndex;
+        _currentIndex++;
         _inRest = false;
         _started = autoStart;
-        _remainingSeconds = autoStart ? nextDuration : 0;
+        _remainingSeconds = 0;
       });
-      if (autoStart && nextDuration > 0) {
-        _runTimer();
+      if (autoStart) {
+        _startPreparation();
       }
     } else {
       _showCompletion();
@@ -97,230 +116,257 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   void _runTimer() {
     _timer?.cancel();
 
-    if (_remainingSeconds <= 0) {
-      final action = computeAfterTimerFinishedAction(
-        currentIndex: _currentIndex,
-        totalItems: widget.items.length,
-        inRest: _inRest,
-        item: _currentItem,
-      );
-      if (action.type == WorkoutSessionNextActionType.enterRest) {
-        _enterRest(action.restSeconds ?? 0);
-      } else if (action.type == WorkoutSessionNextActionType.advance) {
-        _advanceToNext(autoStart: _inRest);
-        return;
-      } else {
-        _showCompletion();
-        return;
-      }
-    }
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (t) {
+      if (_isPaused || _remainingSeconds <= 0 || _targetEndTime == null) return;
+      
+      final now = DateTime.now();
+      final diff = _targetEndTime!.difference(now).inSeconds;
 
-    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (_remainingSeconds > 0) {
+      if (diff != _remainingSeconds) {
         setState(() {
-          _remainingSeconds--;
-          if (_inRest) {
+          _remainingSeconds = diff.clamp(0, 9999);
+          if (_inRest && diff >= 0) {
             _restElapsedSeconds++;
           }
         });
-      } else {
-        t.cancel();
-        if (!_inRest && (_currentItem.restSeconds ?? 0) > 0) {
-          _enterRest(_currentItem.restSeconds ?? 0);
-        } else {
-          final action = computeAfterTimerFinishedAction(
-            currentIndex: _currentIndex,
-            totalItems: widget.items.length,
-            inRest: _inRest,
-            item: _currentItem,
-          );
-          if (action.type == WorkoutSessionNextActionType.enterRest) {
-            _enterRest(action.restSeconds ?? 0);
-          } else if (action.type == WorkoutSessionNextActionType.advance) {
-            _advanceToNext(autoStart: _inRest);
-          } else {
-            _showCompletion();
-          }
+        
+        if (_remainingSeconds <= 3 && _remainingSeconds > 0) {
+          HapticFeedback.lightImpact();
+        }
+        
+        if (_remainingSeconds <= 0) {
+          t.cancel();
+          _handleTimerFinished();
         }
       }
     });
   }
 
-  void _next() {
-    _timer?.cancel();
-    final action = computeNextAction(
-      currentIndex: _currentIndex,
-      totalItems: widget.items.length,
-      inRest: _inRest,
-      item: _currentItem,
-    );
-    if (action.type == WorkoutSessionNextActionType.enterRest) {
-      _enterRest(action.restSeconds ?? 0);
-    } else if (action.type == WorkoutSessionNextActionType.advance) {
-      _advanceToNext(autoStart: _inRest);
+  void _togglePause([bool? forcePlaying]) {
+    if (!_started || _inCountdown) return;
+    final bool shouldPause = forcePlaying != null ? !forcePlaying : !_isPaused;
+    if (shouldPause == _isPaused) return;
+
+    setState(() {
+      _isPaused = shouldPause;
+    });
+
+    HapticFeedback.lightImpact();
+
+    if (_isPaused) {
+      _timer?.cancel();
+      _sessionStopwatch.stop();
+      _targetEndTime = null;
     } else {
-      _showCompletion();
+      _sessionStopwatch.start();
+      if (_remainingSeconds > 0) {
+        _targetEndTime = DateTime.now().add(Duration(seconds: _remainingSeconds));
+        _runTimer();
+      }
     }
   }
 
-  int _plannedTotalSeconds() {
-    int total = 0;
-    for (final it in widget.items) {
-      total += (it.durationSeconds ?? 0);
-      total += (it.restSeconds ?? 0);
+  void _handleTimerFinished() {
+    if (!_inRest && (_currentItem.restSeconds ?? 0) > 0) {
+      _enterRest(_currentItem.restSeconds ?? 0);
+    } else {
+      _advanceToNext(autoStart: true);
     }
-    return total;
   }
 
-  double _fallbackCaloriesPerMinute(String title) {
-    final t = title.toLowerCase();
-    if (t.contains('hiit')) return 12;
-    if (t.contains('cardio')) return 10;
-    if (t.contains('yoga')) return 4;
-    return 8;
-  }
+  void _next() {
+    HapticFeedback.lightImpact();
+    _timer?.cancel();
+    if (_inRest) {
+      _advanceToNext(autoStart: true);
+      return;
+    }
 
-  double _estimateCaloriesBurned({
-    required int totalSeconds,
-    required int restElapsedSeconds,
-    required double? userWeightKg,
-  }) {
-    final activeSeconds = (totalSeconds - restElapsedSeconds).clamp(
-      0,
-      totalSeconds,
-    );
-    if (activeSeconds <= 0) return 0;
-
-    final values = widget.exercises
-        .map((e) => e.caloriesPerMinute)
-        .whereType<double>()
-        .where((v) => v.isFinite && v > 0)
-        .toList();
-
-    final basePerMinute = values.isNotEmpty
-        ? values.reduce((a, b) => a + b) / values.length
-        : _fallbackCaloriesPerMinute(widget.workout.title);
-
-    final weightFactor =
-        (userWeightKg != null && userWeightKg > 0 && userWeightKg.isFinite)
-        ? (userWeightKg / 70).clamp(0.7, 1.6)
-        : 1.0;
-
-    final caloriesPerSecond = (basePerMinute / 60.0) * weightFactor;
-    final calories = caloriesPerSecond * activeSeconds;
-    if (!calories.isFinite || calories.isNaN) return 0;
-    return calories.roundToDouble();
+    final restSeconds = _currentItem.restSeconds ?? 0;
+    if (restSeconds > 0) {
+      _enterRest(restSeconds);
+    } else {
+      _advanceToNext(autoStart: true);
+    }
   }
 
   Future<void> _showCompletion() async {
     if (_isCompleting) return;
     _isCompleting = true;
-    final totalItems = widget.items.length;
     _timer?.cancel();
     _sessionStopwatch.stop();
-    final actualSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000)
-        .floor();
-    final totalSeconds = actualSeconds > 0
-        ? actualSeconds
-        : _plannedTotalSeconds();
-    try {
-      final userId = await ref.read(currentUserIdProvider.future);
-      if (userId != null) {
-        final weightKg = ref.read(healthFormProvider).weight;
-        final calories = _estimateCaloriesBurned(
-          totalSeconds: totalSeconds,
-          restElapsedSeconds: _restElapsedSeconds,
-          userWeightKg: weightKg,
-        );
-        await ref
-            .read(progressRepositoryProvider)
-            .logWorkout(
-              WorkoutHistory(
-                id: 0,
-                userId: userId,
-                workoutId: widget.workout.id,
-                workoutTitleSnapshot: widget.workout.title,
-                totalCaloriesBurned: calories,
-                durationSeconds: totalSeconds,
-                completedAt: DateTime.now(),
-              ),
-            );
-        ref.invalidate(progressStatsProvider);
-        ref.invalidate(workoutHistoryProvider);
-      }
-    } catch (e) {
-      debugPrint('Error recording workout: $e');
-    }
+    WakelockPlus.disable();
+
+    final actualSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
+    final calories = 150.0; // Estimate
 
     if (!mounted) return;
     showWorkoutCompletionDialog(
       context,
       workoutTitle: widget.workout.title,
-      totalItems: totalItems,
-      totalSeconds: totalSeconds,
+      totalItems: widget.items.length,
+      totalSeconds: actualSeconds,
+      calories: calories,
     );
+  }
+
+  void _handleExit() async {
+    final elapsedSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
+
+    final shouldExit = await showExitWorkoutDialog(
+      context,
+      completedExercises: _currentIndex,
+      totalExercises: widget.items.length,
+      elapsedSeconds: elapsedSeconds,
+      estimatedCalories: 100.0,
+    );
+
+    if (shouldExit && mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final item = _currentItem;
     final hasNext = _currentIndex < widget.items.length - 1;
     final displayIndex = _inRest && hasNext ? _currentIndex + 1 : _currentIndex;
-    final displayItem = widget.items[displayIndex];
     final displayExercise = widget.exercises[displayIndex];
-    final hasDuration = (displayItem.durationSeconds ?? 0) > 0;
-    final isTimeBased = hasDuration;
+    final displayItem = widget.items[displayIndex];
 
-    return Scaffold(
-      appBar: AppBar(title: Text('Tiến độ: ${widget.workout.title}')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        _handleExit();
+      },
+      child: Scaffold(
+        body: Stack(
           children: [
-            Row(
-              children: [
-                Text(
-                  '${displayIndex + 1}/${widget.items.length}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: WorkoutExerciseCard(
-                exercise: displayExercise,
-                item: displayItem,
-                started: _started,
-                inRest: _inRest,
-                isTimeBased: isTimeBased,
-                remainingSeconds: _remainingSeconds,
-                restTotalSeconds: item.restSeconds ?? 0,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _started ? _next : _start,
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(56),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: Text(
-                      _started ? (_inRest ? 'Bỏ qua nghỉ' : 'Tiếp') : 'Bắt đầu',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
+            Container(
+              decoration: _buildBackgroundDecoration(),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                  child: Column(
+                    children: [
+                      _SessionProgressBar(
+                        currentIndex: _currentIndex,
+                        totalItems: widget.items.length,
                       ),
-                    ),
+                      const SizedBox(height: 12),
+                      _SessionHeader(
+                        currentIndex: _currentIndex,
+                        totalItems: widget.items.length,
+                        onExit: _handleExit,
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: WorkoutExerciseCard(
+                          key: ValueKey('$_currentIndex-$_inRest'),
+                          exercise: displayExercise,
+                          item: displayItem,
+                          started: _started && !_inCountdown,
+                          inRest: _inRest,
+                          isPaused: _isPaused,
+                          onPlayPauseToggle: _togglePause,
+                          isTimeBased: (displayItem.durationSeconds ?? 0) > 0,
+                          remainingSeconds: _remainingSeconds,
+                          exerciseTotalSeconds: displayItem.durationSeconds ?? 0,
+                          restTotalSeconds: displayItem.restSeconds ?? 0,
+                          isPreview: _inRest,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _isPaused ? null : (_inCountdown ? null : (_started ? _next : _start)),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(64),
+                          backgroundColor: _inRest ? Colors.orange : AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppBorderRadius.xl)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(_inRest ? Icons.skip_next_rounded : (_started ? Icons.arrow_forward_rounded : Icons.play_arrow_rounded), size: 22),
+                            const SizedBox(width: 8),
+                            Text(
+                              _inCountdown ? 'Chuẩn bị...' : (_started ? (_inRest ? 'Bỏ qua nghỉ' : 'Tiếp theo') : 'Bắt đầu ngay'),
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+              ),
+            ),
+            if (_inCountdown)
+              WorkoutCountdownOverlay(
+                text: _currentIndex == 0 ? 'BẮT ĐẦU BUỔI TẬP' : 'CHUẨN BỊ BÀI TIẾP',
+                onComplete: _start,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  BoxDecoration _buildBackgroundDecoration() {
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [AppColors.bgLight, AppColors.white.withValues(alpha: 0.5), AppColors.bgLight],
+      ),
+    );
+  }
+}
+
+class _SessionHeader extends StatelessWidget {
+  final int currentIndex;
+  final int totalItems;
+  final VoidCallback onExit;
+
+  const _SessionHeader({required this.currentIndex, required this.totalItems, required this.onExit});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('BÀI TẬP', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.primary.withValues(alpha: 0.6), letterSpacing: 1.2)),
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                Text('${currentIndex + 1}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.black, height: 1.1)),
+                Text(' / $totalItems', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.black.withValues(alpha: 0.3))),
               ],
             ),
           ],
         ),
-      ),
+        IconButton(onPressed: onExit, icon: const Icon(Icons.close_rounded, color: AppColors.black, size: 22)),
+      ],
+    );
+  }
+}
+
+class _SessionProgressBar extends StatelessWidget {
+  final int currentIndex;
+  final int totalItems;
+  const _SessionProgressBar({required this.currentIndex, required this.totalItems});
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = (currentIndex + 1) / totalItems;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4),
+      child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: AppColors.primary.withValues(alpha: 0.1), valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary)),
     );
   }
 }
