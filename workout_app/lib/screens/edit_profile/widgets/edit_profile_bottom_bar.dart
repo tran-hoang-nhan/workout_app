@@ -46,11 +46,9 @@ class EditProfileBottomBar extends StatelessWidget {
               ),
             ),
             child: isSaving
-                ? const Center(
-                    child: AppLoading(
-                      size: 20,
-                      color: AppColors.white,
-                    ),
+                ? const AppLoading(
+                    size: 20,
+                    color: AppColors.white,
                   )
                 : const Text(
                     'Lưu thay đổi',

@@ -1,11 +1,20 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared/shared.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ApiClient {
-  final String _baseUrl = 'http://localhost:8080/api';
+  static String get _defaultBaseUrl {
+    if (kIsWeb) return 'http://localhost:8080/api';
+    if (Platform.isAndroid) return 'http://10.0.2.2:8080/api';
+    return 'http://localhost:8080/api';
+  }
+
+  final String _baseUrl;
+
+  ApiClient({String? baseUrl}) : _baseUrl = baseUrl ?? _defaultBaseUrl;
 
   // --- Helper ---
   Future<dynamic> _request(
