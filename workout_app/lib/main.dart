@@ -23,6 +23,7 @@ import 'services/notification_service.dart';
 import 'providers/progress_user_provider.dart';
 import 'providers/app_state_provider.dart';
 import 'utils/logger.dart';
+import 'widgets/loading_animation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -237,7 +238,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     AsyncValue<bool> hasHealthData,
   ) {
     if (authState.isLoading && !authState.hasValue) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return AppLoading.fullScreen(message: 'Đang khởi động...');
     }
     final isAuthenticated = authState.value?.session != null;
     if (!isAuthenticated) {
@@ -251,7 +252,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       );
     }
     if (hasHealthData.isLoading && !hasHealthData.hasValue) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return AppLoading.fullScreen(message: 'Đang kiểm tra thông tin sức khỏe...');
     }
 
     final hasData = hasHealthData.value ?? false;
