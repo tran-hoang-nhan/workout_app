@@ -58,6 +58,7 @@ dependencies:
   # Utilities
   intl: any
   uuid: ^4.0.0
+  wakelock_plus: ^1.2.11
   flutter_dotenv: ^6.0.0
   health: any
   timezone: ^0.10.1
