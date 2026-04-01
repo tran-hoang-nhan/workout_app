@@ -62,12 +62,13 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
     super.dispose();
   }
 
-  void _addSystemMessage(String content, {Workout? workout}) {
+  void _addSystemMessage(String content, {Workout? workout, WorkoutDetail? detail}) {
     setState(() {
       _messages.add({
         'type': MessageType.ai,
         'content': content,
         'workout': workout,
+        'detail': detail,
       });
     });
     _scrollToBottom();
@@ -146,18 +147,25 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
         );
 
         final suggestedWorkout = Workout(
-          id: 0,
+          id: workoutPlan.id ?? 0,
           title: workoutPlan.title,
           description: workoutPlan.notes,
           level: workoutPlan.level,
+        );
+
+        // Map AI result to WorkoutDetail for the Preview Mode
+        final workoutDetail = WorkoutDetail(
+          workout: suggestedWorkout,
+          items: workoutPlan.items ?? [],
+          exercises: workoutPlan.exercises,
         );
 
         _addSystemMessage(
           'Tôi gợi ý bạn nên thực hiện lộ trình: ${workoutPlan.title}. '
           'đây là kế hoạch tối ưu cho mục tiêu ${workoutPlan.goal}.',
           workout: suggestedWorkout,
+          detail: workoutDetail,
         );
-
         if (workoutPlan.exercises.isNotEmpty) {
           final exercisesText =
               workoutPlan.exercises.map((e) => '- ${e.name}').join('\n');
@@ -263,6 +271,7 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
                     child: msg['workout'] != null
                         ? WorkoutSuggestionCard(
                             workout: msg['workout'] as Workout,
+                            detail: msg['detail'] as WorkoutDetail?,
                           )
                         : null,
                   );

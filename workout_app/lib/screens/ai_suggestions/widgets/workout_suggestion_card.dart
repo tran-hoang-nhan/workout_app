@@ -5,8 +5,13 @@ import '../../workout_detail/workout_detail_screen.dart';
 
 class WorkoutSuggestionCard extends StatelessWidget {
   final Workout workout;
+  final WorkoutDetail? detail;
 
-  const WorkoutSuggestionCard({super.key, required this.workout});
+  const WorkoutSuggestionCard({
+    super.key,
+    required this.workout,
+    this.detail,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +20,10 @@ class WorkoutSuggestionCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => WorkoutDetailScreen(workout: workout),
+            builder: (context) => WorkoutDetailScreen(
+              workout: workout,
+              initialDetail: detail,
+            ),
           ),
         );
       },
