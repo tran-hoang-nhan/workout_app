@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import '../../../utils/url_utils.dart';
 
 class ExerciseAnimationWidget extends StatefulWidget {
   final String animationUrl;
@@ -37,7 +38,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
-    _isPlaying = widget.autoPlay;
+    _isPlaying = widget.externalIsPlaying ?? widget.autoPlay;
 
     // Validate URL khi init
     if (widget.animationUrl.isEmpty) {
@@ -58,7 +59,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
     if (oldWidget.animationUrl != widget.animationUrl) {
       _controller.stop();
       _controller.reset();
-      _isPlaying = widget.autoPlay;
+      _isPlaying = widget.externalIsPlaying ?? widget.autoPlay;
       _hasError = false;
       _errorMessage = null;
       if (widget.animationUrl.isEmpty) {
@@ -66,10 +67,28 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
         _errorMessage = 'URL không hợp lệ';
       }
       setState(() {});
+    } else if (widget.externalIsPlaying != null &&
+        oldWidget.externalIsPlaying != widget.externalIsPlaying) {
+      _applyExternalPlaying(widget.externalIsPlaying!);
     }
   }
 
-  void _togglePlayPause() {
+  void _applyExternalPlaying(bool wantPlay) {
+    if (_controller.duration == null) return;
+    if (wantPlay) {
+      if (!_isPlaying) {
+        _controller.repeat();
+        setState(() => _isPlaying = true);
+      }
+    } else {
+      if (_isPlaying) {
+        _controller.stop();
+        setState(() => _isPlaying = false);
+      }
+    }
+  }
+
+  void _togglePlayPauseLocal() {
     setState(() {
       if (_isPlaying) {
         _controller.stop();
@@ -78,6 +97,14 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
       }
       _isPlaying = !_isPlaying;
     });
+  }
+
+  void _onTapAnimation() {
+    if (widget.onPlayPauseToggle != null) {
+      widget.onPlayPauseToggle!(!_isPlaying);
+    } else {
+      _togglePlayPauseLocal();
+    }
   }
 
   void _retryLoad() {
@@ -121,7 +148,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
     }
 
     return GestureDetector(
-      onTap: _togglePlayPause,
+      onTap: _onTapAnimation,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -135,7 +162,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
               ),
               child: Lottie.network(
                 key: ValueKey(widget.animationUrl),
-                widget.animationUrl,
+                UrlUtils.sanitize(widget.animationUrl),
                 controller: _controller,
                 fit: BoxFit.contain,
                 repeat: true,
@@ -147,9 +174,14 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
                       _errorMessage = null;
                     });
                     _controller.duration = composition.duration;
-                    if (widget.autoPlay) {
+                    final wantPlay = widget.externalIsPlaying ?? widget.autoPlay;
+                    _isPlaying = wantPlay;
+                    if (wantPlay) {
                       _controller.repeat();
+                    } else {
+                      _controller.stop();
                     }
+                    setState(() {});
                   }
                 },
                 errorBuilder: (context, error, stackTrace) {
@@ -221,7 +253,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  onPressed: _togglePlayPause,
+                  onPressed: _togglePlayPauseLocal,
                   icon: Icon(_isPlaying ? Icons.pause_circle : Icons.play_circle),
                   iconSize: 36,
                   color: Theme.of(context).primaryColor,

@@ -10,6 +10,7 @@ import '../../providers/notification_provider.dart';
 import '../../providers/health_provider.dart';
 import '../../providers/progress_provider.dart';
 import '../notification/notification_screen.dart';
+import '../../utils/url_utils.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -59,7 +60,7 @@ class HomeScreen extends ConsumerWidget {
                                 image: DecorationImage(
                                   image:
                                       avatarUrl != null && avatarUrl.isNotEmpty
-                                      ? NetworkImage(avatarUrl)
+                                      ? NetworkImage(UrlUtils.sanitize(avatarUrl))
                                       : NetworkImage(
                                           'https://ui-avatars.com/api/?name=${Uri.encodeComponent(fullName)}&background=FF7F00&color=fff',
                                         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
 import '../../../widgets/loading_animation.dart';
+import '../../../utils/url_utils.dart';
 
 class EditProfileAvatar extends StatelessWidget {
   final String displayAvatarUrl;
@@ -51,7 +52,7 @@ class EditProfileAvatar extends StatelessWidget {
                 child: ClipOval(
                   child: displayAvatarUrl.isNotEmpty
                       ? Image.network(
-                          displayAvatarUrl,
+                          UrlUtils.sanitize(displayAvatarUrl),
                           fit: BoxFit.cover,
                           loadingBuilder: (context, child, lp) => lp == null
                               ? child

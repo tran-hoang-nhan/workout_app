@@ -134,20 +134,59 @@ class WorkoutExerciseCard extends StatelessWidget {
           if (started)
             Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: (!inRest && !isTimeBased)
-                  ? WorkoutSessionRepsRing(
-                      reps: item.reps ?? 0,
-                      title: 'Đang tập',
-                      color: AppColors.primary,
-                      icon: Icons.repeat,
-                    )
-                  : WorkoutSessionCountdownRing(
-                      remainingSeconds: remainingSeconds,
-                      totalSeconds: inRest ? restTotalSeconds : exerciseTotalSeconds,
-                      title: inRest ? 'Đang nghỉ' : 'Đang tập',
-                      color: inRest ? AppColors.info : AppColors.primary,
-                      icon: inRest ? Icons.pause_circle_filled : Icons.bolt_rounded,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: (!inRest && !isTimeBased)
+                        ? WorkoutSessionRepsRing(
+                            reps: item.reps ?? 0,
+                            title: 'Đang tập',
+                            color: AppColors.primary,
+                            icon: Icons.repeat,
+                          )
+                        : WorkoutSessionCountdownRing(
+                            remainingSeconds: remainingSeconds,
+                            totalSeconds: inRest
+                                ? restTotalSeconds
+                                : exerciseTotalSeconds,
+                            title: inRest ? 'Đang nghỉ' : 'Đang tập',
+                            color: inRest ? AppColors.info : AppColors.primary,
+                            icon: inRest
+                                ? Icons.pause_circle_filled
+                                : Icons.bolt_rounded,
+                          ),
+                  ),
+                  if (onPlayPauseToggle != null) ...[
+                    const SizedBox(width: 4),
+                    Tooltip(
+                      message: isPaused ? 'Tiếp tục' : 'Tạm dừng',
+                      child: Material(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        shape: const CircleBorder(),
+                        child: IconButton(
+                          onPressed: () {
+                            // true = đang phát, false = tạm dừng (khớp _togglePause trong session)
+                            onPlayPauseToggle!(isPaused ? true : false);
+                          },
+                          icon: Icon(
+                            isPaused
+                                ? Icons.play_circle_filled_rounded
+                                : Icons.pause_circle_filled_rounded,
+                            color: inRest ? AppColors.info : AppColors.primary,
+                            size: 32,
+                          ),
+                          padding: const EdgeInsets.all(10),
+                          constraints: const BoxConstraints(
+                            minWidth: 48,
+                            minHeight: 48,
+                          ),
+                        ),
+                      ),
                     ),
+                  ],
+                ],
+              ),
             )
           else if (isPreview) 
             const Padding(

@@ -1,20 +1,17 @@
-import 'dart:convert';
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared/shared.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ApiClient {
-  static String get _defaultBaseUrl {
+  // Use 10.0.2.2 for Android emulators to reach the host machine
+  String get _baseUrl {
     if (kIsWeb) return 'http://localhost:8080/api';
     if (Platform.isAndroid) return 'http://10.0.2.2:8080/api';
     return 'http://localhost:8080/api';
   }
-
-  final String _baseUrl;
-
-  ApiClient({String? baseUrl}) : _baseUrl = baseUrl ?? _defaultBaseUrl;
 
   // --- Helper ---
   Future<dynamic> _request(
@@ -130,7 +127,8 @@ class ApiClient {
   }
 
   Future<List<Workout>> getWorkoutsByCategory(String cat) async {
-    final data = await _request('GET', '/workouts/category/$cat') as List?;
+    final segment = Uri.encodeComponent(cat);
+    final data = await _request('GET', '/workouts/category/$segment') as List?;
     return data?.map((e) => Workout.fromJson(e as Map<String, dynamic>)).toList() ?? [];
   }
 

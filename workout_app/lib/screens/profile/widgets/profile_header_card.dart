@@ -3,6 +3,7 @@ import '../../../constants/app_constants.dart';
 import 'package:shared/shared.dart';
 import '../../../utils/label_utils.dart';
 import '../../../widgets/loading_animation.dart';
+import '../../../utils/url_utils.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
   final AppUser user;
@@ -78,7 +79,7 @@ class ProfileHeaderCard extends StatelessWidget {
                                   user.avatarUrl!.isNotEmpty
                               ? ClipOval(
                                   child: Image.network(
-                                    user.avatarUrl!,
+                                    UrlUtils.sanitize(user.avatarUrl!),
                                     fit: BoxFit.cover,
                                     loadingBuilder:
                                         (context, child, loadingProgress) {

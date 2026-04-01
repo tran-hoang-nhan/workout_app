@@ -45,31 +45,21 @@ class WorkoutService {
     }
   }
 
-  String _simplify(String s) {
-    var str = s.toLowerCase();
-    const vietnamese = 'aáàảãạâấầẩẫậăắằẳẵặeéèẻẽẹêếềểễệiíìỉĩịoóòỏõọôốồổỗộơớờởỡợuúùủũụưứừửữựyýỳỷỹỵdđ';
-    const latin = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeeiiiiiiioooooooooooooooooouuuuuuuuuuuuyyyyyydd';
-    for (var i = 0; i < vietnamese.length; i++) {
-      str = str.replaceAll(vietnamese[i], latin[i]);
-    }
-    return str;
-  }
-
   Future<List<Workout>> getWorkoutsByCategory(String category) async {
     final key = category.trim().toLowerCase();
 
-    // Map UI label to internal key
-    final mappedCategory = (key == 'tất cả' || key == 'all') ? 'all' : _simplify(category);
-
-    // Direct bypass for "All" category since /api/workouts/ is confirmed working
-    if (mappedCategory == 'all') {
-      debugPrint('[WorkoutService] Bypassing category for "All" - calling getAllWorkouts()');
+    /// Backend `_mapFilterKeywords` so khớp theo chuỗi tiếng Việt (vd. `toàn thân`),
+    /// không dùng bản bỏ dấu — gửi đúng nhãn chip từ UI.
+    if (key == 'tất cả' || key == 'all') {
+      debugPrint('[WorkoutService] getWorkoutsByCategory: all → getAllWorkouts()');
       return getAllWorkouts();
     }
 
-    debugPrint('[WorkoutService] getWorkoutsByCategory called: $category -> $mappedCategory');
+    final forApi = category.trim();
+
+    debugPrint('[WorkoutService] getWorkoutsByCategory: $forApi');
     try {
-      final workouts = await _workoutRepository.getWorkoutsByCategory(mappedCategory);
+      final workouts = await _workoutRepository.getWorkoutsByCategory(forApi);
       debugPrint('[WorkoutService] getWorkoutsByCategory returned ${workouts.length} items');
       return workouts;
     } catch (e) {

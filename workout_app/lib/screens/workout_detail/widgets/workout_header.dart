@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared/shared.dart';
 import '../../../utils/label_utils.dart';
+import '../../../utils/url_utils.dart';
 
 class WorkoutHeader extends StatelessWidget {
   final Workout workout;
@@ -20,7 +21,7 @@ class WorkoutHeader extends StatelessWidget {
             ),
 
             child: CachedNetworkImage(
-              imageUrl: workout.thumbnailUrl!,
+              imageUrl: UrlUtils.sanitize(workout.thumbnailUrl!),
               width: double.infinity,
               height: 250,
               fit: BoxFit.cover,

@@ -134,9 +134,10 @@ class ExercisesListScreen extends ConsumerWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    if (exercise.muscleGroup != null)
+                    if (exercise.muscleGroup != null &&
+                        exercise.muscleGroup!.trim().isNotEmpty)
                       Text(
-                        exercise.muscleGroup!,
+                        LabelUtils.getMuscleGroupLabel(exercise.muscleGroup),
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
