@@ -49,6 +49,32 @@ class LabelUtils {
         _ => level!,
       };
 
+  /// Chuẩn hoá nhóm cơ từ API (EN/VN) → nhãn hiển thị thống nhất.
+  static String getMuscleGroupLabel(String? muscleGroup) {
+    if (muscleGroup == null || muscleGroup.trim().isEmpty) {
+      return '';
+    }
+    final k = muscleGroup.trim().toLowerCase();
+    return switch (k) {
+      'toàn thân' ||
+      'toan than' ||
+      'full body' ||
+      'full_body' ||
+      'fullbody' =>
+        'Toàn thân',
+      'ngực' || 'nguc' || 'chest' => 'Ngực',
+      'lưng' || 'lung' || 'back' => 'Lưng',
+      'chân' || 'chan' || 'legs' || 'leg' => 'Chân',
+      'tay' || 'arms' || 'arm' || 'biceps' || 'triceps' => 'Tay',
+      'vai' || 'shoulders' || 'shoulder' => 'Vai',
+      'bụng' || 'core' || 'abs' => 'Bụng/Core',
+      'cardio' => 'Cardio',
+      'hiit' => 'HIIT',
+      'yoga' => 'Yoga',
+      _ => muscleGroup.trim(),
+    };
+  }
+
   static Color getDifficultyColor(String? difficulty) {
     switch (difficulty?.toLowerCase()) {
       case 'beginner':

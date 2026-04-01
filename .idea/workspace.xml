@@ -4,7 +4,28 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84cb67a1-ef6a-48cf-9b81-3b27b10d838f" name="Changes" comment="" />
+    <list default="true" id="84cb67a1-ef6a-48cf-9b81-3b27b10d838f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/edit_profile/widgets/edit_profile_avatar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/edit_profile/widgets/edit_profile_avatar.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/exercise_detail/exercise_detail_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/exercise_detail/exercise_detail_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/exercises/exercises_list_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/exercises/exercises_list_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/exercises/widgets/exercise_animation_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/exercises/widgets/exercise_animation_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/home/home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/home/home_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/profile/widgets/profile_header_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/profile/widgets/profile_header_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/workout_detail/widgets/workout_header.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/workout_detail/widgets/workout_header.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/workout_session/widgets/exit_workout_dialog.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/workout_session/widgets/exit_workout_dialog.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/workout_session/widgets/workout_countdown_overlay.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/workout_session/widgets/workout_countdown_overlay.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/workout_session/widgets/workout_exercise_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/workout_session/widgets/workout_exercise_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/workout_session/workout_session_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/workout_session/workout_session_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/screens/workouts/widgets/workout_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/screens/workouts/widgets/workout_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/services/api_client.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/services/api_client.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/services/workout_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/services/workout_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_app/lib/utils/label_utils.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_app/lib/utils/label_utils.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_backend/lib/repositories/workout_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/workout_backend/lib/repositories/workout_repository.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_backend/routes/api/health/weight.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workout_backend/routes/api/workouts/category.dart" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

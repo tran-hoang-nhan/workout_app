@@ -84,11 +84,14 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  if (widget.exercise.muscleGroup != null) ...[
+                  if (widget.exercise.muscleGroup != null &&
+                      widget.exercise.muscleGroup!.trim().isNotEmpty) ...[
                     ExerciseInfoRow(
                       icon: Icons.fitness_center,
                       label: 'Nhóm cơ',
-                      value: widget.exercise.muscleGroup!,
+                      value: LabelUtils.getMuscleGroupLabel(
+                        widget.exercise.muscleGroup,
+                      ),
                     ),
                     const SizedBox(height: 12),
                   ],

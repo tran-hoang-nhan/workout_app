@@ -38,6 +38,8 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
 
   Timer? _timer;
   final Stopwatch _sessionStopwatch = Stopwatch();
+  /// Đang mở dialog thoát — tạm dừng đếm ngược + đồng hồ bài tập.
+  bool _haltForExitDialog = false;
 
   @override
   void initState() {
@@ -203,19 +205,47 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     );
   }
 
-  void _handleExit() async {
+  /// Calo hiển thị trong dialog thoát (theo thời gian đã tập, ~7 đơn vị/phút).
+  double _caloriesBurnedSoFar() {
+    final elapsed = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
+    if (elapsed <= 0) return 0;
+    return (elapsed / 60.0) * 7.0;
+  }
+
+  Future<void> _handleExit() async {
+    final hadPausedBefore = _isPaused;
+    setState(() {
+      _haltForExitDialog = true;
+    });
+
+    if (_started && !_inCountdown && !hadPausedBefore) {
+      _togglePause(false);
+    }
+
     final elapsedSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
+    final calories = _caloriesBurnedSoFar();
 
     final shouldExit = await showExitWorkoutDialog(
       context,
       completedExercises: _currentIndex,
       totalExercises: widget.items.length,
       elapsedSeconds: elapsedSeconds,
-      estimatedCalories: 100.0,
+      calories: calories,
     );
 
-    if (shouldExit && mounted) {
+    if (!mounted) return;
+
+    setState(() {
+      _haltForExitDialog = false;
+    });
+
+    if (shouldExit) {
       Navigator.of(context).pop();
+      return;
+    }
+
+    if (_started && !_inCountdown && !hadPausedBefore && _isPaused) {
+      _togglePause(true);
     }
   }
 
@@ -271,7 +301,9 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: _isPaused ? null : (_inCountdown ? null : (_started ? _next : _start)),
+                        onPressed: _inCountdown
+                            ? null
+                            : (_started ? _next : _start),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size.fromHeight(64),
                           backgroundColor: _inRest ? Colors.orange : AppColors.primary,
@@ -298,6 +330,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
             if (_inCountdown)
               WorkoutCountdownOverlay(
                 text: _currentIndex == 0 ? 'BẮT ĐẦU BUỔI TẬP' : 'CHUẨN BỊ BÀI TIẾP',
+                paused: _haltForExitDialog,
                 onComplete: _start,
               ),
           ],

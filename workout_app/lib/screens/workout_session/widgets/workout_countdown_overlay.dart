@@ -6,11 +6,14 @@ import 'package:flutter/services.dart';
 class WorkoutCountdownOverlay extends StatefulWidget {
   final String text;
   final VoidCallback onComplete;
+  /// Khi true (vd. đang mở dialog thoát), bộ đếm 3–2–1 tạm dừng.
+  final bool paused;
 
   const WorkoutCountdownOverlay({
     super.key,
     required this.text,
     required this.onComplete,
+    this.paused = false,
   });
 
   @override
@@ -51,6 +54,8 @@ class _WorkoutCountdownOverlayState extends State<WorkoutCountdownOverlay> with 
     HapticFeedback.mediumImpact();
     
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      if (widget.paused) return;
       if (_counter > 1) {
         setState(() {
           _counter--;
