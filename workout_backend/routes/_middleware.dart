@@ -23,8 +23,8 @@ Handler middleware(Handler handler) {
     }
 
     final authHeader = context.request.headers['Authorization'] ?? context.request.headers['authorization'];
-
     SupabaseClient client;
+
     if (authHeader != null && authHeader.startsWith('Bearer ')) {
       // Re-initialize client with user's access token
       final token = authHeader.substring(7);
@@ -37,7 +37,10 @@ Handler middleware(Handler handler) {
       client = SupabaseClient(url, key);
     }
 
-    final response = await handler.use(provider<SupabaseClient>((_) => client))(context);
+    final aiApiUrl = env['AI_API_URL'];
+    final response = await handler
+        .use(provider<SupabaseClient>((_) => client))
+        .use(provider<String?>((_) => aiApiUrl))(context);
     return response.copyWith(
       headers: {
         ...response.headers,

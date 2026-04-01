@@ -9,7 +9,8 @@ Future<Response> onRequest(RequestContext context) async {
   }
 
   final supabase = context.read<SupabaseClient>();
-  final repository = WorkoutRepository(supabase);
+  final aiApiUrl = context.read<String?>();
+  final repository = WorkoutRepository(supabase, aiApiUrl: aiApiUrl);
 
   try {
     final body = await context.request.json() as Map<String, dynamic>;
@@ -22,7 +23,20 @@ Future<Response> onRequest(RequestContext context) async {
     final medicalConditions =
         List<String>.from(body['medical_conditions'] as List);
 
-    final workoutPlan = await repository.generateAndSaveWorkout(
+    String? userId;
+    try {
+      final authHeader = context.request.headers['Authorization'] ?? context.request.headers['authorization'];
+      if (authHeader != null && authHeader.startsWith('Bearer ')) {
+        final token = authHeader.substring(7);
+        final userResponse = await supabase.auth.getUser(token);
+        userId = userResponse.user?.id;
+      }
+    } catch (_) {
+      // Auth might be optional or fail, proceed with null userId
+    }
+
+    final workoutPlan = await repository.generateWorkoutSuggestion(
+      userId: userId,
       weight: weight,
       height: height,
       goal: goal,
