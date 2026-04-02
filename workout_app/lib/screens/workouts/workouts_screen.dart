@@ -41,23 +41,24 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // Premium Header & Discovery
+            // Premium Header (Scrollable)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg, 32, AppSpacing.lg, AppSpacing.lg),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Thư viện bài tập',
+                      'Khám phá bài tập',
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 28,
                         fontWeight: FontWeight.w900,
                         color: AppColors.black,
-                        letterSpacing: -0.5,
+                        letterSpacing: -1.0,
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
+                    const SizedBox(height: AppSpacing.xl),
                     WorkoutSearchBar(
                       controller: _searchController,
                       onChanged: (value) {
@@ -66,9 +67,9 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
                         });
                       },
                     ),
-                    const SizedBox(height: AppSpacing.lg),
+                    const SizedBox(height: AppSpacing.xl),
                     _buildCategoryChips(),
-                    const SizedBox(height: AppSpacing.md),
+                    const SizedBox(height: AppSpacing.sm),
                   ],
                 ),
               ),
@@ -77,7 +78,9 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
               data: (workouts) {
                 if (workouts.isEmpty) {
                   return const SliverFillRemaining(
-                    child: Center(child: Text('Không tìm thấy bài tập nào')),
+                    child: Center(
+                        child: Text('Không tìm thấy bài tập nào',
+                            style: TextStyle(color: AppColors.grey))),
                   );
                 }
                 return SliverPadding(
@@ -127,7 +130,7 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
       'HIIT',
     ];
     return SizedBox(
-      height: 38,
+      height: 40,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
@@ -145,21 +148,21 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
               });
             },
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+              duration: const Duration(milliseconds: 250),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.black : AppColors.white,
-                borderRadius: BorderRadius.circular(16),
+                color: isSelected ? AppColors.primary : AppColors.white,
+                borderRadius: BorderRadius.circular(AppBorderRadius.full),
                 border: Border.all(
                   color: isSelected
-                      ? AppColors.black
+                      ? AppColors.primary
                       : AppColors.cardBorder.withValues(alpha: 0.5),
                 ),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: AppColors.black.withValues(alpha: 0.2),
+                          color: AppColors.primary.withValues(alpha: 0.25),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -169,9 +172,10 @@ class _WorkoutsScreenState extends ConsumerState<WorkoutsScreen> {
               child: Text(
                 category,
                 style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   color: isSelected ? AppColors.white : AppColors.grey,
+                  letterSpacing: 0.2,
                 ),
               ),
             ),

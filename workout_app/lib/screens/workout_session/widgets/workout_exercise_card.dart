@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:workout_app/constants/app_constants.dart';
 import 'package:shared/shared.dart';
 import 'package:workout_app/screens/exercises/widgets/exercise_animation_widget.dart';
-import 'package:workout_app/screens/workout_session/widgets/workout_session_countdown_ring.dart';
+import 'package:workout_app/screens/workout_session/widgets/workout_session_components.dart';
 
 class WorkoutExerciseCard extends StatelessWidget {
   final Exercise exercise;
@@ -39,6 +39,7 @@ class WorkoutExerciseCard extends StatelessWidget {
     final restChipSeconds = inRest ? restTotalSeconds : (item.restSeconds ?? 0);
 
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       decoration: BoxDecoration(
         color: AppColors.cardBg,
@@ -67,7 +68,7 @@ class WorkoutExerciseCard extends StatelessWidget {
                 border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
               ),
               child: const Text(
-                'TIẾP THEO',
+                'BÀI TIẾP THEO',
                 style: TextStyle(
                   color: Colors.orange,
                   fontSize: 10,

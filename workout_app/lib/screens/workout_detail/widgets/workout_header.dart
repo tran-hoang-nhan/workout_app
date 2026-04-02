@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared/shared.dart';
 import '../../../utils/label_utils.dart';
-import '../../../utils/url_utils.dart';
+import '../../../constants/app_constants.dart';
 
 class WorkoutHeader extends StatelessWidget {
   final Workout workout;
@@ -10,96 +9,75 @@ class WorkoutHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (workout.thumbnailUrl != null)
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(16),
-              bottomRight: Radius.circular(16),
-            ),
-
-            child: CachedNetworkImage(
-              imageUrl: UrlUtils.sanitize(workout.thumbnailUrl!),
-              width: double.infinity,
-              height: 250,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(
-                color: Colors.grey[200],
-                height: 250,
-                child: const Center(child: CircularProgressIndicator()),
-              ),
-
-              errorWidget: (context, url, error) {
-                debugPrint(
-                  '[WorkoutHeader] thumbnail load failed: title=${workout.title} url=$url error=$error',
-                );
-                return Container(
-                  color: Colors.grey[200],
-                  height: 250,
-                  child: const Icon(Icons.image_not_supported, size: 48),
-                );
-              },
-            ),
-          ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Text(
-                workout.title,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              if (workout.level != null) ...[
+                _buildMetadataChip(
+                  label: LabelUtils.getWorkoutLevelLabel(workout.level).toUpperCase(),
+                  color: LabelUtils.getDifficultyColor(workout.level),
+                  icon: Icons.bolt_rounded,
                 ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  if (workout.level != null) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: LabelUtils.getDifficultyColor(
-                          workout.level,
-                        ).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        LabelUtils.getWorkoutLevelLabel(
-                          workout.level,
-                        ).toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: LabelUtils.getDifficultyColor(workout.level),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  if (workout.estimatedDuration != null)
-                    Row(
-                      children: [
-                        const Icon(Icons.schedule, size: 18),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${workout.estimatedDuration} phút',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
+                const SizedBox(width: 8),
+              ],
+              if (workout.estimatedDuration != null)
+                _buildMetadataChip(
+                  label: '${workout.estimatedDuration} PHÚT',
+                  color: AppColors.grey,
+                  icon: Icons.timer_outlined,
+                  isOutlined: true,
+                ),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 16),
+          Text(
+            workout.title,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w900,
+              color: AppColors.black,
+              letterSpacing: -0.5,
+              height: 1.2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetadataChip({
+    required String label,
+    required Color color,
+    required IconData icon,
+    bool isOutlined = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: isOutlined ? Colors.transparent : color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: isOutlined ? Border.all(color: color.withValues(alpha: 0.2)) : null,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: color,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
