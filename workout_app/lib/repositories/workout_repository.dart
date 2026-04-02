@@ -29,6 +29,10 @@ class WorkoutRepository {
     return _apiClient.generateWorkout(req);
   }
 
+  Future<List<AISuggestionHistory>> getAISuggestionsHistory() async {
+    return _apiClient.getAISuggestionsHistory();
+  }
+
   Future<List<Workout>> getAllWorkouts() async {
     return _apiClient.getAllWorkouts();
   }
@@ -47,6 +51,10 @@ class WorkoutRepository {
 
   Future<List<Workout>> getWorkoutsByCategory(String category) async {
     return _apiClient.getWorkoutsByCategory(category);
+  }
+
+  Future<void> logWorkout(WorkoutHistory history) async {
+    await _apiClient.logWorkout(history);
   }
 
   // Older methods that are no longer directly used or need to be refactored

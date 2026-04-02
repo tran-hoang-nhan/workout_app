@@ -32,6 +32,11 @@ final workoutDetailProvider = FutureProvider.family<WorkoutDetail, int>((
   return await service.getWorkoutDetail(id);
 });
 
+final aiSuggestionHistoryProvider =
+    FutureProvider<List<AISuggestionHistory>>((ref) async {
+  return ref.watch(workoutServiceProvider).getAISuggestionsHistory();
+});
+
 final searchWorkoutsProvider = FutureProvider.family<List<Workout>, String>((
   ref,
   query,

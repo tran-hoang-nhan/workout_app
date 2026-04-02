@@ -16,22 +16,36 @@ class WorkoutSearchBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FA),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.transparent),
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+        border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: TextField(
         controller: controller,
         onChanged: onChanged,
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: AppColors.black,
+        ),
         decoration: InputDecoration(
-          hintText: 'Tìm kiếm...',
+          hintText: 'Tìm kiếm bài tập...',
           hintStyle: TextStyle(
-            color: AppColors.grey.withValues(alpha: 0.5),
+            color: AppColors.grey.withValues(alpha: 0.4),
             fontSize: 15,
+            fontWeight: FontWeight.w500,
           ),
-          prefixIcon: Icon(
-            Icons.search,
-            color: AppColors.grey.withValues(alpha: 0.5),
+          prefixIcon: const Icon(
+            Icons.search_rounded,
+            color: AppColors.primary,
+            size: 22,
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 16),

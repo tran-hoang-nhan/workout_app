@@ -246,16 +246,13 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     if (!isAuthenticated) {
       return LoginScreen(
         onLoginSuccess: () async {
-          // Explicitly invalidate and wait for health data check
           ref.invalidate(healthDataProvider);
           ref.invalidate(hasHealthDataProvider);
-          // This ensures the loading state is triggered
         },
       );
     }
 
     // Show loading while checking health data presence
-    // Use isRefreshing or isLoading to ensure we catch every transition
     if (hasHealthData.isLoading || (isAuthenticated && hasHealthData.isRefreshing)) {
       return AppLoading.fullScreen(message: 'Đang kiểm tra hồ sơ sức khỏe...');
     }
