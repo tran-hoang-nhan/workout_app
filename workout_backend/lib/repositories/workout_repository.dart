@@ -166,59 +166,79 @@ class WorkoutRepository {
   }
 
   /// Returns workouts matching a specific category label.
+  ///
+  /// Dùng join trong bộ nhớ (workouts + workout_items + exercises) thay vì
+  /// chuỗi `.or(title.ilike...)` — PostgREST dễ trả [] khi title không chứa
+  /// đúng từ khóa tiếng Việt nhưng bài vẫn có động tác đúng nhóm cơ.
   Future<List<Workout>> getWorkoutsByCategory(String category) async {
     final key = category.trim().toLowerCase();
     if (key == 'tất cả' || key == 'all') return getAllWorkouts();
 
     final (titleKeywords, muscleKeywords) = _mapFilterKeywords(category);
 
-    final titleOr = titleKeywords.map((k) => 'title.ilike.*$k*').join(',');
-    final descOr = titleKeywords.map((k) => 'description.ilike.*$k*').join(',');
+    final workouts = await getAllWorkouts();
+    if (workouts.isEmpty) return [];
 
-    final byTitleDesc = await _supabase
-        .from('workouts')
-        .select()
-        .or('$titleOr,$descOr');
+    final itemsData = await _supabase.from('workout_items').select('workout_id, exercise_id');
+    final items = itemsData as List;
 
-    final resultsMap = {
-      for (final dynamic json in byTitleDesc as List)
-        (json as Map<String, dynamic>)['id'] as int: Workout.fromJson(json)
-    };
-
-    final muscleOr = muscleKeywords.map((k) => 'muscle_group.ilike.*$k*').join(',');
-    final exercisesByMuscle = await _supabase
-        .from('exercises')
-        .select('id')
-        .or(muscleOr);
-
-    final exerciseIds = (exercisesByMuscle as List)
-        .map((dynamic e) => (e as Map<String, dynamic>)['id'] as int)
+    final exerciseIds = items
+        .map((dynamic e) => (e as Map<String, dynamic>)['exercise_id'] as int)
+        .toSet()
         .toList();
-    if (exerciseIds.isNotEmpty) {
-      final workoutItems = await _supabase
-          .from('workout_items')
-          .select('workout_id')
-          .inFilter('exercise_id', exerciseIds);
 
-      final workoutIds = (workoutItems as List)
-          .map((dynamic item) => (item as Map<String, dynamic>)['workout_id'] as int)
-          .toSet()
-          .toList();
-      if (workoutIds.isNotEmpty) {
-        final workoutsByIds = await _supabase
-            .from('workouts')
-            .select()
-            .inFilter('id', workoutIds);
-        for (final dynamic json in workoutsByIds as List) {
-          final workoutJson = json as Map<String, dynamic>;
-          resultsMap[workoutJson['id'] as int] = Workout.fromJson(workoutJson);
-        }
+    final idToMuscle = <int, String>{};
+    if (exerciseIds.isNotEmpty) {
+      final exercisesData = await _supabase
+          .from('exercises')
+          .select('id, muscle_group')
+          .inFilter('id', exerciseIds);
+      for (final dynamic row in exercisesData as List) {
+        final m = row as Map<String, dynamic>;
+        final id = m['id'] as int;
+        final mg = m['muscle_group'] as String?;
+        idToMuscle[id] = (mg ?? '').toLowerCase();
       }
     }
 
-    final merged = resultsMap.values.toList()
-      ..sort((a, b) => a.id.compareTo(b.id));
-    return merged;
+    final workoutToExerciseIds = <int, List<int>>{};
+    for (final dynamic row in items) {
+      final m = row as Map<String, dynamic>;
+      final wid = m['workout_id'] as int;
+      final eid = m['exercise_id'] as int;
+      (workoutToExerciseIds[wid] ??= <int>[]).add(eid);
+    }
+
+    bool textMatches(String? title, String? description, List<String> kws) {
+      final text = '${title ?? ''} ${description ?? ''}'.toLowerCase();
+      return kws.any((k) => k.isNotEmpty && text.contains(k.toLowerCase()));
+    }
+
+    bool muscleMatches(String muscleLower, List<String> kws) {
+      if (muscleLower.isEmpty) return false;
+      return kws.any((k) => k.isNotEmpty && muscleLower.contains(k.toLowerCase()));
+    }
+
+    final out = <Workout>[];
+    for (final w in workouts) {
+      if (textMatches(w.title, w.description, titleKeywords)) {
+        out.add(w);
+        continue;
+      }
+      final eids = workoutToExerciseIds[w.id] ?? const <int>[];
+      var hit = false;
+      for (final eid in eids) {
+        final mg = idToMuscle[eid] ?? '';
+        if (muscleMatches(mg, muscleKeywords)) {
+          hit = true;
+          break;
+        }
+      }
+      if (hit) out.add(w);
+    }
+
+    out.sort((a, b) => a.id.compareTo(b.id));
+    return out;
   }
 
   (List<String> titleKeywords, List<String> muscleKeywords) _mapFilterKeywords(
@@ -227,15 +247,36 @@ class WorkoutRepository {
     final key = category.trim().toLowerCase();
     switch (key) {
       case 'toàn thân':
+      case 'toan than':
         return (
-          ['toàn thân', 'toan than', 'full body'],
-          ['toàn thân', 'toan than', 'full body']
+          [
+            'toàn thân',
+            'toan than',
+            'full body',
+            'fullbody',
+            'total body',
+            'whole body',
+          ],
+          [
+            'toàn thân',
+            'toan than',
+            'full body',
+            'fullbody',
+            'total body',
+            'whole body',
+          ],
         );
       case 'ngực':
-        return (['ngực', 'nguc', 'chest'], ['ngực', 'nguc', 'chest']);
+      case 'nguc':
+        return (
+          ['ngực', 'nguc', 'chest', 'pectoral', 'pec'],
+          ['ngực', 'nguc', 'chest', 'pectoral', 'pec'],
+        );
       case 'lưng':
+      case 'lung':
         return (['lưng', 'lung', 'back'], ['lưng', 'lung', 'back']);
       case 'chân':
+      case 'chan':
         return (['chân', 'chan', 'legs'], ['chân', 'chan', 'legs']);
       case 'tay':
         return (['tay', 'arms', 'arm'], ['tay', 'arms', 'arm']);
@@ -248,5 +289,67 @@ class WorkoutRepository {
       default:
         return ([key], [key]);
     }
+  }
+
+  /// Returns a list of past AI workout suggestions for the specified user.
+  Future<List<AISuggestionHistory>> getAISuggestionsHistory(String userId) async {
+    final response = await _supabase
+        .from('workout_ai_suggestions')
+        .select()
+        .eq('user_id', userId)
+        .order('id', ascending: false);
+
+    final historyList = (response as List)
+        .map((dynamic json) => AISuggestionHistory.fromJson(json as Map<String, dynamic>))
+        .toList();
+
+    if (historyList.isEmpty) return [];
+
+    // Collect all unique exercise IDs across all history items
+    final Set<int> exerciseIds = {};
+    for (final history in historyList) {
+      if (history.plan != null && history.plan!.items != null) {
+        for (final item in history.plan!.items!) {
+          exerciseIds.add(item.exerciseId);
+        }
+      }
+    }
+
+    if (exerciseIds.isEmpty) return historyList;
+
+    // Fetch all needed exercises in one batch
+    final exercisesData = await _supabase
+        .from('exercises')
+        .select()
+        .inFilter('id', exerciseIds.toList());
+    
+    final allExercises = (exercisesData as List)
+        .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
+        .toList();
+    
+    final exerciseMap = { for (final ex in allExercises) ex.id : ex };
+
+    // Map exercises back to each history item's plan
+    return historyList.map((history) {
+      if (history.plan != null && history.plan!.items != null) {
+        final planExercises = <Exercise>[];
+        for (final item in history.plan!.items!) {
+          final ex = exerciseMap[item.exerciseId];
+          if (ex != null) {
+            planExercises.add(ex);
+          }
+        }
+        
+        // Return enriched history with full exercises definitions, 
+        // while preserving the original workout items (steps).
+        return history.copyWith(
+          plan: history.plan!.copyWith(
+            exercises: planExercises,
+            items: history.plan!.items, // Explicitly keep items
+          ),
+        );
+      }
+      return history;
+    }).toList();
   }
 }

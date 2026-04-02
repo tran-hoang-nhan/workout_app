@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import '../../../utils/url_utils.dart';
 
 class ExerciseAnimationWidget extends StatefulWidget {
   final String animationUrl;
   final double? width;
   final double? height;
   final bool autoPlay;
+  final bool? externalIsPlaying;
+  final ValueChanged<bool>? onPlayPauseToggle;
+  final bool showControls;
 
   const ExerciseAnimationWidget({
     super.key,
@@ -13,6 +17,9 @@ class ExerciseAnimationWidget extends StatefulWidget {
     this.width,
     this.height,
     this.autoPlay = true,
+    this.externalIsPlaying,
+    this.onPlayPauseToggle,
+    this.showControls = true,
   });
 
   @override
@@ -31,7 +38,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
-    _isPlaying = widget.autoPlay;
+    _isPlaying = widget.externalIsPlaying ?? widget.autoPlay;
 
     // Validate URL khi init
     if (widget.animationUrl.isEmpty) {
@@ -52,7 +59,7 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
     if (oldWidget.animationUrl != widget.animationUrl) {
       _controller.stop();
       _controller.reset();
-      _isPlaying = widget.autoPlay;
+      _isPlaying = widget.externalIsPlaying ?? widget.autoPlay;
       _hasError = false;
       _errorMessage = null;
       if (widget.animationUrl.isEmpty) {
@@ -60,10 +67,28 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
         _errorMessage = 'URL không hợp lệ';
       }
       setState(() {});
+    } else if (widget.externalIsPlaying != null &&
+        oldWidget.externalIsPlaying != widget.externalIsPlaying) {
+      _applyExternalPlaying(widget.externalIsPlaying!);
     }
   }
 
-  void _togglePlayPause() {
+  void _applyExternalPlaying(bool wantPlay) {
+    if (_controller.duration == null) return;
+    if (wantPlay) {
+      if (!_isPlaying) {
+        _controller.repeat();
+        setState(() => _isPlaying = true);
+      }
+    } else {
+      if (_isPlaying) {
+        _controller.stop();
+        setState(() => _isPlaying = false);
+      }
+    }
+  }
+
+  void _togglePlayPauseLocal() {
     setState(() {
       if (_isPlaying) {
         _controller.stop();
@@ -72,6 +97,14 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
       }
       _isPlaying = !_isPlaying;
     });
+  }
+
+  void _onTapAnimation() {
+    if (widget.onPlayPauseToggle != null) {
+      widget.onPlayPauseToggle!(!_isPlaying);
+    } else {
+      _togglePlayPauseLocal();
+    }
   }
 
   void _retryLoad() {
@@ -114,123 +147,133 @@ class _ExerciseAnimationWidgetState extends State<ExerciseAnimationWidget>
       );
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Flexible(
-          child: Container(
-            width: widget.width,
-            height: widget.height,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Lottie.network(
-              key: ValueKey(widget.animationUrl),
-              widget.animationUrl,
-              controller: _controller,
-              fit: BoxFit.contain,
-              repeat: true,
-              animate: widget.autoPlay,
-              onLoaded: (composition) {
-                if (mounted) {
-                  setState(() {
-                    _hasError = false;
-                    _errorMessage = null;
-                  });
-                  _controller.duration = composition.duration;
-                  if (widget.autoPlay) {
-                    _controller.repeat();
-                  }
-                }
-              },
-              errorBuilder: (context, error, stackTrace) {
-                // Log error để debug
-                debugPrint('❌ Lỗi tải animation: $error');
-                debugPrint('📎 URL: ${widget.animationUrl}');
-                debugPrint('📚 StackTrace: $stackTrace');
-
-                if (mounted) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
+    return GestureDetector(
+      onTap: _onTapAnimation,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Container(
+              width: widget.width,
+              height: widget.height,
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Lottie.network(
+                key: ValueKey(widget.animationUrl),
+                UrlUtils.sanitize(widget.animationUrl),
+                controller: _controller,
+                fit: BoxFit.contain,
+                repeat: true,
+                animate: widget.autoPlay,
+                onLoaded: (composition) {
+                  if (mounted) {
                     setState(() {
-                      _hasError = true;
-                      _errorMessage = 'Không thể tải animation';
+                      _hasError = false;
+                      _errorMessage = null;
                     });
-                  });
-                }
+                    _controller.duration = composition.duration;
+                    final wantPlay = widget.externalIsPlaying ?? widget.autoPlay;
+                    _isPlaying = wantPlay;
+                    if (wantPlay) {
+                      _controller.repeat();
+                    } else {
+                      _controller.stop();
+                    }
+                    setState(() {});
+                  }
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  // Log error để debug
+                  debugPrint('❌ Lỗi tải animation: $error');
+                  debugPrint('📎 URL: ${widget.animationUrl}');
+                  debugPrint('📚 StackTrace: $stackTrace');
 
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: Colors.red[300],
-                        size: 48,
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Không thể tải animation',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      const SizedBox(height: 4),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          widget.animationUrl,
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 10,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                  if (mounted) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() {
+                        _hasError = true;
+                        _errorMessage = 'Không thể tải animation';
+                      });
+                    });
+                  }
+
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: Colors.red[300],
+                          size: 48,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton.icon(
-                        onPressed: _retryLoad,
-                        icon: const Icon(Icons.refresh, size: 18),
-                        label: const Text('Thử lại'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              frameBuilder: (context, child, composition) {
-                if (composition == null) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return child;
-              },
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Không thể tải animation',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Text(
+                            widget.animationUrl,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton.icon(
+                          onPressed: _retryLoad,
+                          icon: const Icon(Icons.refresh, size: 18),
+                          label: const Text('Thử lại'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                frameBuilder: (context, child, composition) {
+                  if (composition == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return child;
+                },
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              onPressed: _togglePlayPause,
-              icon: Icon(_isPlaying ? Icons.pause_circle : Icons.play_circle),
-              iconSize: 36,
-              color: Theme.of(context).primaryColor,
-            ),
-            IconButton(
-              onPressed: () {
-                _controller.reset();
-                if (_isPlaying) {
-                  _controller.repeat();
-                }
-              },
-              icon: const Icon(Icons.replay),
-              iconSize: 28,
-              color: Colors.grey[700],
+          if (widget.showControls) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: _togglePlayPauseLocal,
+                  icon: Icon(_isPlaying ? Icons.pause_circle : Icons.play_circle),
+                  iconSize: 36,
+                  color: Theme.of(context).primaryColor,
+                ),
+                IconButton(
+                  onPressed: () {
+                    _controller.reset();
+                    if (_isPlaying) {
+                      _controller.repeat();
+                    }
+                  },
+                  icon: const Icon(Icons.replay),
+                  iconSize: 28,
+                  color: Colors.grey[700],
+                ),
+              ],
             ),
           ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

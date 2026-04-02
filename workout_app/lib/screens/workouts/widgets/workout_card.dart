@@ -6,6 +6,7 @@ import '../../../constants/app_constants.dart';
 import 'package:shared/shared.dart';
 import '../../../utils/label_utils.dart';
 import '../../workout_detail/workout_detail_screen.dart';
+import '../../../utils/url_utils.dart';
 
 class WorkoutCard extends StatelessWidget {
   final Workout workout;
@@ -57,7 +58,7 @@ class WorkoutCard extends StatelessWidget {
               if (workout.thumbnailUrl != null)
                 Positioned.fill(
                   child: CachedNetworkImage(
-                    imageUrl: workout.thumbnailUrl!,
+                    imageUrl: UrlUtils.sanitize(workout.thumbnailUrl!),
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Shimmer.fromColors(
                       baseColor: Colors.grey[300]!,

@@ -25,11 +25,11 @@ class AppLoading extends StatelessWidget {
   /// Factory method to provide a full-screen loading overlay.
   /// Used for major transitions (e.g., login checking status).
   static Widget fullScreen({String? message}) {
-    return Container(
-      color: Colors.white.withValues(alpha: 0.9),
-      child: Center(
+    return Scaffold(
+      backgroundColor: Colors.white.withValues(alpha: 0.9),
+      body: Center(
         child: AppLoading(
-          size: 50,
+          size: 60,
           message: message,
         ),
       ),
@@ -41,21 +41,23 @@ class AppLoading extends StatelessWidget {
     final themeColor = color ?? AppColors.primary;
     
     return Column(
-      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         LoadingAnimationWidget.staggeredDotsWave(
           color: themeColor,
           size: size,
         ),
         if (message != null) ...[
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             message!,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               color: AppColors.grey,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.2,
               decoration: TextDecoration.none, // For scaffold-less usage
             ),
           ),
