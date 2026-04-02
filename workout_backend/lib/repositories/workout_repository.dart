@@ -6,12 +6,12 @@ import 'package:supabase/supabase.dart';
 
 /// Repository for workout-related data operations and AI generation.
 class WorkoutRepository {
-  WorkoutRepository(this._supabase);
+  WorkoutRepository(this._supabase, {String? aiApiUrl}): _aiApiUrl = aiApiUrl ?? 'http://localhost:8000/api/v1/chat/workout';
   final SupabaseClient _supabase;
-  final String _aiApiUrl = 'https://api.your-python-ai.com/generate';
+  final String _aiApiUrl;
 
-  /// Generates a workout plan using an external AI service and saves metadata.
-  Future<WorkoutPlan> generateAndSaveWorkout({
+  Future<WorkoutPlan> generateWorkoutSuggestion({
+    required String? userId,
     required double weight,
     required double height,
     required String goal,
@@ -33,52 +33,70 @@ class WorkoutRepository {
         }),
       );
 
-      developer.log(
-        'AI Response Status: ${aiResponse.statusCode}',
-        name: 'WorkoutRepository',
-      );
-      try {
-        final dynamic decoded = jsonDecode(aiResponse.body);
-        final encoder = JsonEncoder.withIndent('  ');
-        developer.log(
-          'AI Response Body:\n${encoder.convert(decoded)}',
-          name: 'WorkoutRepository',
-        );
-      } catch (_) {
-        developer.log(
-          'AI Response Body (Raw): ${aiResponse.body}',
-          name: 'WorkoutRepository',
-        );
-      }
-
       if (aiResponse.statusCode != 200) {
+        if (userId != null) {
+          await _supabase.from('workout_ai_suggestions').insert({
+            'user_id': userId,
+            'user_prompt': requirement,
+            'status': 'failed',
+          });
+        }
         throw Exception(
           'Failed to generate workout from AI: ${aiResponse.body}',
         );
       }
 
       final aiData = jsonDecode(aiResponse.body) as Map<String, dynamic>;
-      final workoutPlan = WorkoutPlan.fromJson(aiData);
 
-      await _supabase.from('workouts').insert({
-        'title': workoutPlan.title,
-        'goal': workoutPlan.goal,
-        'level': workoutPlan.level,
-        'notes': workoutPlan.notes,
-      });
+      if (userId != null) {
+        try {
+          await _supabase.from('workout_ai_suggestions').insert({
+            'user_id': userId,
+            'health_context_snapshot': {
+              'weight': weight,
+              'height': height,
+              'goal': goal,
+              'diet_type': dietType,
+              'medical_conditions': medicalConditions,
+            },
+            'user_prompt': requirement,
+            'ai_response_data': aiData,
+            'status': 'completed',
+          });
+        } catch (e) {
+          developer.log('Failed to log AI suggestion: $e', name: 'WorkoutRepository', error: e);
+        }
+      }
 
-      return workoutPlan;
-    } catch (e) {
-      developer.log(
-        'Error in generateAndSaveWorkout: $e',
-        name: 'WorkoutRepository',
-        error: e,
+      final aiPlan = WorkoutPlan.fromJson(aiData);
+      final aiItems = aiPlan.items ?? [];
+
+      List<Exercise> fullExercises = [];
+      if (aiItems.isNotEmpty) {
+        final List<int> exerciseIds = aiItems.map((e) => e.exerciseId).toList();
+        final exercisesData = await _supabase
+            .from('exercises')
+            .select()
+            .inFilter('id', exerciseIds);
+        fullExercises = (exercisesData as List)
+            .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+
+      return WorkoutPlan(
+        id: null,
+        title: aiPlan.title,
+        goal: aiPlan.goal.isNotEmpty ? aiPlan.goal : goal,
+        level: aiPlan.level,
+        exercises: fullExercises,
+        items: aiItems,
+        notes: aiPlan.notes,
       );
+    } catch (e) {
       rethrow;
     }
   }
-
-  /// Returns all workouts ordered by ID ascending.
+  /// Filter ALL
   Future<List<Workout>> getAllWorkouts() async {
     final response = await _supabase
         .from('workouts')
@@ -89,7 +107,7 @@ class WorkoutRepository {
         .toList();
   }
 
-  /// Returns workouts filtered by workout level.
+  /// Filter by level
   Future<List<Workout>> getWorkoutsByLevel(String level) async {
     final response = await _supabase
         .from('workouts')
@@ -101,7 +119,7 @@ class WorkoutRepository {
         .toList();
   }
 
-  /// Returns detailed information for a specific workout.
+  /// Returns detail workout 
   Future<WorkoutDetail> getWorkoutDetail(int workoutId) async {
     final workoutData = await _supabase
         .from('workouts')
@@ -135,7 +153,7 @@ class WorkoutRepository {
     return WorkoutDetail(workout: workout, items: items, exercises: exercises);
   }
 
-  /// Searches workouts by title or description matching the query.
+  /// Searching workout
   Future<List<Workout>> searchWorkouts(String query) async {
     final response = await _supabase
         .from('workouts')
