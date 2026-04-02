@@ -11,7 +11,12 @@ import '../../widgets/loading_animation.dart';
 
 class WorkoutDetailScreen extends ConsumerStatefulWidget {
   final Workout workout;
-  const WorkoutDetailScreen({super.key, required this.workout});
+  final WorkoutDetail? initialDetail;
+  const WorkoutDetailScreen({
+    super.key,
+    required this.workout,
+    this.initialDetail,
+  });
 
   @override
   ConsumerState<WorkoutDetailScreen> createState() =>
@@ -33,9 +38,9 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final workoutDetailAsync = ref.watch(
-      workoutDetailProvider(widget.workout.id),
-    );
+    final workoutDetailAsync = widget.initialDetail != null
+        ? AsyncValue.data(widget.initialDetail!)
+        : ref.watch(workoutDetailProvider(widget.workout.id));
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.workout.title)),
