@@ -12,6 +12,7 @@ import 'widgets/health_edit_form.dart';
 import 'widgets/health_validation_card.dart';
 import 'widgets/workout_suggestion_card.dart';
 import '../../widgets/loading_animation.dart';
+import 'ai_suggestions_history_screen.dart';
 
 /// The steps in the AI workout suggestion flow.
 enum AISuggestionStep {
@@ -234,6 +235,21 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history, color: AppColors.black),
+            onPressed: () {
+              ref.invalidate(aiSuggestionHistoryProvider);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AISuggestionsHistoryScreen(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: syncAsync.when(
         loading: () => const Center(

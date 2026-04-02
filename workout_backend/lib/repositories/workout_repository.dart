@@ -290,4 +290,66 @@ class WorkoutRepository {
         return ([key], [key]);
     }
   }
+
+  /// Returns a list of past AI workout suggestions for the specified user.
+  Future<List<AISuggestionHistory>> getAISuggestionsHistory(String userId) async {
+    final response = await _supabase
+        .from('workout_ai_suggestions')
+        .select()
+        .eq('user_id', userId)
+        .order('id', ascending: false);
+
+    final historyList = (response as List)
+        .map((dynamic json) => AISuggestionHistory.fromJson(json as Map<String, dynamic>))
+        .toList();
+
+    if (historyList.isEmpty) return [];
+
+    // Collect all unique exercise IDs across all history items
+    final Set<int> exerciseIds = {};
+    for (final history in historyList) {
+      if (history.plan != null && history.plan!.items != null) {
+        for (final item in history.plan!.items!) {
+          exerciseIds.add(item.exerciseId);
+        }
+      }
+    }
+
+    if (exerciseIds.isEmpty) return historyList;
+
+    // Fetch all needed exercises in one batch
+    final exercisesData = await _supabase
+        .from('exercises')
+        .select()
+        .inFilter('id', exerciseIds.toList());
+    
+    final allExercises = (exercisesData as List)
+        .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
+        .toList();
+    
+    final exerciseMap = { for (final ex in allExercises) ex.id : ex };
+
+    // Map exercises back to each history item's plan
+    return historyList.map((history) {
+      if (history.plan != null && history.plan!.items != null) {
+        final planExercises = <Exercise>[];
+        for (final item in history.plan!.items!) {
+          final ex = exerciseMap[item.exerciseId];
+          if (ex != null) {
+            planExercises.add(ex);
+          }
+        }
+        
+        // Return enriched history with full exercises definitions, 
+        // while preserving the original workout items (steps).
+        return history.copyWith(
+          plan: history.plan!.copyWith(
+            exercises: planExercises,
+            items: history.plan!.items, // Explicitly keep items
+          ),
+        );
+      }
+      return history;
+    }).toList();
+  }
 }

@@ -9,6 +9,10 @@ import 'package:workout_app/screens/workout_session/widgets/workout_countdown_ov
 import 'package:workout_app/screens/workout_session/widgets/exit_workout_dialog.dart';
 import 'package:workout_app/constants/app_constants.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/workout_provider.dart';
+import '../../providers/progress_user_provider.dart';
+import '../../providers/daily_stats_provider.dart';
 
 class WorkoutSessionScreen extends ConsumerStatefulWidget {
   final Workout workout;
@@ -213,15 +217,33 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
   }
 
   Future<void> _showCompletion() async {
-    if (_isCompleting) return;
-    _isCompleting = true;
-    _timer?.cancel();
-    _sessionStopwatch.stop();
-    WakelockPlus.disable();
-
     final actualSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
     final calories = _caloriesBurnedSoFar();
     
+    // Log workout completion to backend
+    try {
+      final authService = ref.read(authServiceProvider);
+      final userId = authService.currentUser?.id;
+      if (userId != null) {
+        final history = WorkoutHistory(
+          userId: userId,
+          workoutId: widget.workout.id != 0 ? widget.workout.id : null,
+          workoutTitleSnapshot: widget.workout.title,
+          totalCaloriesBurned: calories,
+          durationSeconds: actualSeconds,
+          completedAt: DateTime.now(),
+        );
+        await ref.read(workoutServiceProvider).logWorkout(history);
+        
+        // Invalidate progress providers to refresh UI
+        final now = DateTime.now();
+        ref.invalidate(progressDailyProvider(now));
+        ref.invalidate(dailyStatsProvider(now));
+      }
+    } catch (e) {
+      debugPrint('[WorkoutSessionScreen] Error logging workout completion: $e');
+    }
+
     HapticFeedback.mediumImpact();
 
     if (!mounted) return;

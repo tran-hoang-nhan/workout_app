@@ -26,21 +26,33 @@ class WorkoutPlan {
       data = json['workout_suggestion'] as Map<String, dynamic>;
     }
 
+    final rawExercises = data['exercises'] as List? ?? [];
+    
+    // In AI suggestions, 'exercises' field contains workout metrics (reps, rest).
+    // In enriched/standard workouts, it contains full Exercise objects.
+    // We parse them as Exercises here.
+    final List<Exercise> parsedExercises = rawExercises.map((e) {
+      final map = e as Map<String, dynamic>;
+      // Ensure 'id' is present if 'exercise_id' is used
+      if (!map.containsKey('id') && map.containsKey('exercise_id')) {
+        map['id'] = map['exercise_id'];
+      }
+      return Exercise.fromJson(map);
+    }).toList();
+
+    // The 'items' are the workout steps (reps, duration, etc.)
+    // They are usually in 'items' or 'exercises' (in AI suggestions)
+    final List<WorkoutItem> parsedItems = (data['items'] as List? ?? rawExercises)
+        .map((e) => WorkoutItem.fromJson(e as Map<String, dynamic>))
+        .toList();
+
     return WorkoutPlan(
       id: data['id'] as int?,
       title: data['title'] ?? '',
       goal: data['goal'] ?? '',
       level: data['level'] ?? '',
-      exercises: (data['exercises'] as List? ?? []).map((e) {
-        final map = e as Map<String, dynamic>;
-        if (!map.containsKey('id') && map.containsKey('exercise_id')) {
-          map['id'] = map['exercise_id'];
-        }
-        return Exercise.fromJson(map);
-      }).toList(),
-      items: (data['items'] as List? ?? data['exercises'] as List? ?? [])
-          .map((e) => WorkoutItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      exercises: parsedExercises,
+      items: parsedItems,
       notes: data['notes'] ?? data['description'],
     );
   }
@@ -55,5 +67,25 @@ class WorkoutPlan {
       'items': items?.map((e) => e.toJson()).toList(),
       'notes': notes,
     };
+  }
+
+  WorkoutPlan copyWith({
+    int? id,
+    String? title,
+    String? goal,
+    String? level,
+    List<Exercise>? exercises,
+    List<WorkoutItem>? items,
+    String? notes,
+  }) {
+    return WorkoutPlan(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      goal: goal ?? this.goal,
+      level: level ?? this.level,
+      exercises: exercises ?? this.exercises,
+      items: items ?? this.items,
+      notes: notes ?? this.notes,
+    );
   }
 }

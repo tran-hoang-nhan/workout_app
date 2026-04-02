@@ -111,6 +111,11 @@ class ApiClient {
   Future<WorkoutPlan> generateWorkout(WorkoutGenerationRequest r) async => 
       WorkoutPlan.fromJson(await _request('POST', '/workout', body: r.toJson()) as Map<String, dynamic>);
 
+  Future<List<AISuggestionHistory>> getAISuggestionsHistory() async {
+    final data = await _request('GET', '/workouts/history') as List?;
+    return data?.map((e) => AISuggestionHistory.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+  }
+
   Future<List<Workout>> getAllWorkouts({String? level}) async {
     final data = await _request('GET', '/workouts',
             queryParams: level != null ? {'level': level} : null)
@@ -132,6 +137,7 @@ class ApiClient {
     return data?.map((e) => Workout.fromJson(e as Map<String, dynamic>)).toList() ?? [];
   }
 
+  // --- Progress & History ---
   // --- Health ---
   Future<HealthData?> getHealthData(String userId) async {
     final data = await _request('GET', '/health', queryParams: {'userId': userId});

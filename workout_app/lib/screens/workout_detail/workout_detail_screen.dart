@@ -196,14 +196,10 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) => WorkoutSessionScreen(
+                                        builder: (context) => WorkoutSessionScreen(
                                           workout: widget.workout,
-                                          items: pairs
-                                              .map((p) => p.item)
-                                              .toList(),
-                                          exercises: pairs
-                                              .map((p) => p.ex)
-                                              .toList(),
+                                          items: pairs.map((p) => p.item).toList(),
+                                          exercises: pairs.map((p) => p.ex).toList(),
                                         ),
                                       ),
                                     );
