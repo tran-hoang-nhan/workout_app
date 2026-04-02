@@ -5,6 +5,7 @@ export 'models/workout_plan.dart';
 export 'models/workout.dart';
 export 'models/workout_item.dart';
 export 'models/workout_detail.dart';
+export 'models/ai_suggestion_history.dart';
 export 'models/user.dart';
 export 'models/auth.dart';
 export 'models/health.dart';

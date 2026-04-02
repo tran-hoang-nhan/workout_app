@@ -62,9 +62,28 @@ class WorkoutService {
       final workouts = await _workoutRepository.getWorkoutsByCategory(forApi);
       debugPrint('[WorkoutService] getWorkoutsByCategory returned ${workouts.length} items');
       return workouts;
+      return workouts;
     } catch (e) {
       debugPrint('[WorkoutService] Error in getWorkoutsByCategory: $e');
       return []; // Return empty list on error to keep UI stable
+    }
+  }
+
+  Future<List<AISuggestionHistory>> getAISuggestionsHistory() async {
+    try {
+      return await _workoutRepository.getAISuggestionsHistory();
+    } catch (e) {
+      debugPrint('[WorkoutService] Error fetching AI suggestions history: $e');
+      return [];
+    }
+  }
+
+  Future<void> logWorkout(WorkoutHistory history) async {
+    try {
+      await _workoutRepository.logWorkout(history);
+    } catch (e) {
+      debugPrint('[WorkoutService] Error logging workout: $e');
+      rethrow;
     }
   }
 }
