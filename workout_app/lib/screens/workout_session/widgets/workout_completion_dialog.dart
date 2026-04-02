@@ -123,7 +123,7 @@ class _WorkoutCompletionDialogContentState
                         children: [
                           _buildStatItem(icon: Icons.fitness_center_rounded, label: 'Bài tập', value: '${widget.totalItems}'),
                           _buildStatItem(icon: Icons.timer_rounded, label: 'Thời gian', value: _formatDuration(widget.totalSeconds)),
-                          _buildStatItem(icon: Icons.local_fire_department_rounded, label: 'Calo', value: widget.calories.toStringAsFixed(0)),
+                          _buildStatItem(icon: Icons.local_fire_department_rounded, label: 'Tiêu hao', value: '${widget.calories.ceil()} Calo'),
                         ],
                       ),
                       const SizedBox(height: 40),
@@ -188,12 +188,24 @@ class _WorkoutCompletionConfettiState extends State<WorkoutCompletionConfetti> w
   late AnimationController _controller;
   final List<_ConfettiParticle> _particles = [];
   final math.Random _random = math.Random();
+  bool _isVisible = true;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 4));
     for (int i = 0; i < 60; i++) { _particles.add(_ConfettiParticle(_random)); }
+    
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        if (mounted) {
+          setState(() {
+            _isVisible = false;
+          });
+        }
+      }
+    });
+
     _controller.forward();
     _controller.addListener(() { for (final p in _particles) { p.update(); } setState(() {}); });
   }
@@ -202,7 +214,13 @@ class _WorkoutCompletionConfettiState extends State<WorkoutCompletionConfetti> w
   void dispose() { _controller.dispose(); super.dispose(); }
 
   @override
-  Widget build(BuildContext context) { return CustomPaint(painter: _ConfettiPainter(_particles)); }
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      opacity: _isVisible ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 500),
+      child: CustomPaint(painter: _ConfettiPainter(_particles)),
+    );
+  }
 }
 
 class _ConfettiParticle {
@@ -213,13 +231,13 @@ class _ConfettiParticle {
   _ConfettiParticle(this.random) { reset(); y = random.nextDouble() * -200; }
 
   void reset() {
-    x = random.nextDouble() * 400; y = -20; vx = (random.nextDouble() - 0.5) * 4; vy = random.nextDouble() * 5 + 2;
+    x = random.nextDouble(); y = -20; vx = (random.nextDouble() - 0.5) * 0.01; vy = random.nextDouble() * 5 + 2;
     size = random.nextDouble() * 8 + 4; rotation = random.nextDouble() * math.pi * 2; rspeed = (random.nextDouble() - 0.5) * 0.2;
     final colors = [AppColors.primary, AppColors.secondary, AppColors.success, AppColors.info, Colors.orange, Colors.pinkAccent, Colors.yellowAccent];
     color = colors[random.nextInt(colors.length)];
   }
 
-  void update() { x += vx; y += vy; rotation += rspeed; }
+  void update() { x += vx; y += vy; rotation += rspeed; if (y > 800) reset(); }
 }
 
 class _ConfettiPainter extends CustomPainter {
@@ -230,7 +248,7 @@ class _ConfettiPainter extends CustomPainter {
     for (final p in particles) {
       final paint = Paint()..color = p.color..style = PaintingStyle.fill;
       canvas.save();
-      final double actualX = (p.x / 400.0) * size.width;
+      final double actualX = p.x * size.width;
       canvas.translate(actualX, p.y); canvas.rotate(p.rotation);
       if (p.random.nextBool()) { canvas.drawRect(Rect.fromCenter(center: Offset.zero, width: p.size, height: p.size), paint); }
       else { canvas.drawCircle(Offset.zero, p.size / 2, paint); }

@@ -26,7 +26,7 @@ class WorkoutSessionScreen extends ConsumerStatefulWidget {
   ConsumerState<WorkoutSessionScreen> createState() => _WorkoutSessionScreenState();
 }
 
-class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
+class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
   bool _started = false;
   bool _inRest = false;
@@ -38,21 +38,36 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
 
   Timer? _timer;
   final Stopwatch _sessionStopwatch = Stopwatch();
+  double _accumulatedCalories = 0;
+  DateTime? _lastStepStartTime;
+
   /// Đang mở dialog thoát — tạm dừng đếm ngược + đồng hồ bài tập.
   bool _haltForExitDialog = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WakelockPlus.enable();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     WakelockPlus.disable();
     _timer?.cancel();
     _sessionStopwatch.stop();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // Tự động tạm dừng khi app vào background
+      if (_started && !_inCountdown && !_isPaused) {
+        _togglePause(false);
+      }
+    }
   }
 
   WorkoutItem get _currentItem => widget.items[_currentIndex];
@@ -76,6 +91,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
       _inCountdown = false;
       _isPaused = false;
       _remainingSeconds = item.durationSeconds ?? 0;
+      _lastStepStartTime = DateTime.now();
     });
     
     if (_remainingSeconds > 0) {
@@ -91,6 +107,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
       _started = true;
       _isPaused = false;
       _targetEndTime = DateTime.now().add(Duration(seconds: seconds));
+      _lastStepStartTime = DateTime.now();
     });
     _runTimer();
   }
@@ -107,6 +124,8 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
         _startPreparation();
       }
     } else {
+      // Trước khi hoàn thành, cộng nốt calo cuối cùng
+      _accumulatedCalories = _caloriesBurnedSoFar();
       _showCompletion();
     }
   }
@@ -151,9 +170,12 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     if (_isPaused) {
       _timer?.cancel();
       _sessionStopwatch.stop();
+      _accumulatedCalories = _caloriesBurnedSoFar();
       _targetEndTime = null;
+      _lastStepStartTime = null;
     } else {
       _sessionStopwatch.start();
+      _lastStepStartTime = DateTime.now();
       if (_remainingSeconds > 0) {
         _targetEndTime = DateTime.now().add(Duration(seconds: _remainingSeconds));
         _runTimer();
@@ -162,7 +184,8 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   }
 
   void _handleTimerFinished() {
-    if (!_inRest && (_currentItem.restSeconds ?? 0) > 0) {
+    final isLast = _currentIndex >= widget.items.length - 1;
+    if (!_inRest && !isLast && (_currentItem.restSeconds ?? 0) > 0) {
       _enterRest(_currentItem.restSeconds ?? 0);
     } else {
       _advanceToNext(autoStart: true);
@@ -177,11 +200,15 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
       return;
     }
 
+    final isLast = _currentIndex >= widget.items.length - 1;
     final restSeconds = _currentItem.restSeconds ?? 0;
-    if (restSeconds > 0) {
-      _enterRest(restSeconds);
-    } else {
+
+    if (isLast || restSeconds <= 0) {
+      _accumulatedCalories = _caloriesBurnedSoFar();
       _advanceToNext(autoStart: true);
+    } else {
+      _accumulatedCalories = _caloriesBurnedSoFar();
+      _enterRest(restSeconds);
     }
   }
 
@@ -193,7 +220,9 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     WakelockPlus.disable();
 
     final actualSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
-    final calories = 150.0; // Estimate
+    final calories = _caloriesBurnedSoFar();
+    
+    HapticFeedback.mediumImpact();
 
     if (!mounted) return;
     showWorkoutCompletionDialog(
@@ -205,11 +234,23 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
     );
   }
 
-  /// Calo hiển thị trong dialog thoát (theo thời gian đã tập, ~7 đơn vị/phút).
+  /// Tính Calo dựa trên caloriesPerMinute của từng bài tập hoặc mặc định 7.0.
   double _caloriesBurnedSoFar() {
-    final elapsed = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
-    if (elapsed <= 0) return 0;
-    return (elapsed / 60.0) * 7.0;
+    double currentRate = 7.0; // Default
+    if (_inRest) {
+      currentRate = 3.0; // Rest burns less
+    } else if (_currentIndex < widget.exercises.length) {
+      currentRate = widget.exercises[_currentIndex].caloriesPerMinute ?? 7.0;
+    }
+
+    double currentStepCalories = 0;
+    if (_lastStepStartTime != null && !_isPaused) {
+      final now = DateTime.now();
+      final ms = now.difference(_lastStepStartTime!).inMilliseconds;
+      currentStepCalories = (ms / 60000.0) * currentRate;
+    }
+
+    return _accumulatedCalories + currentStepCalories;
   }
 
   Future<void> _handleExit() async {
@@ -284,19 +325,33 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                       ),
                       const SizedBox(height: 16),
                       Expanded(
-                        child: WorkoutExerciseCard(
-                          key: ValueKey('$_currentIndex-$_inRest'),
-                          exercise: displayExercise,
-                          item: displayItem,
-                          started: _started && !_inCountdown,
-                          inRest: _inRest,
-                          isPaused: _isPaused,
-                          onPlayPauseToggle: _togglePause,
-                          isTimeBased: (displayItem.durationSeconds ?? 0) > 0,
-                          remainingSeconds: _remainingSeconds,
-                          exerciseTotalSeconds: displayItem.durationSeconds ?? 0,
-                          restTotalSeconds: displayItem.restSeconds ?? 0,
-                          isPreview: _inRest,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          switchInCurve: Curves.easeOutCubic,
+                          switchOutCurve: Curves.easeInCubic,
+                          transitionBuilder: (Widget child, Animation<double> animation) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: ScaleTransition(
+                                scale: Tween<double>(begin: 0.96, end: 1.0).animate(animation),
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: WorkoutExerciseCard(
+                            key: ValueKey('$_currentIndex-$_inRest'),
+                            exercise: displayExercise,
+                            item: displayItem,
+                            started: _started && !_inCountdown,
+                            inRest: _inRest,
+                            isPaused: _isPaused,
+                            onPlayPauseToggle: _togglePause,
+                            isTimeBased: (displayItem.durationSeconds ?? 0) > 0,
+                            remainingSeconds: _remainingSeconds,
+                            exerciseTotalSeconds: displayItem.durationSeconds ?? 0,
+                            restTotalSeconds: displayItem.restSeconds ?? 0,
+                            isPreview: _inRest,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -316,7 +371,13 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
                             Icon(_inRest ? Icons.skip_next_rounded : (_started ? Icons.arrow_forward_rounded : Icons.play_arrow_rounded), size: 22),
                             const SizedBox(width: 8),
                             Text(
-                              _inCountdown ? 'Chuẩn bị...' : (_started ? (_inRest ? 'Bỏ qua nghỉ' : 'Tiếp theo') : 'Bắt đầu ngay'),
+                              _inCountdown
+                                  ? 'Chuẩn bị...'
+                                  : (_started
+                                      ? (_inRest
+                                          ? 'Bỏ qua nghỉ'
+                                          : (hasNext ? 'Tiếp theo' : 'Hoàn thành'))
+                                      : 'Bắt đầu ngay'),
                               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                             ),
                           ],
@@ -340,11 +401,23 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> {
   }
 
   BoxDecoration _buildBackgroundDecoration() {
+    final colors = _inRest
+        ? [
+            Colors.orange.withValues(alpha: 0.12),
+            Colors.orange.withValues(alpha: 0.04),
+            Colors.orange.withValues(alpha: 0.08),
+          ]
+        : [
+            AppColors.bgLight,
+            AppColors.white.withValues(alpha: 0.5),
+            AppColors.bgLight,
+          ];
+
     return BoxDecoration(
       gradient: LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [AppColors.bgLight, AppColors.white.withValues(alpha: 0.5), AppColors.bgLight],
+        colors: colors,
       ),
     );
   }
@@ -392,7 +465,19 @@ class _SessionProgressBar extends StatelessWidget {
     final progress = (currentIndex + 1) / totalItems;
     return ClipRRect(
       borderRadius: BorderRadius.circular(4),
-      child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: AppColors.primary.withValues(alpha: 0.1), valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary)),
+      child: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOutCubic,
+        tween: Tween<double>(begin: 0, end: progress),
+        builder: (context, value, _) {
+          return LinearProgressIndicator(
+            value: value,
+            minHeight: 6,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+          );
+        },
+      ),
     );
   }
 }
