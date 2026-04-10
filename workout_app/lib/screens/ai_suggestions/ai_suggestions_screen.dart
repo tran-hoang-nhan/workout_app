@@ -11,6 +11,8 @@ import 'widgets/chat_message_bubble.dart';
 import 'widgets/health_edit_form.dart';
 import 'widgets/health_validation_card.dart';
 import 'widgets/workout_suggestion_card.dart';
+import 'widgets/chat_input.dart';
+import 'widgets/suggestion_interactive_step.dart';
 import '../../widgets/loading_animation.dart';
 import 'ai_suggestions_history_screen.dart';
 
@@ -34,8 +36,11 @@ enum AISuggestionStep {
 
 /// A screen that provides AI-powered workout suggestions.
 class AISuggestionsScreen extends ConsumerStatefulWidget {
+  /// Optional history item to display.
+  final AISuggestionHistory? historyItem;
+
   /// Creates an [AISuggestionsScreen].
-  const AISuggestionsScreen({super.key});
+  const AISuggestionsScreen({super.key, this.historyItem});
 
   @override
   ConsumerState<AISuggestionsScreen> createState() =>
@@ -51,10 +56,80 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
   @override
   void initState() {
     super.initState();
-    _addSystemMessage(
-      'Hệ thống AI đã sẵn sàng. Trước khi bắt đầu, hãy xác nhận thông tin '
-      'sức khỏe của bạn để tôi có thể đưa ra gợi ý chính xác nhất.',
-    );
+    if (widget.historyItem != null) {
+      _loadHistoryItem(widget.historyItem!);
+    } else {
+      _addSystemMessage(
+        'Hệ thống AI đã sẵn sàng. Trước khi bắt đầu, hãy xác nhận thông tin '
+        'sức khỏe của bạn để tôi có thể đưa ra gợi ý chính xác nhất.',
+      );
+    }
+  }
+
+  void _loadHistoryItem(AISuggestionHistory item) {
+    // Add initial system message and user confirmation for consistency with real chat
+    _messages.add({
+      'type': MessageType.ai,
+      'content': 'Hệ thống AI đã sẵn sàng. Trước khi bắt đầu, hãy xác nhận thông tin '
+          'sức khỏe của bạn để tôi có thể đưa ra gợi ý chính xác nhất.',
+    });
+
+    _messages.add({
+      'type': MessageType.user,
+      'content': 'Tôi đã xác nhận hồ sơ sức khỏe.',
+    });
+
+    if (item.healthContext != null) {
+      _messages.add({
+        'type': MessageType.ai,
+        'content': _formatHealthSummary(item.healthContext!),
+      });
+    }
+
+    if (item.userPrompt != null) {
+      _messages.add({
+        'type': MessageType.user,
+        'content': item.userPrompt!,
+      });
+    }
+
+    if (item.plan != null) {
+      final workoutPlan = item.plan!;
+      final suggestedWorkout = workoutPlan.toWorkout();
+      final workoutDetail = workoutPlan.toWorkoutDetail();
+
+      _messages.add({
+        'type': MessageType.ai,
+        'content': 'Tuyệt vời! Dựa trên thông tin và yêu cầu của bạn, '
+            'tôi đã phân tích và chuẩn bị một lộ trình cá nhân hóa.',
+      });
+
+      _messages.add({
+        'type': MessageType.ai,
+        'content': 'Tôi gợi ý bạn nên thực hiện lộ trình: ${workoutPlan.title}. '
+            'đây là kế hoạch tối ưu cho mục tiêu ${workoutPlan.goal}.',
+        'workout': suggestedWorkout,
+        'detail': workoutDetail,
+      });
+
+      if (workoutPlan.exercises.isNotEmpty) {
+        final exercisesText =
+            workoutPlan.exercises.map((e) => '- ${e.name}').join('\n');
+        _messages.add({
+          'type': MessageType.ai,
+          'content': 'Các bài tập bao gồm:\n$exercisesText',
+        });
+      }
+
+      if (workoutPlan.notes != null) {
+        _messages.add({
+          'type': MessageType.ai,
+          'content': 'Lưu ý: ${workoutPlan.notes}',
+        });
+      }
+    }
+
+    _currentStep = AISuggestionStep.results;
   }
 
   @override
@@ -95,7 +170,11 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
   }
 
   Future<void> _handleValidationConfirm() async {
-    _addUserMessage('Tôi đã xác nhận thông tin.');
+    _addUserMessage('Tôi đã xác nhận hồ sơ sức khỏe.');
+    
+    final healthState = ref.read(healthFormProvider);
+    _addSystemMessage(_formatHealthSummary(healthState.toJson()));
+
     setState(() => _currentStep = AISuggestionStep.askingRequirement);
     
     await Future.delayed(const Duration(milliseconds: 500));
@@ -147,19 +226,8 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
           'tôi đã phân tích và chuẩn bị một lộ trình cá nhân hóa.',
         );
 
-        final suggestedWorkout = Workout(
-          id: workoutPlan.id ?? 0,
-          title: workoutPlan.title,
-          description: workoutPlan.notes,
-          level: workoutPlan.level,
-        );
-
-        // Map AI result to WorkoutDetail for the Preview Mode
-        final workoutDetail = WorkoutDetail(
-          workout: suggestedWorkout,
-          items: workoutPlan.items ?? [],
-          exercises: workoutPlan.exercises,
-        );
+        final suggestedWorkout = workoutPlan.toWorkout();
+        final workoutDetail = workoutPlan.toWorkoutDetail();
 
         _addSystemMessage(
           'Tôi gợi ý bạn nên thực hiện lộ trình: ${workoutPlan.title}. '
@@ -194,13 +262,24 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
   }
 
   void _handleEditSave(HealthUpdateParams newState) {
-    ref.read(healthFormProvider.notifier).setAge(newState.age);
-    ref.read(healthFormProvider.notifier).setWeight(newState.weight);
-    ref.read(healthFormProvider.notifier).setHeight(newState.height);
-    ref.read(healthFormProvider.notifier).setDietType(newState.dietType);
+    ref.read(healthFormProvider.notifier).updateAndSave(newState);
 
     _addSystemMessage('Thông tin đã được cập nhật thành công!');
     _handleValidationConfirm();
+  }
+
+  String _formatHealthSummary(Map<String, dynamic> hc) {
+    final weight = hc['weight'] ?? '--';
+    final height = hc['height'] ?? '--';
+    final goal = hc['goal'] ?? '--';
+    final diet = hc['diet_type'] ?? '--';
+    final conditions = hc['medical_conditions'] as List?;
+
+    String summary = 'Hồ sơ sức khỏe: $weight kg, $height cm, Mục tiêu: $goal, Chế độ: $diet.';
+    if (conditions != null && conditions.isNotEmpty) {
+      summary += '\nTình trạng: ${conditions.join(", ")}';
+    }
+    return summary;
   }
 
   @override
@@ -221,13 +300,13 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.auto_awesome, color: Color(0xFFFF7F00), size: 20),
-            SizedBox(width: 8),
+            const Icon(Icons.auto_awesome, color: Color(0xFFFF7F00), size: 20),
+            const SizedBox(width: 8),
             Text(
-              'Gợi ý từ AI',
-              style: TextStyle(
+              widget.historyItem != null ? 'Chi tiết gợi ý' : 'Gợi ý từ AI',
+              style: const TextStyle(
                 color: AppColors.black,
                 fontWeight: FontWeight.bold,
                 fontSize: AppFontSize.lg,
@@ -278,7 +357,15 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
                 itemCount: _messages.length + 1,
                 itemBuilder: (context, index) {
                   if (index == _messages.length) {
-                    return _buildInteractiveStep(healthState);
+                    return SuggestionInteractiveStep(
+                      currentStep: _currentStep,
+                      healthState: healthState,
+                      onConfirm: _handleValidationConfirm,
+                      onEdit: _handleEditRequest,
+                      onSaveEdit: _handleEditSave,
+                      onCancelEdit: () => setState(
+                          () => _currentStep = AISuggestionStep.validating),
+                    );
                   }
                   final msg = _messages[index];
                   return ChatMessageBubble(
@@ -296,87 +383,10 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
             ),
             if (_currentStep == AISuggestionStep.askingRequirement ||
                 _currentStep == AISuggestionStep.results)
-              _buildChatInput(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInteractiveStep(HealthUpdateParams healthState) {
-    switch (_currentStep) {
-      case AISuggestionStep.validating:
-        return HealthValidationCard(
-          healthData: healthState,
-          onConfirm: _handleValidationConfirm,
-          onEdit: _handleEditRequest,
-        );
-      case AISuggestionStep.editing:
-        return HealthEditForm(
-          initialState: healthState,
-          onSave: _handleEditSave,
-          onCancel: () =>
-              setState(() => _currentStep = AISuggestionStep.validating),
-        );
-      case AISuggestionStep.askingRequirement:
-        return const SizedBox.shrink();
-      case AISuggestionStep.generating:
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: AppLoading(
-            message: 'AI đang phân tích dữ liệu của bạn...',
-          ),
-        );
-      case AISuggestionStep.results:
-        return const SizedBox.shrink();
-    }
-  }
-
-  Widget _buildChatInput() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            offset: const Offset(0, -2),
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.bgLight,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: TextField(
-                  controller: _chatController,
-                  onSubmitted: _handleRequirementSubmit,
-                  decoration: const InputDecoration(
-                    hintText: 'Hỏi thêm điều gì đó...',
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(fontSize: 14),
-                  ),
-                ),
+              ChatInput(
+                controller: _chatController,
+                onSubmitted: _handleRequirementSubmit,
               ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFFF7F00),
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.send, color: Colors.white, size: 20),
-                onPressed: () => _handleRequirementSubmit(_chatController.text),
-              ),
-            ),
           ],
         ),
       ),

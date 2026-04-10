@@ -7,6 +7,7 @@ import '../../constants/app_constants.dart';
 import '../../providers/workout_provider.dart';
 import '../../widgets/loading_animation.dart';
 import '../workout_detail/workout_detail_screen.dart';
+import 'ai_suggestions_screen.dart';
 
 class AISuggestionsHistoryScreen extends ConsumerWidget {
   const AISuggestionsHistoryScreen({super.key});
@@ -138,25 +139,11 @@ class AISuggestionsHistoryScreen extends ConsumerWidget {
                     ),
                     onTap: () {
                       if (item.plan != null) {
-                        final workout = Workout(
-                          id: item.plan!.id ?? 0,
-                          title: item.plan!.title,
-                          description: item.plan!.notes,
-                          level: item.plan!.level,
-                        );
-
-                        final workoutDetail = WorkoutDetail(
-                          workout: workout,
-                          items: item.plan!.items ?? [],
-                          exercises: item.plan!.exercises,
-                        );
-
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => WorkoutDetailScreen(
-                              workout: workout,
-                              initialDetail: workoutDetail,
+                            builder: (context) => AISuggestionsScreen(
+                              historyItem: item,
                             ),
                           ),
                         );
