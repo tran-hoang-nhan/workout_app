@@ -1,5 +1,7 @@
 import 'exercise.dart';
 import 'workout_item.dart';
+import 'workout.dart';
+import 'workout_detail.dart';
 
 class WorkoutPlan {
   final int? id;
@@ -19,6 +21,25 @@ class WorkoutPlan {
     this.items,
     this.notes,
   });
+
+  /// Converts this plan to a standard [Workout] object.
+  Workout toWorkout() {
+    return Workout(
+      id: id ?? 0,
+      title: title,
+      description: notes,
+      level: level,
+    );
+  }
+
+  /// Converts this plan and its references to a standard [WorkoutDetail] object.
+  WorkoutDetail toWorkoutDetail() {
+    return WorkoutDetail(
+      workout: toWorkout(),
+      items: items ?? [],
+      exercises: exercises,
+    );
+  }
 
   factory WorkoutPlan.fromJson(Map<String, dynamic> json) {
     var data = json;
