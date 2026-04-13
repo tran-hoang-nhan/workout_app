@@ -36,10 +36,11 @@ class WorkoutExerciseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasDuration = (item.durationSeconds ?? 0) > 0;
     final hasReps = (item.reps ?? 0) > 0;
-    final restChipSeconds = inRest ? restTotalSeconds : (item.restSeconds ?? 0);
+    final restChipSeconds = item.restSeconds ?? 0;
 
     return Container(
       width: double.infinity,
+      height: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       decoration: BoxDecoration(
         color: AppColors.cardBg,
