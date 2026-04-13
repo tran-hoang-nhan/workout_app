@@ -41,10 +41,8 @@ String? convertToPublicUrl(
         ? publicUrlResolver(bucketName, cleanPath)
         : supabase.storage.from(bucketName).getPublicUrl(cleanPath);
     final normalized = _normalizeUrl(publicUrl);
-    debugPrint('[StorageUtils] $trimmed -> $normalized');
     return normalized;
   } catch (e) {
-    debugPrint('[StorageUtils] error: $e, url=$url, bucket=$bucketName');
     return trimmed;
   }
 }

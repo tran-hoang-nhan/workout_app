@@ -246,7 +246,6 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
         ref.invalidate(dailyStatsProvider(now));
       }
     } catch (e) {
-      debugPrint('[WorkoutSessionScreen] Error logging workout completion: $e');
     }
 
     HapticFeedback.mediumImpact();

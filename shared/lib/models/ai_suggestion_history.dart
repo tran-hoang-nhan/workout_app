@@ -19,8 +19,8 @@ class AISuggestionHistory {
   factory AISuggestionHistory.fromJson(Map<String, dynamic> json) {
     return AISuggestionHistory(
       id: json['id'] as int,
-      recordedAt: json['recorded_at'] != null 
-          ? DateTime.parse(json['recorded_at'] as String)
+      recordedAt: (json['recorded_at'] ?? json['created_at']) != null 
+          ? DateTime.parse((json['recorded_at'] ?? json['created_at']) as String)
           : DateTime.now(),
       userPrompt: json['user_prompt'] as String?,
       plan: json['ai_response_data'] != null 

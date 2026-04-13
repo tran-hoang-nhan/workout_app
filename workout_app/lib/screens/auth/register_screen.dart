@@ -7,6 +7,11 @@ import '../../utils/app_error.dart';
 import '../../widgets/loading_animation.dart';
 import 'login_screen.dart';
 import 'email_confirmation_screen.dart';
+import 'widgets/auth_input_field.dart';
+import 'widgets/auth_password_field.dart';
+import 'widgets/auth_submit_button.dart';
+import 'widgets/auth_logo_section.dart';
+import 'widgets/auth_date_picker_field.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   final Future<void> Function() onSignupSuccess;
@@ -199,7 +204,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Logo & Title
-                      _buildLogoSection(),
+                      const AuthLogoSection(),
                       const SizedBox(height: AppSpacing.xxl),
                       // Auth Card
                       _buildAuthCard(),
@@ -211,56 +216,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildLogoSection() {
-    return Column(
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [AppColors.primary, AppColors.primaryDark],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.3),
-                blurRadius: 15,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.fitness_center,
-            color: Colors.white,
-            size: 40,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xl),
-        const Text(
-          'Workout App',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: AppColors.black,
-            letterSpacing: -0.5,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        const Text(
-          'Bắt đầu hành trình fitness của bạn',
-          style: TextStyle(
-            color: AppColors.grey,
-            fontSize: 15,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ],
     );
   }
 
@@ -308,7 +263,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ],
             // Submit Button
             const SizedBox(height: AppSpacing.xl),
-            _buildSubmitButton(),
+            AuthSubmitButton(
+              text: 'Đăng ký',
+              isLoading: ref.watch(authControllerProvider).isLoading,
+              onTap: handleSignup,
+            ),
             // Toggle Mode Link
             const SizedBox(height: AppSpacing.lg),
             _buildLoginLink(),
@@ -323,7 +282,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildInputField(
+          AuthInputField(
             label: 'Họ và tên',
             icon: Icons.person,
             controller: nameController,
@@ -331,7 +290,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             autofillHints: const [AutofillHints.name],
           ),
           const SizedBox(height: AppSpacing.lg),
-          _buildDatePickerField(
+          AuthDatePickerField(
             label: 'Ngày sinh',
             icon: Icons.calendar_today,
             value: _selectedDate == null
@@ -341,7 +300,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             onTap: _selectDate,
           ),
           const SizedBox(height: AppSpacing.lg),
-          _buildInputField(
+          AuthInputField(
             label: 'Email',
             icon: Icons.mail_outline,
             controller: emailController,
@@ -350,199 +309,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             autofillHints: const [AutofillHints.email],
           ),
           const SizedBox(height: AppSpacing.lg),
-          _buildPasswordField(
+          AuthPasswordField(
             label: 'Mật khẩu',
             controller: passwordController,
-            showPassword: showPassword,
-            onToggle: () {
-              setState(() => showPassword = !showPassword);
-            },
-            autofillHints: const [AutofillHints.newPassword],
           ),
           const SizedBox(height: AppSpacing.lg),
-          _buildPasswordField(
+          AuthPasswordField(
             label: 'Xác nhận mật khẩu',
             controller: confirmPasswordController,
-            showPassword: showConfirmPassword,
-            onToggle: () {
-              setState(() => showConfirmPassword = !showConfirmPassword);
-            },
-            autofillHints: const [AutofillHints.newPassword],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildInputField({
-    required String label,
-    required IconData icon,
-    required TextEditingController controller,
-    required String placeholder,
-    TextInputType keyboardType = TextInputType.text,
-    Iterable<String>? autofillHints,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.black,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.greyLight.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.cardBorder),
-          ),
-          child: TextField(
-            controller: controller,
-            keyboardType: keyboardType,
-            autofillHints: autofillHints,
-            style: const TextStyle(color: AppColors.black, fontSize: 15),
-            decoration: InputDecoration(
-              hintText: placeholder,
-              hintStyle: const TextStyle(color: AppColors.grey, fontSize: 15),
-              prefixIcon: Icon(icon, color: AppColors.grey, size: 20),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: 16,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPasswordField({
-    required String label,
-    required TextEditingController controller,
-    required bool showPassword,
-    required VoidCallback onToggle,
-    Iterable<String>? autofillHints,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.black,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.greyLight.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.cardBorder),
-          ),
-          child: TextField(
-            controller: controller,
-            obscureText: !showPassword,
-            autofillHints: autofillHints,
-            style: const TextStyle(color: AppColors.black, fontSize: 15),
-            decoration: InputDecoration(
-              hintText: '••••••••',
-              hintStyle: const TextStyle(color: AppColors.grey, fontSize: 15),
-              prefixIcon: const Icon(
-                Icons.lock_outline,
-                color: AppColors.grey,
-                size: 20,
-              ),
-              suffixIcon: GestureDetector(
-                onTap: onToggle,
-                child: Icon(
-                  showPassword ? Icons.visibility_off : Icons.visibility,
-                  color: AppColors.grey,
-                  size: 20,
-                ),
-              ),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: 16,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildErrorMessage() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.red.withValues(alpha: 0.1),
-        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Text(
-        authError,
-        style: TextStyle(color: Colors.red.shade400, fontSize: 12),
-      ),
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    final authState = ref.watch(authControllerProvider);
-    final isControllerLoading = authState.isLoading;
-
-    return GestureDetector(
-      onTap: isControllerLoading ? null : handleSignup,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isControllerLoading
-                ? [Colors.grey.shade600, Colors.grey.shade700]
-                : [Colors.orange.shade500, Colors.red.shade500],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.orange.shade500.withValues(alpha: 0.3),
-              blurRadius: 10,
-              spreadRadius: 0,
-            ),
-          ],
-        ),
-        child: Center(
-          child: isControllerLoading
-              ? const AppLoading(size: 24, color: Colors.white)
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Đăng ký',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ],
-                ),
-        ),
       ),
     );
   }
@@ -582,53 +358,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
-  Widget _buildDatePickerField({
-    required String label,
-    required IconData icon,
-    required String value,
-    required String placeholder,
-    required VoidCallback onTap,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.black,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.greyLight.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.cardBorder),
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: 16,
-            ),
-            child: Row(
-              children: [
-                Icon(icon, color: AppColors.grey, size: 20),
-                const SizedBox(width: AppSpacing.md),
-                Text(
-                  value.isEmpty ? placeholder : value,
-                  style: TextStyle(
-                    color: value.isEmpty ? AppColors.grey : AppColors.black,
-                    fontSize: 15,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+  Widget _buildErrorMessage() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.red.withValues(alpha: 0.1),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Text(
+        authError,
+        style: TextStyle(color: Colors.red.shade400, fontSize: 12),
+      ),
     );
   }
 }
