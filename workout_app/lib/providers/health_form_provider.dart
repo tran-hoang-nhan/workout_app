@@ -143,6 +143,11 @@ class HealthFormNotifier extends Notifier<HealthUpdateParams> {
     state = params;
   }
 
+  void updateAndSave(HealthUpdateParams params) {
+    state = params;
+    ref.read(healthControllerProvider.notifier).saveFullProfile(params);
+  }
+
   String _mapActivityLevel(String label) {
     if (label.contains('Ít')) return 'sedentary';
     if (label.contains('Nhẹ')) return 'lightly_active';
