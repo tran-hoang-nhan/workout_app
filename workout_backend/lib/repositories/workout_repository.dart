@@ -171,21 +171,32 @@ class WorkoutRepository {
   /// chuỗi `.or(title.ilike...)` — PostgREST dễ trả [] khi title không chứa
   /// đúng từ khóa tiếng Việt nhưng bài vẫn có động tác đúng nhóm cơ.
   Future<List<Workout>> getWorkoutsByCategory(String category) async {
-    final key = category.trim().toLowerCase();
-    if (key == 'tất cả' || key == 'all') return getAllWorkouts();
+    // Giải mã URL (ví dụ: Ng%E1%BB%B1c -> Ngực) 
+    final decodedCategory = Uri.decodeComponent(category);
+    final key = decodedCategory.trim().toLowerCase();
+    print('DEBUG: [WorkoutRepository] getWorkoutsByCategory called with category="$category", decoded="$decodedCategory", key="$key"');
 
-    final (titleKeywords, muscleKeywords) = _mapFilterKeywords(category);
+    if (key == 'tất cả' || key == 'all') {
+      print('DEBUG: [WorkoutRepository] Fetching all workouts...');
+      return getAllWorkouts();
+    }
+
+    final (titleKeywords, muscleKeywords) = _mapFilterKeywords(decodedCategory);
+    print('DEBUG: [WorkoutRepository] Mapping keywords: titleKeywords=$titleKeywords, muscleKeywords=$muscleKeywords');
 
     final workouts = await getAllWorkouts();
+    print('DEBUG: [WorkoutRepository] Total workouts from DB: ${workouts.length}');
     if (workouts.isEmpty) return [];
 
     final itemsData = await _supabase.from('workout_items').select('workout_id, exercise_id');
     final items = itemsData as List;
+    print('DEBUG: [WorkoutRepository] Total items from DB: ${items.length}');
 
     final exerciseIds = items
         .map((dynamic e) => (e as Map<String, dynamic>)['exercise_id'] as int)
         .toSet()
         .toList();
+    print('DEBUG: [WorkoutRepository] Unique exercises needed: ${exerciseIds.length}');
 
     final idToMuscle = <int, String>{};
     if (exerciseIds.isNotEmpty) {
@@ -193,7 +204,10 @@ class WorkoutRepository {
           .from('exercises')
           .select('id, muscle_group')
           .inFilter('id', exerciseIds);
-      for (final dynamic row in exercisesData as List) {
+      final exerciseList = exercisesData as List;
+      print('DEBUG: [WorkoutRepository] Exercises fetched from DB: ${exerciseList.length}');
+
+      for (final dynamic row in exerciseList) {
         final m = row as Map<String, dynamic>;
         final id = m['id'] as int;
         final mg = m['muscle_group'] as String?;
@@ -221,22 +235,25 @@ class WorkoutRepository {
 
     final out = <Workout>[];
     for (final w in workouts) {
+      bool matched = false;
       if (textMatches(w.title, w.description, titleKeywords)) {
-        out.add(w);
-        continue;
-      }
-      final eids = workoutToExerciseIds[w.id] ?? const <int>[];
-      var hit = false;
-      for (final eid in eids) {
-        final mg = idToMuscle[eid] ?? '';
-        if (muscleMatches(mg, muscleKeywords)) {
-          hit = true;
-          break;
+        print('DEBUG: [WorkoutRepository] Workout "${w.title}" (id: ${w.id}) matched by TITLE');
+        matched = true;
+      } else {
+        final eids = workoutToExerciseIds[w.id] ?? const <int>[];
+        for (final eid in eids) {
+          final mg = idToMuscle[eid] ?? '';
+          if (muscleMatches(mg, muscleKeywords)) {
+            print('DEBUG: [WorkoutRepository] Workout "${w.title}" (id: ${w.id}) matched by EXERCISE muscle_group: "$mg"');
+            matched = true;
+            break;
+          }
         }
       }
-      if (hit) out.add(w);
+      if (matched) out.add(w);
     }
 
+    print('DEBUG: [WorkoutRepository] Final matched count: ${out.length}');
     out.sort((a, b) => a.id.compareTo(b.id));
     return out;
   }
@@ -248,38 +265,49 @@ class WorkoutRepository {
     switch (key) {
       case 'toàn thân':
       case 'toan than':
-        return (
-          [
-            'toàn thân',
-            'toan than',
-            'full body',
-            'fullbody',
-            'total body',
-            'whole body',
-          ],
-          [
-            'toàn thân',
-            'toan than',
-            'full body',
-            'fullbody',
-            'total body',
-            'whole body',
-          ],
-        );
+        final kws = [
+          'toàn thân',
+          'toan than',
+          'full body',
+          'fullbody',
+          'full_body',
+          'total body',
+          'whole body',
+        ];
+        return (kws, kws);
       case 'ngực':
       case 'nguc':
-        return (
-          ['ngực', 'nguc', 'chest', 'pectoral', 'pec'],
-          ['ngực', 'nguc', 'chest', 'pectoral', 'pec'],
-        );
+        final kws = ['ngực', 'nguc', 'chest', 'pectoral', 'pec', 'pectorals'];
+        return (kws, kws);
       case 'lưng':
       case 'lung':
-        return (['lưng', 'lung', 'back'], ['lưng', 'lung', 'back']);
+        final kws = ['lưng', 'lung', 'back', 'lats', 'traps', 'lower back'];
+        return (kws, kws);
       case 'chân':
       case 'chan':
-        return (['chân', 'chan', 'legs'], ['chân', 'chan', 'legs']);
+        final kws = [
+          'chân',
+          'chan',
+          'legs',
+          'leg',
+          'quads',
+          'hamstrings',
+          'calves',
+          'glutes',
+        ];
+        return (kws, kws);
       case 'tay':
-        return (['tay', 'arms', 'arm'], ['tay', 'arms', 'arm']);
+        final kws = [
+          'tay',
+          'arms',
+          'arm',
+          'biceps',
+          'triceps',
+          'forearms',
+          'bicep',
+          'tricep',
+        ];
+        return (kws, kws);
       case 'cardio':
         return (['cardio'], ['cardio']);
       case 'yoga':
