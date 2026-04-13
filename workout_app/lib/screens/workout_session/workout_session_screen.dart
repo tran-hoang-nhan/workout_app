@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared/shared.dart';
 import 'package:workout_app/screens/workout_session/widgets/workout_completion_dialog.dart';
 import 'package:workout_app/screens/workout_session/widgets/workout_exercise_card.dart';
-import 'package:workout_app/screens/workout_session/widgets/workout_countdown_overlay.dart';
+import 'package:workout_app/screens/workout_session/widgets/workout_preparation_card.dart';
 import 'package:workout_app/screens/workout_session/widgets/exit_workout_dialog.dart';
 import 'package:workout_app/constants/app_constants.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -125,7 +125,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
         _remainingSeconds = 0;
       });
       if (autoStart) {
-        _startPreparation();
+        _start();
       }
     } else {
       // Trước khi hoàn thành, cộng nốt calo cuối cùng
@@ -188,6 +188,9 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
   }
 
   void _handleTimerFinished() {
+    _accumulatedCalories = _caloriesBurnedSoFar();
+    _lastStepStartTime = DateTime.now();
+
     final isLast = _currentIndex >= widget.items.length - 1;
     if (!_inRest && !isLast && (_currentItem.restSeconds ?? 0) > 0) {
       _enterRest(_currentItem.restSeconds ?? 0);
@@ -199,6 +202,10 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
   void _next() {
     HapticFeedback.lightImpact();
     _timer?.cancel();
+    
+    _accumulatedCalories = _caloriesBurnedSoFar();
+    _lastStepStartTime = DateTime.now();
+
     if (_inRest) {
       _advanceToNext(autoStart: true);
       return;
@@ -208,10 +215,8 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
     final restSeconds = _currentItem.restSeconds ?? 0;
 
     if (isLast || restSeconds <= 0) {
-      _accumulatedCalories = _caloriesBurnedSoFar();
       _advanceToNext(autoStart: true);
     } else {
-      _accumulatedCalories = _caloriesBurnedSoFar();
       _enterRest(restSeconds);
     }
   }
@@ -265,10 +270,12 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
     }
 
     double currentStepCalories = 0;
-    if (_lastStepStartTime != null && !_isPaused) {
+    if (_lastStepStartTime != null && !_inCountdown) {
       final now = DateTime.now();
       final ms = now.difference(_lastStepStartTime!).inMilliseconds;
-      currentStepCalories = (ms / 60000.0) * currentRate;
+      if (ms > 0) {
+        currentStepCalories = (ms / 60000.0) * currentRate;
+      }
     }
 
     return _accumulatedCalories + currentStepCalories;
@@ -359,26 +366,36 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
                               ),
                             );
                           },
-                          child: WorkoutExerciseCard(
-                            key: ValueKey('$_currentIndex-$_inRest'),
-                            exercise: displayExercise,
-                            item: displayItem,
-                            started: _started && !_inCountdown,
-                            inRest: _inRest,
-                            isPaused: _isPaused,
-                            onPlayPauseToggle: _togglePause,
-                            isTimeBased: (displayItem.durationSeconds ?? 0) > 0,
-                            remainingSeconds: _remainingSeconds,
-                            exerciseTotalSeconds: displayItem.durationSeconds ?? 0,
-                            restTotalSeconds: displayItem.restSeconds ?? 0,
-                            isPreview: _inRest,
-                          ),
+                          child: _inCountdown
+                              ? WorkoutPreparationCard(
+                                  key: const ValueKey('preparation'),
+                                  text: _currentIndex == 0 ? 'CHUẨN BỊ' : 'CHUẨN BỊ BÀI TIẾP',
+                                  subtitle: _currentIndex == 0 ? 'BÀI TẬP ĐẦU TIÊN' : 'BÀI TẬP TIẾP THEO',
+                                  exercise: displayExercise,
+                                  durationSeconds: _currentIndex == 0 ? 10 : 3,
+                                  paused: _haltForExitDialog,
+                                  onComplete: _start,
+                                )
+                              : WorkoutExerciseCard(
+                                  key: ValueKey('$_currentIndex-$_inRest'),
+                                  exercise: displayExercise,
+                                  item: displayItem,
+                                  started: _started && !_inCountdown,
+                                  inRest: _inRest,
+                                  isPaused: _isPaused,
+                                  onPlayPauseToggle: _togglePause,
+                                  isTimeBased: (displayItem.durationSeconds ?? 0) > 0,
+                                  remainingSeconds: _remainingSeconds,
+                                  exerciseTotalSeconds: displayItem.durationSeconds ?? 0,
+                                  restTotalSeconds: _currentItem.restSeconds ?? 0,
+                                  isPreview: _inRest,
+                                ),
                         ),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _inCountdown
-                            ? null
+                            ? _start
                             : (_started ? _next : _start),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size.fromHeight(64),
@@ -393,7 +410,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
                             const SizedBox(width: 8),
                             Text(
                               _inCountdown
-                                  ? 'Chuẩn bị...'
+                                  ? 'Bắt đầu ngay'
                                   : (_started
                                       ? (_inRest
                                           ? 'Bỏ qua nghỉ'
@@ -409,12 +426,6 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
                 ),
               ),
             ),
-            if (_inCountdown)
-              WorkoutCountdownOverlay(
-                text: _currentIndex == 0 ? 'BẮT ĐẦU BUỔI TẬP' : 'CHUẨN BỊ BÀI TIẾP',
-                paused: _haltForExitDialog,
-                onComplete: _start,
-              ),
           ],
         ),
       ),
