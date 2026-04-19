@@ -11,12 +11,11 @@ class EmailConfirmationScreen extends ConsumerStatefulWidget {
   const EmailConfirmationScreen({super.key, required this.email});
 
   @override
-  ConsumerState<EmailConfirmationScreen> createState() =>
-      _EmailConfirmationScreenState();
+  ConsumerState<EmailConfirmationScreen> createState() =>_EmailConfirmationScreenState();
 }
 
 class _EmailConfirmationScreenState
-    extends ConsumerState<EmailConfirmationScreen> {
+  extends ConsumerState<EmailConfirmationScreen> {
   final _otpController = TextEditingController();
   int _resendCountdown = 0;
 
