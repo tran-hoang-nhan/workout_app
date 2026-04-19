@@ -6,7 +6,6 @@ import 'package:shared/shared.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ApiClient {
-  // Use 10.0.2.2 for Android emulators to reach the host machine
   String get _baseUrl {
     if (kIsWeb) return 'http://localhost:8080/api';
     if (Platform.isAndroid) return 'http://10.0.2.2:8080/api';
