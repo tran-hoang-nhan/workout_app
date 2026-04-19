@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
 
-enum MessageType { ai, user }
+import '../../../models/chat_message.dart';
+import 'workout_suggestion_card.dart';
+import 'package:shared/shared.dart';
 
 class ChatMessageBubble extends StatelessWidget {
-  final String content;
-  final MessageType type;
-  final Widget? child;
+  final ChatMessage message;
 
   const ChatMessageBubble({
     super.key,
-    required this.content,
-    required this.type,
-    this.child,
+    required this.message,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isAI = type == MessageType.ai;
+    final isAI = message.type == MessageType.ai;
     final CrossAxisAlignment alignment = isAI
         ? CrossAxisAlignment.start
         : CrossAxisAlignment.end;
@@ -58,16 +56,19 @@ class ChatMessageBubble extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        content,
+                        message.content,
                         style: TextStyle(
                           color: isAI ? AppColors.black : Colors.white,
                           fontSize: 14,
                           height: 1.4,
                         ),
                       ),
-                      if (child != null) ...[
+                      if (message.workout != null) ...[
                         const SizedBox(height: 12),
-                        child!,
+                        WorkoutSuggestionCard(
+                          workout: message.workout!,
+                          detail: message.detail,
+                        ),
                       ],
                     ],
                   ),
