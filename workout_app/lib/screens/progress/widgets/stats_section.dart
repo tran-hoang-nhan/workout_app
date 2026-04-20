@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_constants.dart';
-import '../../../providers/daily_stats_provider.dart';
-import '../../../providers/progress_provider.dart';
-import '../../../providers/health_provider.dart';
+import '../../../providers/stats_ui_provider.dart';
 import '../../../widgets/loading_animation.dart';
 
 class StatsSection extends ConsumerWidget {
@@ -14,20 +12,11 @@ class StatsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final now = DateTime.now();
-    final effectiveDate = date != null
-        ? DateTime(date!.year, date!.month, date!.day)
-        : DateTime(now.year, now.month, now.day);
-    final todayStatsAsync = ref.watch(dailyStatsProvider(effectiveDate));
-    final workoutStatsAsync = ref.watch(
-      dailyWorkoutStatsProvider(effectiveDate),
-    );
-    final healthCalculations = ref.watch(healthCalculationsProvider);
-
-    final isToday =
-        effectiveDate.year == now.year &&
-        effectiveDate.month == now.month &&
-        effectiveDate.day == now.day;
+    final statsData = ref.watch(statsSectionDataProvider(date));
+    final workoutStatsAsync = statsData.workoutStats;
+    final todayStatsAsync = statsData.dailyStats;
+    final healthCalculations = statsData.healthCalculations;
+    final isToday = statsData.isToday;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,32 +60,15 @@ class StatsSection extends ConsumerWidget {
                       icon: Icons.local_fire_department_rounded,
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildSimpleStatCard(
-                            context,
-                            title: 'Số bước',
-                            value: steps.toString(),
-                            unit: 'bước',
-                            progress: (steps / stepGoal).clamp(0, 1),
-                            color: const Color(0xFF3B82F6),
-                            icon: Icons.directions_walk_rounded,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: _buildSimpleStatCard(
-                            context,
-                            title: 'Tập luyện',
-                            value: minutes.toString(),
-                            unit: 'phút',
-                            progress: (minutes / minuteGoal).clamp(0, 1),
-                            color: const Color(0xFF10B981),
-                            icon: Icons.timer_rounded,
-                          ),
-                        ),
-                      ],
+                    _buildProgressCard(
+                      context,
+                      title: 'Tập luyện',
+                      value: minutes.toString(),
+                      goal: minuteGoal.toString(),
+                      unit: 'phút',
+                      progress: (minutes / minuteGoal).clamp(0, 1),
+                      color: const Color(0xFF10B981),
+                      icon: Icons.timer_rounded,
                     ),
                   ],
                 );

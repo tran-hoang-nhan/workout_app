@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared/shared.dart';
 import '../../../widgets/loading_animation.dart';
-import '../ai_suggestions_screen.dart';
 import 'health_edit_form.dart';
 import 'health_validation_card.dart';
+import '../../../providers/ai_suggestion_provider.dart';
+
 
 class SuggestionInteractiveStep extends StatelessWidget {
   final AISuggestionStep currentStep;

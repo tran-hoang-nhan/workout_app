@@ -42,11 +42,11 @@ class ProgressSummaryCards extends StatelessWidget {
                 AppColors.info,
               ),
               _buildStatSquare(
-                'Bước chân',
-                '${stats?.steps ?? 0}',
-                'bước',
-                Icons.directions_walk,
-                Colors.orange,
+                'Hoàn thành',
+                '${stats?.workoutsCompleted ?? 0}',
+                'bài tập',
+                Icons.check_circle_outline,
+                Colors.purple,
               ),
               _buildStatSquare(
                 'Nước uống',

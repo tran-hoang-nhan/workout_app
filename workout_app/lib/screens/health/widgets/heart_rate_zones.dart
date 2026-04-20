@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared/shared.dart';
 import '../../../constants/app_constants.dart';
-import '../../heart_rate_detail/heart_rate_detail_screen.dart';
 
 class HeartRateZones extends StatefulWidget {
   final HealthCalculations calculations;
@@ -38,12 +37,6 @@ class _HeartRateZonesState extends State<HeartRateZones>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const HeartRateDetailScreen()),
-        );
-      },
       onTapDown: (_) => _controller.forward(),
       onTapUp: (_) => _controller.reverse(),
       onTapCancel: () => _controller.reverse(),

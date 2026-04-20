@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared/shared.dart';
 import '../../../constants/app_constants.dart';
 
-class StepCard extends ConsumerWidget {
-  final int steps;
+class HeartRateCard extends StatelessWidget {
+  final HealthCalculations calculations;
   final double height;
-  static const int stepsGoal = 10000;
 
-  const StepCard({super.key, required this.steps, required this.height});
+  const HeartRateCard({
+    super.key,
+    required this.calculations,
+    required this.height,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final progress = (steps / stepsGoal).clamp(0.0, 1.0);
-    final percentage = (progress * 100).toInt();
-
+  Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         height: height,
@@ -24,11 +24,11 @@ class StepCard extends ConsumerWidget {
           children: [
             Row(
               children: [
-                _buildIconBox(Icons.directions_walk, AppColors.primary),
+                _buildIconBox(Icons.favorite_rounded, Colors.red),
                 const SizedBox(width: AppSpacing.sm),
                 const Expanded(
                   child: Text(
-                    'Bước chân',
+                    'Nhịp tim',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -40,56 +40,36 @@ class StepCard extends ConsumerWidget {
                 ),
               ],
             ),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: 80,
-                  height: 80,
-                  child: CircularProgressIndicator(
-                    value: progress,
-                    strokeWidth: 10,
-                    backgroundColor: Colors.orange.shade50,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
-                    ),
-                    strokeCap: StrokeCap.round,
-                  ),
-                ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '$percentage%',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.black,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+            const Spacer(),
+            Icon(
+              Icons.favorite_rounded,
+              size: 48,
+              color: Colors.red.withValues(alpha: 0.8),
             ),
+            const SizedBox(height: AppSpacing.sm),
             Column(
               children: [
                 Text(
-                  steps.toString(),
+                  '${calculations.maxHeartRate}',
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppColors.black,
                   ),
                 ),
+                const SizedBox(height: 2),
                 Text(
-                  'Mục tiêu: $stepsGoal',
+                  'Max HR (bpm)',
                   style: TextStyle(
-                    fontSize: 11,
-                    color: AppColors.grey.withValues(alpha: 0.8),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.grey.withValues(alpha: 0.7),
+                    letterSpacing: 0.2,
                   ),
                 ),
               ],
             ),
+            const Spacer(),
           ],
         ),
       ),

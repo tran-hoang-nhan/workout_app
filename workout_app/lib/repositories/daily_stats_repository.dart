@@ -24,7 +24,6 @@ class DailyStatsRepository {
     required DateTime date,
     double? addEnergy,
     int? addMinutes,
-    int? steps,
     double? distance,
   }) async {
     final existing = await getDailyStats(userId, date);
@@ -34,7 +33,6 @@ class DailyStatsRepository {
       activeEnergyBurned:
           (existing?.activeEnergyBurned ?? 0) + (addEnergy ?? 0),
       activeMinutes: (existing?.activeMinutes ?? 0) + (addMinutes ?? 0),
-      stepsCount: steps ?? (existing?.stepsCount ?? 0),
       distanceMeters: (existing?.distanceMeters ?? 0) + (distance ?? 0),
     );
     await _apiClient.saveDailyStats(newStats);
