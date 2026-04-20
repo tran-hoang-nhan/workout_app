@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared/shared.dart';
 import '../models/chat_message.dart';
-import '../repositories/workout_repository.dart';
 import 'health_form_provider.dart';
 import 'workout_provider.dart';
 
@@ -40,14 +39,20 @@ class AISuggestionState {
   }
 }
 
-class AISuggestionNotifier extends AutoDisposeNotifier<AISuggestionState> {
+class AISuggestionNotifier extends Notifier<AISuggestionState> {
   @override
   AISuggestionState build() {
     return AISuggestionState.initial();
   }
 
   void init({AISuggestionHistory? historyItem}) {
-    if (state.messages.isNotEmpty) return; // Prevent re-init
+    // If we're already viewing this specific history item, don't re-init
+    // Or if we have a new chat active, don't clear unless requested.
+    // For simplicity and to fix the bug where stale state prevents history loading:
+    if (historyItem == null && state.messages.isNotEmpty) return;
+
+    // Reset to initial state for a fresh view
+    state = AISuggestionState.initial();
 
     if (historyItem != null) {
       loadHistoryItem(historyItem);
@@ -244,6 +249,6 @@ class AISuggestionNotifier extends AutoDisposeNotifier<AISuggestionState> {
 }
 
 final aiSuggestionProvider =
-    AutoDisposeNotifierProvider<AISuggestionNotifier, AISuggestionState>(
+    NotifierProvider<AISuggestionNotifier, AISuggestionState>(
   AISuggestionNotifier.new,
 );

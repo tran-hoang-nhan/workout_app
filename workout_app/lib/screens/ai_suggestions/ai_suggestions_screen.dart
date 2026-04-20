@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared/shared.dart';
-
 import '../../constants/app_constants.dart';
 import '../../providers/health_provider.dart';
 import '../../providers/workout_provider.dart';
@@ -13,7 +10,6 @@ import 'widgets/suggestion_interactive_step.dart';
 import '../../widgets/loading_animation.dart';
 import 'ai_suggestions_history_screen.dart';
 import '../../providers/ai_suggestion_provider.dart';
-import '../../models/chat_message.dart';
 
 /// A screen that provides AI-powered workout suggestions.
 class AISuggestionsScreen extends ConsumerStatefulWidget {
@@ -95,6 +91,7 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
             icon: const Icon(Icons.history, color: AppColors.black),
             onPressed: () {
               ref.invalidate(aiSuggestionHistoryProvider);
+              ref.invalidate(aiSuggestionProvider);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -129,7 +126,7 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
           final notifier = ref.read(aiSuggestionProvider.notifier);
 
           // Scroll to bottom when messages change
-          ref.listen(aiSuggestionProvider, (prev, next) {
+          ref.listen<AISuggestionState>(aiSuggestionProvider, (prev, next) {
             if (prev?.messages.length != next.messages.length) {
               _scrollToBottom();
             }

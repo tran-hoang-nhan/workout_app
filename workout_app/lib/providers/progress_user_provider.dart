@@ -5,7 +5,6 @@ import '../repositories/progress_user_repository.dart';
 import './auth_provider.dart';
 import '../utils/app_error.dart';
 import './health_provider.dart';
-import './daily_stats_provider.dart';
 import './notification_provider.dart';
 
 final progressUserControllerProvider =
@@ -73,35 +72,7 @@ class ProgressUserController extends AsyncNotifier<void> {
     }
   }
 
-  Future<void> updateSteps(int deltaSteps) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final userId = await ref.read(currentUserIdProvider.future);
-      if (userId == null) throw UnauthorizedException('Chưa đăng nhập');
-      final repo = ref.read(progressUserRepositoryProvider);
-      final rawNow = DateTime.now();
-      final now = DateTime(rawNow.year, rawNow.month, rawNow.day);
-      await repo.updateActivityProgress(
-        userId: userId,
-        date: now,
-        addSteps: deltaSteps,
-      );
-      try {
-        final dailyRepo = ref.read(dailyStatsRepositoryProvider);
-        await dailyRepo.updateActivityStats(
-          userId: userId,
-          date: now,
-          steps: deltaSteps,
-        );
-        ref.invalidate(dailyStatsProvider(now));
-      } catch (e) {
-        debugPrint('Error syncing daily steps: $e');
-      }
-      ref.invalidate(progressDailyProvider(now));
-    });
 
-    if (state.hasError) throw state.error!;
-  }
 }
 
 final progressUserRepositoryProvider = Provider<ProgressUserRepository>((ref) {

@@ -4,10 +4,9 @@ import '../../constants/app_constants.dart';
 import '../../providers/progress_provider.dart';
 import 'widgets/history_list.dart';
 import 'widgets/progress_header.dart';
-import 'widgets/achievements_section.dart';
 import 'widgets/calendar_slider.dart';
-import 'widgets/running_card.dart';
 import 'widgets/stats_section.dart';
+import 'widgets/user_level_section.dart';
 import '../../widgets/loading_animation.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
@@ -53,19 +52,12 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
-            const RunningCard(),
-
-            // Replaced Statistics with Achievements
             historyAsync.when(
-              data: (history) =>
-                  AchievementsSection(totalWorkouts: history.length),
-              loading: () => const SliverToBoxAdapter(
-                child: Center(child: AppLoading()),
-              ),
-              error: (e, _) => SliverToBoxAdapter(
-                child: Center(child: Text('Lỗi tải thành tích: $e')),
-              ),
+              data: (history) => UserLevelSection(totalWorkouts: history.length),
+              loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
+              error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
             ),
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
 
             const SliverToBoxAdapter(
               child: Padding(

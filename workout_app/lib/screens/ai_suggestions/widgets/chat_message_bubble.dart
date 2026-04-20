@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
-
 import '../../../models/chat_message.dart';
 import 'workout_suggestion_card.dart';
-import 'package:shared/shared.dart';
 
 class ChatMessageBubble extends StatelessWidget {
   final ChatMessage message;

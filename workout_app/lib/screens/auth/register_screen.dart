@@ -4,7 +4,6 @@ import '../../constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import 'package:shared/shared.dart';
 import '../../utils/app_error.dart';
-import '../../widgets/loading_animation.dart';
 import 'login_screen.dart';
 import 'email_confirmation_screen.dart';
 import 'widgets/auth_input_field.dart';

@@ -8,10 +8,9 @@ import 'widgets/health_header.dart';
 import 'widgets/health_alerts.dart';
 import 'widgets/input_section.dart';
 import 'widgets/bmi_card.dart';
-import 'widgets/step_card.dart';
+import 'widgets/heart_rate_card.dart';
 import 'widgets/water_card.dart';
 import 'widgets/water_intake_card.dart';
-import 'widgets/heart_rate_zones.dart';
 import 'widgets/calorie_goals.dart';
 import '../../providers/progress_user_provider.dart';
 import '../../providers/app_state_provider.dart';
@@ -73,11 +72,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
       error: (_, _) => 0,
     );
 
-    final steps = todayProgressAsync.when(
-      data: (progress) => progress?.steps ?? 0,
-      loading: () => 0,
-      error: (_, _) => 0,
-    );
+
 
     ref.watch(syncHealthProfileProvider);
     _updateControllers(formState);
@@ -145,7 +140,10 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                 ),
                 data: (_) => Row(
                   children: [
-                    StepCard(steps: steps, height: cardHeight),
+                    HeartRateCard(
+                      calculations: calculations,
+                      height: cardHeight,
+                    ),
                     const SizedBox(width: AppSpacing.md),
                     WaterCard(
                       currentMl: currentMl,
@@ -159,10 +157,6 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
 
               // Water Intake
               WaterIntakeCard(formState: formState),
-              const SizedBox(height: AppSpacing.md),
-
-              // Heart Rate Zones
-              HeartRateZones(calculations: calculations),
               const SizedBox(height: AppSpacing.md),
 
               // Calorie Goals

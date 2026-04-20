@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared/shared.dart';
 import '../repositories/health_repository.dart';
 import '../services/health_service.dart';
-import '../services/health_integration_service.dart';
 import '../services/notification_service.dart';
 import './auth_provider.dart';
 import './daily_stats_provider.dart';
@@ -12,11 +11,7 @@ final healthRepositoryProvider = Provider<HealthRepository>((ref) {
   return HealthRepository();
 });
 
-final healthIntegrationServiceProvider = Provider<HealthIntegrationService>((
-  ref,
-) {
-  return HealthIntegrationService();
-});
+
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();

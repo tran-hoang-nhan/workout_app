@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared/shared.dart';
 import 'package:intl/intl.dart';
-
 import '../../constants/app_constants.dart';
 import '../../providers/workout_provider.dart';
 import '../../widgets/loading_animation.dart';
-import '../workout_detail/workout_detail_screen.dart';
 import 'ai_suggestions_screen.dart';
 
 class AISuggestionsHistoryScreen extends ConsumerWidget {
