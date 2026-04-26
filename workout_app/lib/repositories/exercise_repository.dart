@@ -3,13 +3,11 @@ import '../services/api_client.dart';
 
 class ExerciseRepository {
   final ApiClient _apiClient;
-  ExerciseRepository({ApiClient? apiClient})
-    : _apiClient = apiClient ?? ApiClient();
+  ExerciseRepository({ApiClient? apiClient}): _apiClient = apiClient ?? ApiClient();
 
   Future<List<Exercise>> getExercises() => _apiClient.getExercises();
 
   Future<Exercise?> getExerciseById(String id) async {
-    // Note: API returns list for now, we can add getById if needed or find in list
     final all = await getExercises();
     try {
       return all.firstWhere((e) => e.id.toString() == id);

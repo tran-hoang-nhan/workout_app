@@ -15,8 +15,9 @@ Future<Response> onRequest(RequestContext context, String id) async {
       return Response.json(body: profile?.toJson());
     } catch (e) {
       return Response.json(
-          statusCode: HttpStatus.internalServerError,
-          body: {'error': e.toString()},);
+        statusCode: HttpStatus.internalServerError,
+        body: {'error': e.toString()},
+      );
     }
   }
 

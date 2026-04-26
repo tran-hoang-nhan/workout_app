@@ -33,8 +33,7 @@ class OTPNotifier extends Notifier<bool> {
   }
 }
 
-final resendEmailProvider =
-    NotifierProvider.family<ResendNotifier, bool, String>(ResendNotifier.new);
+final resendEmailProvider = NotifierProvider.family<ResendNotifier, bool, String>(ResendNotifier.new);
 
 class ResendNotifier extends Notifier<bool> {
   final String email;

@@ -1,11 +1,36 @@
 import 'package:shared/shared.dart';
 import 'package:supabase/supabase.dart';
 
-/// Repository responsible for authentication and profile persistence.
+class DuplicateEmailException implements Exception {
+  const DuplicateEmailException([this.message = 'User already registered']);
+
+  final String message;
+
+  @override
+
+  String toString() => message;
+}
+
 class AuthRepository {
   /// Creates an auth repository backed by Supabase.
-  AuthRepository(this._supabase);
+  AuthRepository(this._supabase, {SupabaseClient? adminSupabase})
+      : _adminSupabase = adminSupabase;
   final SupabaseClient _supabase;
+  final SupabaseClient? _adminSupabase;
+
+  String _normalizeEmail(String email) => email.trim().toLowerCase();
+
+  Future<bool> isEmailRegistered(String email) async {
+    final normalizedEmail = _normalizeEmail(email);
+    final lookupClient = _adminSupabase ?? _supabase;
+    final existing = await lookupClient
+        .from('profiles')
+        .select('id')
+        .eq('email', normalizedEmail)
+        .limit(1)
+        .maybeSingle();
+    return existing != null;
+  }
 
   /// Signs in a user with email and password.
   Future<AuthResponse> signIn(SignInParams params) async {
@@ -17,13 +42,23 @@ class AuthRepository {
 
   /// Signs up a user and creates an initial profile row.
   Future<AuthResponse> signUp(SignUpParams params) async {
+    final normalizedEmail = _normalizeEmail(params.email);
+    final alreadyRegistered = await isEmailRegistered(normalizedEmail);
+    if (alreadyRegistered) {
+      throw const DuplicateEmailException();
+    }
+
     final response = await _supabase.auth.signUp(
-      email: params.email,
+      email: normalizedEmail,
       password: params.password,
       data: {'full_name': params.fullName},
     );
     if (response.user != null) {
-      await createUserProfile(id: response.user!.id, params: params);
+      await createUserProfile(
+        id: response.user!.id,
+        params: params,
+        normalizedEmail: normalizedEmail,
+      );
     }
     return response;
   }
@@ -32,10 +67,11 @@ class AuthRepository {
   Future<void> createUserProfile({
     required String id,
     required SignUpParams params,
+    required String normalizedEmail,
   }) async {
     await _supabase.from('profiles').insert({
       'id': id,
-      'email': params.email,
+      'email': normalizedEmail,
       'full_name': params.fullName,
       'avatar_url': params.avatarUrl,
       'gender': params.gender ?? 'male',
@@ -75,7 +111,8 @@ class AuthRepository {
     if (params.avatarUrl != null) updates['avatar_url'] = params.avatarUrl;
     if (params.gender != null) updates['gender'] = params.gender;
     if (params.dateOfBirth != null) {
-      updates['date_of_birth'] = params.dateOfBirth!.toIso8601String().split('T')[0];
+      updates['date_of_birth'] =
+          params.dateOfBirth!.toIso8601String().split('T')[0];
     }
     if (params.goal != null) updates['goal'] = params.goal;
     updates['updated_at'] = DateTime.now().toIso8601String();

@@ -8,8 +8,6 @@ export './health_form_provider.dart';
 export './health_controller_provider.dart';
 export './health_stats_provider.dart';
 
-// healthDataProvider is exported from health_base_provider.dart
-
 final syncHealthProfileProvider = FutureProvider<void>((ref) async {
   final healthData = await ref.watch(healthDataProvider.future);
   if (healthData != null) {
@@ -29,7 +27,5 @@ final saveHealthProfileProvider = FutureProvider.family<void, ({double height, S
     gender: params.gender ?? form.gender,
     goal: currentGoal,
   );
-  await ref
-      .read(healthControllerProvider.notifier)
-      .saveFullProfile(updateParams);
+  await ref.read(healthControllerProvider.notifier).saveFullProfile(updateParams);
 });

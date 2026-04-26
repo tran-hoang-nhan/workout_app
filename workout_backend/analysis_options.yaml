@@ -1,1 +1,4 @@
+analyzer:
+  errors:
+    lines_longer_than_80_chars: ignore
 include: package:dart_frog_lint/recommended.yaml

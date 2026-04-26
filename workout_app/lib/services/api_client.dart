@@ -33,11 +33,17 @@ class ApiClient {
       final http.Response response;
       switch (method.toUpperCase()) {
         case 'POST':
-          response =
-              await http.post(uri, headers: headers, body: jsonEncode(body));
+          response = await http.post(
+            uri,
+            headers: headers,
+            body: jsonEncode(body),
+          );
         case 'PUT':
-          response =
-              await http.put(uri, headers: headers, body: jsonEncode(body));
+          response = await http.put(
+            uri,
+            headers: headers,
+            body: jsonEncode(body),
+          );
         case 'DELETE':
           response = await http.delete(uri, headers: headers);
         case 'GET':
@@ -46,12 +52,16 @@ class ApiClient {
       }
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        debugPrint('[ApiClient] Response (${response.statusCode}): ${response.body}');
+        debugPrint(
+          '[ApiClient] Response (${response.statusCode}): ${response.body}',
+        );
         if (response.body.isEmpty) return null;
         try {
           return jsonDecode(response.body);
         } catch (e) {
-          debugPrint('[ApiClient] JSON Decode Error: $e\nBody: ${response.body}');
+          debugPrint(
+            '[ApiClient] JSON Decode Error: $e\nBody: ${response.body}',
+          );
           rethrow;
         }
       }
@@ -63,10 +73,10 @@ class ApiClient {
   }
 
   // --- Auth ---
-  Future<Map<String, dynamic>> login(SignInParams p) async => 
+  Future<Map<String, dynamic>> login(SignInParams p) async =>
       await _request('POST', '/auth/login', body: p.toJson());
 
-  Future<Map<String, dynamic>> register(SignUpParams p) async => 
+  Future<Map<String, dynamic>> register(SignUpParams p) async =>
       await _request('POST', '/auth/register', body: p.toJson());
 
   Future<AppUser?> getProfile(String userId) async {
@@ -74,118 +84,168 @@ class ApiClient {
     return data != null ? AppUser.fromJson(data) : null;
   }
 
-  Future<void> updateProfile(String userId, UpdateProfileParams p) async => 
+  Future<void> updateProfile(String userId, UpdateProfileParams p) async =>
       await _request('PUT', '/auth/profile/$userId', body: p.toJson());
 
   Future<Map<String, dynamic>> verifyOtp(
     String email,
     String token,
     String type,
-  ) async =>
-      await _request(
-        'POST',
-        '/auth/verify-otp',
-        body: {'email': email, 'token': token, 'type': type},
-      );
+  ) async => await _request(
+    'POST',
+    '/auth/verify-otp',
+    body: {'email': email, 'token': token, 'type': type},
+  );
 
-  Future<void> resendOtp(String email, String type) async => 
-      await _request('POST', '/auth/resend-otp', body: {'email': email, 'type': type});
+  Future<void> resendOtp(String email, String type) async => await _request(
+    'POST',
+    '/auth/resend-otp',
+    body: {'email': email, 'type': type},
+  );
 
-  Future<void> resetPassword(String email) async => 
+  Future<void> resetPassword(String email) async =>
       await _request('POST', '/auth/reset-password', body: {'email': email});
 
-  Future<void> updatePassword(String password) async => 
-      await _request('POST', '/auth/update-password', body: {'password': password});
-
-  Future<Map<String, dynamic>> completeRegistration(
-    SignUpParams s,
-    HealthUpdateParams h,
-  ) async =>
-      await _request('POST', '/auth/complete-registration', body: {
-        'signUpParams': s.toJson(),
-        'healthParams': h.toJson(),
-      });
+  Future<void> updatePassword(String password) async => await _request(
+    'POST',
+    '/auth/update-password',
+    body: {'password': password},
+  );
 
   // --- Workouts ---
-  Future<WorkoutPlan> generateWorkout(WorkoutGenerationRequest r) async => 
-      WorkoutPlan.fromJson(await _request('POST', '/workout', body: r.toJson()) as Map<String, dynamic>);
+  Future<WorkoutPlan> generateWorkout(WorkoutGenerationRequest r) async =>
+      WorkoutPlan.fromJson(
+        await _request('POST', '/workout', body: r.toJson())
+            as Map<String, dynamic>,
+      );
 
   Future<List<AISuggestionHistory>> getAISuggestionsHistory() async {
     final data = await _request('GET', '/workouts/history') as List?;
-    return data?.map((e) => AISuggestionHistory.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    return data
+            ?.map(
+              (e) => AISuggestionHistory.fromJson(e as Map<String, dynamic>),
+            )
+            .toList() ??
+        [];
   }
 
   Future<List<Workout>> getAllWorkouts({String? level}) async {
-    final data = await _request('GET', '/workouts',
-            queryParams: level != null ? {'level': level} : null)
-        as List?;
-    return data?.map((e) => Workout.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    final data =
+        await _request(
+              'GET',
+              '/workouts',
+              queryParams: level != null ? {'level': level} : null,
+            )
+            as List?;
+    return data
+            ?.map((e) => Workout.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
   }
 
-  Future<WorkoutDetail> getWorkoutDetail(int id) async => 
-      WorkoutDetail.fromJson(await _request('GET', '/workouts/$id') as Map<String, dynamic>);
+  Future<WorkoutDetail> getWorkoutDetail(int id) async =>
+      WorkoutDetail.fromJson(
+        await _request('GET', '/workouts/$id') as Map<String, dynamic>,
+      );
 
   Future<List<Workout>> searchWorkouts(String query) async {
-    final data = await _request('GET', '/workouts/search', queryParams: {'q': query}) as List?;
-    return data?.map((e) => Workout.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    final data =
+        await _request('GET', '/workouts/search', queryParams: {'q': query})
+            as List?;
+    return data
+            ?.map((e) => Workout.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
   }
 
   Future<List<Workout>> getWorkoutsByCategory(String cat) async {
     final segment = Uri.encodeComponent(cat);
     final data = await _request('GET', '/workouts/category/$segment') as List?;
-    return data?.map((e) => Workout.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    return data
+            ?.map((e) => Workout.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
   }
 
   // --- Progress & History ---
   // --- Health ---
   Future<HealthData?> getHealthData(String userId) async {
-    final data = await _request('GET', '/health', queryParams: {'userId': userId});
-    return data != null ? HealthData.fromJson(data as Map<String, dynamic>) : null;
+    final data = await _request(
+      'GET',
+      '/health',
+      queryParams: {'userId': userId},
+    );
+    return data != null
+        ? HealthData.fromJson(data as Map<String, dynamic>)
+        : null;
   }
 
-  Future<void> updateHealthProfile(HealthUpdateParams p) async => 
+  Future<void> updateHealthProfile(HealthUpdateParams p) async =>
       await _request('PUT', '/health', body: p.toJson());
 
   Future<void> updateQuickMetrics({
     required String userId,
     double? weight,
     double? height,
-  }) async =>
-      await _request('PUT', '/health/quick', body: {
-        'userId': userId,
-        if (weight != null) 'weight': weight,
-        if (height != null) 'height': height,
-      });
+  }) async => await _request(
+    'PUT',
+    '/health/quick',
+    body: {
+      'userId': userId,
+      if (weight != null) 'weight': weight,
+      if (height != null) 'height': height,
+    },
+  );
 
   Future<DailyStats?> getDailyStats(String userId, DateTime date) async {
-    final data = await _request('GET', '/health/daily-stats',
-        queryParams: {'userId': userId, 'date': date.toIso8601String()});
-    return data != null ? DailyStats.fromJson(data as Map<String, dynamic>) : null;
+    final data = await _request(
+      'GET',
+      '/health/daily-stats',
+      queryParams: {'userId': userId, 'date': date.toIso8601String()},
+    );
+    return data != null
+        ? DailyStats.fromJson(data as Map<String, dynamic>)
+        : null;
   }
 
-  Future<void> saveDailyStats(DailyStats stats) async => 
+  Future<void> saveDailyStats(DailyStats stats) async =>
       await _request('POST', '/health/daily-stats', body: stats.toJson());
 
   Future<List<BodyMetric>> getWeightHistory(String userId) async {
-    final data = await _request('GET', '/health/weight-history/$userId') as List?;
-    return data?.map((e) => BodyMetric.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    final data =
+        await _request('GET', '/health/weight-history/$userId') as List?;
+    return data
+            ?.map((e) => BodyMetric.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
   }
 
-  Future<void> addWeight( String userId, double weight, double? bmi, DateTime date) async =>
-    await _request('POST', '/health/weight', body: {
+  Future<void> addWeight(
+    String userId,
+    double weight,
+    double? bmi,
+    DateTime date,
+  ) async => await _request(
+    'POST',
+    '/health/weight',
+    body: {
       'user_id': userId,
       'weight': weight,
       'bmi': bmi,
       'date': date.toIso8601String(),
-    }
+    },
   );
 
-  Future<void> deleteWeight(int id) async => await _request('DELETE', '/health/weight/$id');
+  Future<void> deleteWeight(int id) async =>
+      await _request('DELETE', '/health/weight/$id');
 
   // --- Progress ---
   Future<ProgressUser?> getDailyProgress(String userId, DateTime date) async {
-    final data = await _request('GET', '/progress/daily',
-        queryParams: {'userId': userId, 'date': date.toIso8601String()});
+    final data = await _request(
+      'GET',
+      '/progress/daily',
+      queryParams: {'userId': userId, 'date': date.toIso8601String()},
+    );
     return data != null ? ProgressUser.fromJson(data) : null;
   }
 
@@ -198,29 +258,38 @@ class ApiClient {
     double? addEnergy,
     int? addDuration,
     int? addWorkouts,
-  }) async =>
-      await _request('POST', '/progress/daily', body: {
-        'user_id': userId,
-        'date': date.toIso8601String(),
-        'addWaterMl': addWaterMl,
-        'addWaterGlasses': addWaterGlasses,
-        'addSteps': addSteps,
-        'addEnergy': addEnergy,
-        'addDuration': addDuration,
-        'addWorkouts': addWorkouts,
-      });
+  }) async => await _request(
+    'POST',
+    '/progress/daily',
+    body: {
+      'user_id': userId,
+      'date': date.toIso8601String(),
+      'addWaterMl': addWaterMl,
+      'addWaterGlasses': addWaterGlasses,
+      'addSteps': addSteps,
+      'addEnergy': addEnergy,
+      'addDuration': addDuration,
+      'addWorkouts': addWorkouts,
+    },
+  );
 
   Future<List<WorkoutHistory>> getWorkoutHistory(String userId) async {
-    final data = await _request('GET', '/progress/workout-history/$userId') as List?;
-    return data?.map((e) => WorkoutHistory.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    final data =
+        await _request('GET', '/progress/workout-history/$userId') as List?;
+    return data
+            ?.map((e) => WorkoutHistory.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
   }
 
-  Future<void> logWorkout(WorkoutHistory history) async => 
+  Future<void> logWorkout(WorkoutHistory history) async =>
       await _request('POST', '/progress/workout-log', body: history.toJson());
 
   Future<ProgressStats?> getProgressStats(String userId) async {
     final data = await _request('GET', '/progress/stats/$userId');
-    return data != null ? ProgressStats.fromJson(data as Map<String, dynamic>) : null;
+    return data != null
+        ? ProgressStats.fromJson(data as Map<String, dynamic>)
+        : null;
   }
 
   // --- Avatar ---
@@ -239,11 +308,7 @@ class ApiClient {
     }
     request.fields['user_id'] = userId;
     request.files.add(
-      http.MultipartFile.fromBytes(
-        'avatar',
-        bytes,
-        filename: fileName,
-      ),
+      http.MultipartFile.fromBytes('avatar', bytes, filename: fileName),
     );
 
     final streamedResponse = await request.send();
@@ -264,26 +329,48 @@ class ApiClient {
   }
 
   Future<void> updateAvatar(String userId, String? avatarUrl) async =>
-      await _request('POST', '/user/avatar',
-          body: {'user_id': userId, 'avatar_url': avatarUrl});
+      await _request(
+        'POST',
+        '/user/avatar',
+        body: {'user_id': userId, 'avatar_url': avatarUrl},
+      );
 
   // --- Exercises ---
   Future<List<Exercise>> getExercises({String? muscleGroup}) async {
-    final data = await _request('GET', '/exercises',
-        queryParams: muscleGroup != null ? {'muscle_group': muscleGroup} : null)
-        as List?;
-    return data?.map((e) => Exercise.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    final data =
+        await _request(
+              'GET',
+              '/exercises',
+              queryParams: muscleGroup != null
+                  ? {'muscle_group': muscleGroup}
+                  : null,
+            )
+            as List?;
+    return data
+            ?.map((e) => Exercise.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
   }
 
   Future<List<Exercise>> searchExercises(String query) async {
-    final data = await _request('GET', '/exercises/search', queryParams: {'q': query}) as List?;
-    return data?.map((e) => Exercise.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    final data =
+        await _request('GET', '/exercises/search', queryParams: {'q': query})
+            as List?;
+    return data
+            ?.map((e) => Exercise.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
   }
 
   // --- Notifications ---
   Future<List<NotificationModel>> getNotifications(String userId) async {
-    final data = await _request('GET', '/notifications', queryParams: {'userId': userId}) as List?;
-    return data?.map((e) => NotificationModel.fromJson(e as Map<String, dynamic>)).toList() ?? [];
+    final data =
+        await _request('GET', '/notifications', queryParams: {'userId': userId})
+            as List?;
+    return data
+            ?.map((e) => NotificationModel.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
   }
 }
 

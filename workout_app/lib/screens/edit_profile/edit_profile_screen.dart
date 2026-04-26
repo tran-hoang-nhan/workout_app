@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/avatar_provider.dart';
 import '../../providers/profile_provider.dart';
-import '../../services/profile_service.dart';
 import '../../utils/ui_utils.dart';
 import '../../widgets/loading_animation.dart';
 import 'widgets/edit_profile_avatar.dart';
@@ -54,14 +53,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Future<void> _pickAndUploadAvatar() async {
-    try {
-      await ref.read(profileServiceProvider).pickAndUploadAvatar();
-      if (!mounted) return;
+    final success = await ref
+        .read(editProfileControllerProvider.notifier)
+        .pickAndUploadAvatar();
+
+    if (!mounted) return;
+
+    if (success) {
       context.showSuccess('Cập nhật avatar thành công!');
-    } catch (e) {
-      if (!mounted) return;
-      context.showError('Lỗi: $e');
+      return;
     }
+
+    final state = ref.read(editProfileControllerProvider);
+    context.showError('Lỗi: ${state.error}');
   }
 
   Future<void> _removeAvatar() async {
@@ -84,14 +88,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
 
     if (confirm == true) {
-      try {
-        await ref.read(profileServiceProvider).removeAvatar();
-        if (!mounted) return;
+      final success = await ref
+          .read(editProfileControllerProvider.notifier)
+          .removeAvatar();
+
+      if (!mounted) return;
+
+      if (success) {
         context.showSuccess('Xóa avatar thành công!');
-      } catch (e) {
-        if (!mounted) return;
-        context.showError('Lỗi: $e');
+        return;
       }
+
+      final state = ref.read(editProfileControllerProvider);
+      context.showError('Lỗi: ${state.error}');
     }
   }
 
@@ -101,27 +110,27 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     setState(() => _isSaving = true);
 
-    try {
-      await ref
-          .read(profileServiceProvider)
-          .saveProfile(
-            userId: user.id,
-            fullName: _nameController.text,
-            gender: _gender,
-            dateOfBirth: _birthDate,
-            goal: _goal,
-          );
+    final success = await ref
+        .read(editProfileControllerProvider.notifier)
+        .saveProfile(
+          userId: user.id,
+          fullName: _nameController.text,
+          gender: _gender,
+          dateOfBirth: _birthDate,
+          goal: _goal,
+        );
 
-      if (!mounted) return;
+    if (!mounted) return;
+
+    if (success) {
       context.showSuccess('Đã cập nhật hồ sơ thành công!');
-      ref.invalidate(fullUserProfileProvider);
       Navigator.pop(context);
-    } catch (e) {
-      if (!mounted) return;
-      context.showError('Lỗi: $e');
-    } finally {
-      if (mounted) setState(() => _isSaving = false);
+    } else {
+      final state = ref.read(editProfileControllerProvider);
+      context.showError('Lỗi: ${state.error}');
     }
+
+    setState(() => _isSaving = false);
   }
 
   Future<void> _selectDate(BuildContext context) async {

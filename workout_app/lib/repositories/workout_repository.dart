@@ -3,21 +3,10 @@ import '../services/api_client.dart';
 
 /// Repository responsible for interacting with workout-related API endpoints.
 class WorkoutRepository {
-  /// Creates a [WorkoutRepository] instance.
-  WorkoutRepository({ApiClient? apiClient})
-      : _apiClient = apiClient ?? ApiClient();
-
+  WorkoutRepository({ApiClient? apiClient}): _apiClient = apiClient ?? ApiClient();
   final ApiClient _apiClient;
 
-  /// Requests a workout suggestion from the AI based on health metrics.
-  Future<WorkoutPlan> createWorkoutSuggestion({
-    required double weight,
-    required double height,
-    required String goal,
-    required String dietType,
-    required List<String> medicalConditions,
-    String? requirement,
-  }) async {
+  Future<WorkoutPlan> createWorkoutSuggestion({required double weight, required double height, required String goal, required String dietType, required List<String> medicalConditions, String? requirement,}) async {
     final req = WorkoutGenerationRequest(
       weight: weight,
       height: height,
@@ -56,7 +45,4 @@ class WorkoutRepository {
   Future<void> logWorkout(WorkoutHistory history) async {
     await _apiClient.logWorkout(history);
   }
-
-  // Older methods that are no longer directly used or need to be refactored
-  // For the sake of this migration, we are mapping the main entry points.
 }

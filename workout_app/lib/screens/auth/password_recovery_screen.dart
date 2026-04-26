@@ -7,16 +7,13 @@ import '../../../providers/auth_provider.dart';
 
 class PasswordRecoveryScreen extends ConsumerStatefulWidget {
   final String email;
-
   const PasswordRecoveryScreen({super.key, required this.email});
 
   @override
-  ConsumerState<PasswordRecoveryScreen> createState() =>
-      _PasswordRecoveryScreenState();
+  ConsumerState<PasswordRecoveryScreen> createState() =>_PasswordRecoveryScreenState();
 }
 
-class _PasswordRecoveryScreenState
-    extends ConsumerState<PasswordRecoveryScreen> {
+class _PasswordRecoveryScreenState extends ConsumerState<PasswordRecoveryScreen> {
   final _otpController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
@@ -82,28 +79,34 @@ class _PasswordRecoveryScreenState
       return;
     }
 
-    try {
-      await ref.read(authControllerProvider.notifier).updatePassword(password);
-      await ref.read(authControllerProvider.notifier).signOut();
+    final success = await ref.read(authControllerProvider.notifier).updatePassword(password, confirmPassword: confirm);
 
+    if (!success) {
       if (mounted) {
+        final state = ref.read(authControllerProvider);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Mật khẩu đã được cập nhật thành công! Vui lòng đăng nhập lại.',
-            ),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 3),
+          SnackBar(
+            content: Text('Lỗi: ${state.error}'),
+            backgroundColor: Colors.red,
           ),
         );
-        Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
-        );
-      }
+      return;
+    }
+
+    await ref.read(authControllerProvider.notifier).signOut();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Mật khẩu đã được cập nhật thành công! Vui lòng đăng nhập lại.',
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     }
   }
 

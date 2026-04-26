@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared/shared.dart';
 import '../utils/app_error.dart';
@@ -39,11 +38,8 @@ class HealthController extends AsyncNotifier<void> {
 }
 
 final hasHealthDataProvider = FutureProvider<bool>((ref) async {
-  debugPrint('[hasHealthDataProvider] Initializing...');
   final healthData = await ref.watch(healthDataProvider.future);
-  debugPrint('[hasHealthDataProvider] Awaited healthDataProvider: ${healthData != null}');
   if (healthData == null) return false;
-  // If height or weight is 0, they haven't onboarded fully yet
   if (healthData.weight == 0.0 || healthData.height == 0.0) return false;
   return true;
 });

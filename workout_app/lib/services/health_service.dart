@@ -26,27 +26,49 @@ class HealthService {
   Future<HealthData?> checkHealthProfile(String userId) => getHealthData(userId);
 
   Future<void> syncWaterReminders({required bool enabled, required int intervalHours, required String? wakeTime, required String? sleepTime, required int currentWaterMl, required int goalWaterMl,}) async {
-    if (_notifications != null) {
-      await _notifications.cancelAllWaterReminders();
-      if (enabled) {
-        // Implementation logic for scheduling reminders
-      }
-    }
+    if (_notifications == null) return;
+    await _notifications.cancelAllWaterReminders();
+    if (!enabled) return;
+    if (goalWaterMl > 0 && currentWaterMl >= goalWaterMl) return;
+
+    final safeInterval = intervalHours > 0 ? intervalHours : 2;
+    final normalizedWakeTime = _normalizeTimeOrDefault(wakeTime, '07:00');
+    final normalizedSleepTime = _normalizeTimeOrDefault(sleepTime, '23:00');
+
+    await _notifications.scheduleWaterReminder(
+      intervalHours: safeInterval,
+      wakeTime: normalizedWakeTime,
+      sleepTime: normalizedSleepTime,
+    );
+  }
+
+  String _normalizeTimeOrDefault(String? value, String fallback) {
+    if (value == null || value.trim().isEmpty) return fallback;
+
+    final parsed = RegExp(r'^([01]?\d|2[0-3]):([0-5]\d)$',).firstMatch(value.trim());
+    if (parsed == null) return fallback;
+
+    final hour = int.parse(parsed.group(1)!);
+    final minute = int.parse(parsed.group(2)!);
+    return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
   }
 
   Future<void> updateQuickMetrics({required String userId, double? weight, double? height,}) async {
-    await _healthRepo.updateQuickMetrics(userId: userId, weight: weight, height: height);
+    await _healthRepo.updateQuickMetrics(
+      userId: userId,
+      weight: weight,
+      height: height,
+    );
   }
 
   Future<void> cancelAllWaterReminders() async {
     if (_notifications != null) {
-      await _notifications.cancelAllReminders();
+      await _notifications.cancelAllWaterReminders();
     }
   }
 
   double calculateBMI(double weight, double height) => HealthUtils.calculateBMI(weight, height);
   String getBMICategory(double bmi) => HealthUtils.getBMICategory(bmi);
-
   int calculateBMR(double weight, double height, int age, String gender) => HealthUtils.calculateBMR(weight, height, age, gender);
   int calculateTDEE(int bmr, String activityLevel) => HealthUtils.calculateTDEE(bmr, activityLevel);
   int calculateMaxHeartRate(int age) => HealthUtils.calculateMaxHeartRate(age);

@@ -117,52 +117,33 @@ class HealthRepository {
   ) async {
     final startStr = start.toIso8601String().split('T')[0];
     final endStr = end.toIso8601String().split('T')[0];
-    final response = await _supabase
-        .from('daily_summaries')
-        .select()
-        .eq('user_id', userId)
-        .gte('date', startStr)
-        .lte('date', endStr)
-        .order('date', ascending: true);
+    final response = await _supabase.from('daily_summaries').select().eq('user_id', userId).gte('date', startStr).lte('date', endStr).order('date', ascending: true);
     final rows = List<Map<String, dynamic>>.from(response as List);
     return rows.map(DailyStats.fromJson).toList();
   }
 
   /// Saves or updates one daily stats row.
   Future<void> saveDailyStats(DailyStats stats) async {
-    await _supabase
-        .from('daily_summaries')
-        .upsert(stats.toJson(), onConflict: 'user_id, date');
+    await _supabase.from('daily_summaries').upsert(stats.toJson(), onConflict: 'user_id, date');
   }
 
   /// Returns weight history ordered by most recent date first.
   Future<List<BodyMetric>> getWeightHistory(String userId) async {
-    final response = await _supabase
-        .from('body_metrics')
-        .select()
-        .eq('user_id', userId)
-        .order(
-          'recorded_at',
-          ascending: false,
-        ); // Changed from 'date' to 'recorded_at'
-    return (response as List)
-        .map((json) => BodyMetric.fromJson(json as Map<String, dynamic>))
-        .toList();
+    final response = await _supabase.from('body_metrics').select().eq('user_id', userId).order(
+      'recorded_at',
+      ascending: false,
+    ); 
+    return (response as List).map((json) => BodyMetric.fromJson(json as Map<String, dynamic>)).toList();
   }
 
   /// Inserts a new weight record and optional BMI value.
-  Future<void> addWeightRecord({
-    required String userId,
-    required double weight,
-    required DateTime date,
-    double? bmi,
-  }) async {
+  Future<void> addWeightRecord({required String userId, required double weight, required DateTime date, double? bmi,}) async {
     final dateStr = date.toIso8601String().split('T')[0];
     await _supabase.from('body_metrics').insert({
       'user_id': userId,
       'weight': weight,
       if (bmi != null) 'bmi': bmi,
-      'recorded_at': dateStr, // Changed from 'date' to 'recorded_at'
+      'recorded_at': dateStr, 
     });
   }
 }

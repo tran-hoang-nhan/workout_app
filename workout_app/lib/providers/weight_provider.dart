@@ -23,13 +23,6 @@ final weightHistoryProvider = FutureProvider.autoDispose<List<BodyMetric>>((
   return service.loadHistory(userId);
 });
 
-final userHeightProvider = FutureProvider.autoDispose<double>((ref) async {
-  final userId = await ref.watch(currentUserIdProvider.future);
-  if (userId == null) return 0.0;
-  final repo = ref.watch(weightRepositoryProvider);
-  return (await repo.getUserHeight(userId)) ?? 0.0;
-});
-
 final loadWeightDataProvider = FutureProvider.autoDispose<WeightData>((
   ref,
 ) async {

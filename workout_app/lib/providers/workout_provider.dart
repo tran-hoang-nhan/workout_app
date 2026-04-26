@@ -16,14 +16,6 @@ final workoutsProvider = FutureProvider<List<Workout>>((ref) async {
   return await service.getAllWorkouts();
 });
 
-final workoutsByLevelProvider = FutureProvider.family<List<Workout>, String>((
-  ref,
-  level,
-) async {
-  final service = ref.watch(workoutServiceProvider);
-  return await service.getWorkoutsByLevel(level);
-});
-
 final workoutDetailProvider = FutureProvider.family<WorkoutDetail, int>((
   ref,
   id,
@@ -32,8 +24,9 @@ final workoutDetailProvider = FutureProvider.family<WorkoutDetail, int>((
   return await service.getWorkoutDetail(id);
 });
 
-final aiSuggestionHistoryProvider =
-    FutureProvider<List<AISuggestionHistory>>((ref) async {
+final aiSuggestionHistoryProvider = FutureProvider<List<AISuggestionHistory>>((
+  ref,
+) async {
   return ref.watch(workoutServiceProvider).getAISuggestionsHistory();
 });
 

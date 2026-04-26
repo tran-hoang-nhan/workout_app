@@ -47,9 +47,6 @@ class WorkoutService {
 
   Future<List<Workout>> getWorkoutsByCategory(String category) async {
     final key = category.trim().toLowerCase();
-
-    /// Backend `_mapFilterKeywords` so khớp theo chuỗi tiếng Việt (vd. `toàn thân`),
-    /// không dùng bản bỏ dấu — gửi đúng nhãn chip từ UI.
     if (key == 'tất cả' || key == 'all') {
       debugPrint('[WorkoutService] getWorkoutsByCategory: all → getAllWorkouts()');
       return getAllWorkouts();
@@ -61,7 +58,6 @@ class WorkoutService {
     try {
       final workouts = await _workoutRepository.getWorkoutsByCategory(forApi);
       debugPrint('[WorkoutService] getWorkoutsByCategory returned ${workouts.length} items');
-      return workouts;
       return workouts;
     } catch (e) {
       debugPrint('[WorkoutService] Error in getWorkoutsByCategory: $e');

@@ -24,8 +24,7 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
       NotificationModel(
         id: 'w1',
         title: 'Đã đến giờ uống nước! 💧',
-        message:
-            'Hãy bổ sung 250ml nước để cơ thể khỏe mạnh và tràn đầy năng lượng nhé.',
+        message: 'Hãy bổ sung 250ml nước để cơ thể khỏe mạnh và tràn đầy năng lượng nhé.',
         createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
         type: NotificationType.water,
         isRead: false,
@@ -59,12 +58,8 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
     }
   }
 
-  /// Called when water is added globally (e.g., from the WaterCard '+')
-  /// to ensure any active water notifications and their UI cards also reflect this.
   void handleGlobalWaterIntake() {
     final now = DateTime.now();
-    // Find the latest water notification that hasn't been marked as "drank" yet
-    // and mark it as drank to trigger the countdown UI.
     bool updated = false;
     state = [
       for (final notification in state)

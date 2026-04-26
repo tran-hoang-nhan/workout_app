@@ -27,32 +27,25 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
     final password = passwordController.text;
     final confirm = confirmController.text;
 
-    try {
-      debugPrint('[ChangePasswordDialog] Requesting update...');
-      await ref
-          .read(authControllerProvider.notifier)
-          .updatePassword(password, confirmPassword: confirm);
-      final authState = ref.read(authControllerProvider);
+    debugPrint('[ChangePasswordDialog] Requesting update...');
+    final success = await ref
+        .read(authControllerProvider.notifier)
+        .updatePassword(password, confirmPassword: confirm);
+    final authState = ref.read(authControllerProvider);
 
-      if (mounted) {
-        if (authState.hasError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Lỗi: ${authState.error}')));
-        } else {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đổi mật khẩu thành công!')),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi không xác định: $e')));
-      }
+    if (!mounted) return;
+
+    if (!success) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Lỗi: ${authState.error}')));
+      return;
     }
+
+    Navigator.pop(context);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Đổi mật khẩu thành công!')));
   }
 
   @override

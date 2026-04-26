@@ -15,8 +15,6 @@ class NotificationService {
   Future<void> scheduleWaterReminder({required int intervalHours, String wakeTime = '07:00', String sleepTime = '23:00',}) async {
     String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
     final safeInterval = intervalHours > 0 ? intervalHours : 2;
-    debugPrint("🕒 Scheduling water reminder every $safeInterval hours (Requested: $intervalHours) (Timezone: $localTimeZone)");
-    debugPrint("💤 Active hours: $wakeTime - $sleepTime");
     await AwesomeNotifications().cancel(10);
     final wakeHour = int.tryParse(wakeTime.split(':')[0]) ?? 7;
     final sleepHour = int.tryParse(sleepTime.split(':')[0]) ?? 23;

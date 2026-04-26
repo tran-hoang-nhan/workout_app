@@ -7,7 +7,6 @@ import '../../utils/label_utils.dart';
 
 class ExerciseDetailScreen extends StatefulWidget {
   final Exercise exercise;
-
   const ExerciseDetailScreen({super.key, required this.exercise});
 
   @override
@@ -17,9 +16,7 @@ class ExerciseDetailScreen extends StatefulWidget {
 class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   @override
   Widget build(BuildContext context) {
-    final hasAnimation =
-        widget.exercise.animationUrl != null &&
-        widget.exercise.animationUrl!.isNotEmpty;
+    final hasAnimation = widget.exercise.animationUrl != null && widget.exercise.animationUrl!.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.exercise.name)),

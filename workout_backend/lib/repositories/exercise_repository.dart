@@ -1,17 +1,13 @@
 import 'package:shared/shared.dart';
 import 'package:supabase/supabase.dart';
 
-/// Repository responsible for exercise-related data.
 class ExerciseRepository {
-  /// Creates an exercise repository backed by Supabase.
   ExerciseRepository(this._supabase);
   final SupabaseClient _supabase;
 
-  /// Gets all exercises.
   Future<List<Exercise>> getExercises() async {
     final response = await _supabase.from('exercises').select().order('name');
-    return (response as List<dynamic>)
-        .map((e) => Exercise.fromJson(Map<String, dynamic>.from(e as Map)))
+    return (response as List<dynamic>).map((e) => Exercise.fromJson(Map<String, dynamic>.from(e as Map)))
         .toList();
   }
 

@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared/shared.dart';
 import 'auth_provider.dart';
 import '../repositories/progress_repository.dart';
-
 import './daily_stats_provider.dart';
 
 final progressRepositoryProvider = Provider<ProgressRepository>((ref) {

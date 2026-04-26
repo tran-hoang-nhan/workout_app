@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared/shared.dart';
 import '../repositories/profile_repository.dart';
 import '../providers/auth_provider.dart';
-import '../services/profile_service.dart';
+import '../providers/avatar_provider.dart';
+import '../providers/health_base_provider.dart';
 import '../utils/app_error.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
@@ -17,62 +18,79 @@ final fullUserProfileProvider = FutureProvider<AppUser?>((ref) async {
   return await profileRepo.getFullUserProfile(userIdAsync);
 });
 
-final editProfileControllerProvider =
-    AsyncNotifierProvider<EditProfileController, void>(() {
-      return EditProfileController();
-    });
+final editProfileControllerProvider =AsyncNotifierProvider<EditProfileController, void>(() {
+  return EditProfileController();
+});
 
 class EditProfileController extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
-  Future<bool> saveProfile({
-    required String userId,
-    required String fullName,
-    String? gender,
-    DateTime? dateOfBirth,
-    String? goal,
-  }) async {
+  Future<bool> pickAndUploadAvatar() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      try {
-        await ref
-            .read(profileServiceProvider)
-            .saveProfile(
-              userId: userId,
-              fullName: fullName,
-              gender: gender,
-              dateOfBirth: dateOfBirth,
-              goal: goal,
-            );
-      } catch (e, st) {
-        throw handleException(e, st);
+    try {
+      await ref.read(avatarControllerProvider.notifier).pickAndUploadAvatar();
+      final avatarState = ref.read(avatarControllerProvider);
+      if (avatarState.hasError) {
+        throw avatarState.error ?? Exception('Không thể cập nhật avatar');
       }
-    });
-    return !state.hasError;
-  }
 
-  Future<bool> updateAvatar() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      try {
-        await ref.read(profileServiceProvider).pickAndUploadAvatar();
-      } catch (e, st) {
-        throw handleException(e, st);
-      }
-    });
-    return !state.hasError;
+      ref.invalidate(currentUserProvider);
+      ref.invalidate(fullUserProfileProvider);
+      state = const AsyncValue.data(null);
+      return true;
+    } catch (e, st) {
+      state = AsyncValue.error(handleException(e, st), st);
+      return false;
+    }
   }
 
   Future<bool> removeAvatar() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      try {
-        await ref.read(profileServiceProvider).removeAvatar();
-      } catch (e, st) {
-        throw handleException(e, st);
+    try {
+      await ref.read(avatarControllerProvider.notifier).removeAvatar();
+      final avatarState = ref.read(avatarControllerProvider);
+      if (avatarState.hasError) {
+        throw avatarState.error ?? Exception('Không thể xóa avatar');
       }
-    });
-    return !state.hasError;
+
+      ref.invalidate(currentUserProvider);
+      ref.invalidate(fullUserProfileProvider);
+      state = const AsyncValue.data(null);
+      return true;
+    } catch (e, st) {
+      state = AsyncValue.error(handleException(e, st), st);
+      return false;
+    }
+  }
+
+  Future<bool> saveProfile({required String userId, required String fullName, String? gender, String? goal, DateTime? dateOfBirth,}) async {
+    final trimmedName = fullName.trim();
+    if (trimmedName.isEmpty) {
+      state = AsyncValue.error(
+        ValidationException('Vui lòng nhập tên'),
+        StackTrace.current,
+      );
+      return false;
+    }
+
+    state = const AsyncValue.loading();
+    try {
+      await ref.read(profileRepositoryProvider).saveProfile(
+        userId: userId,
+        fullName: trimmedName,
+        gender: gender,
+        goal: goal,
+        dateOfBirth: dateOfBirth,
+      );
+      ref.invalidate(currentUserProvider);
+      ref.invalidate(fullUserProfileProvider);
+      ref.invalidate(healthDataProvider);
+      state = const AsyncValue.data(null);
+      return true;
+    } catch (e, st) {
+      state = AsyncValue.error(handleException(e, st), st);
+      return false;
+    }
   }
 }

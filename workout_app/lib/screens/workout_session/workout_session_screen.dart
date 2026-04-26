@@ -27,16 +27,17 @@ class WorkoutSessionScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<WorkoutSessionScreen> createState() => _WorkoutSessionScreenState();
+  ConsumerState<WorkoutSessionScreen> createState() =>
+      _WorkoutSessionScreenState();
 }
 
-class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> with WidgetsBindingObserver {
+class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen>
+    with WidgetsBindingObserver {
   int _currentIndex = 0;
   bool _started = false;
   bool _inRest = false;
   int _remainingSeconds = 0;
   bool _inCountdown = true;
-  bool _isCompleting = false;
   bool _isPaused = false;
   DateTime? _targetEndTime;
 
@@ -76,13 +77,6 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
 
   WorkoutItem get _currentItem => widget.items[_currentIndex];
 
-  void _startPreparation() {
-    setState(() {
-      _inCountdown = true;
-      _started = false;
-    });
-  }
-
   void _start() {
     HapticFeedback.lightImpact();
     if (!_sessionStopwatch.isRunning) {
@@ -97,7 +91,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
       _remainingSeconds = item.durationSeconds ?? 0;
       _lastStepStartTime = DateTime.now();
     });
-    
+
     if (_remainingSeconds > 0) {
       _targetEndTime = DateTime.now().add(Duration(seconds: _remainingSeconds));
       _runTimer();
@@ -139,7 +133,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
 
     _timer = Timer.periodic(const Duration(milliseconds: 500), (t) {
       if (_isPaused || _remainingSeconds <= 0 || _targetEndTime == null) return;
-      
+
       final now = DateTime.now();
       final diff = _targetEndTime!.difference(now).inSeconds;
 
@@ -147,11 +141,11 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
         setState(() {
           _remainingSeconds = diff.clamp(0, 9999);
         });
-        
+
         if (_remainingSeconds <= 3 && _remainingSeconds > 0) {
           HapticFeedback.lightImpact();
         }
-        
+
         if (_remainingSeconds <= 0) {
           t.cancel();
           _handleTimerFinished();
@@ -181,7 +175,9 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
       _sessionStopwatch.start();
       _lastStepStartTime = DateTime.now();
       if (_remainingSeconds > 0) {
-        _targetEndTime = DateTime.now().add(Duration(seconds: _remainingSeconds));
+        _targetEndTime = DateTime.now().add(
+          Duration(seconds: _remainingSeconds),
+        );
         _runTimer();
       }
     }
@@ -202,7 +198,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
   void _next() {
     HapticFeedback.lightImpact();
     _timer?.cancel();
-    
+
     _accumulatedCalories = _caloriesBurnedSoFar();
     _lastStepStartTime = DateTime.now();
 
@@ -222,9 +218,10 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
   }
 
   Future<void> _showCompletion() async {
-    final actualSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
+    final actualSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000)
+        .floor();
     final calories = _caloriesBurnedSoFar();
-    
+
     // Log workout completion to backend
     try {
       final authService = ref.read(authServiceProvider);
@@ -239,13 +236,14 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
           completedAt: DateTime.now(),
         );
         await ref.read(workoutServiceProvider).logWorkout(history);
-        
+
         // Invalidate progress providers to refresh UI
         final now = DateTime.now();
         ref.invalidate(progressDailyProvider(now));
         ref.invalidate(dailyStatsProvider(now));
       }
     } catch (e) {
+      debugPrint('Error logging workout completion: $e');
     }
 
     HapticFeedback.mediumImpact();
@@ -291,7 +289,8 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
       _togglePause(false);
     }
 
-    final elapsedSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
+    final elapsedSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000)
+        .floor();
     final calories = _caloriesBurnedSoFar();
 
     final shouldExit = await showExitWorkoutDialog(
@@ -357,20 +356,28 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
                           duration: const Duration(milliseconds: 400),
                           switchInCurve: Curves.easeOutCubic,
                           switchOutCurve: Curves.easeInCubic,
-                          transitionBuilder: (Widget child, Animation<double> animation) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: ScaleTransition(
-                                scale: Tween<double>(begin: 0.96, end: 1.0).animate(animation),
-                                child: child,
-                              ),
-                            );
-                          },
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: ScaleTransition(
+                                    scale: Tween<double>(
+                                      begin: 0.96,
+                                      end: 1.0,
+                                    ).animate(animation),
+                                    child: child,
+                                  ),
+                                );
+                              },
                           child: _inCountdown
                               ? WorkoutPreparationCard(
                                   key: const ValueKey('preparation'),
-                                  text: _currentIndex == 0 ? 'CHUẨN BỊ' : 'CHUẨN BỊ BÀI TIẾP',
-                                  subtitle: _currentIndex == 0 ? 'BÀI TẬP ĐẦU TIÊN' : 'BÀI TẬP TIẾP THEO',
+                                  text: _currentIndex == 0
+                                      ? 'CHUẨN BỊ'
+                                      : 'CHUẨN BỊ BÀI TIẾP',
+                                  subtitle: _currentIndex == 0
+                                      ? 'BÀI TẬP ĐẦU TIÊN'
+                                      : 'BÀI TẬP TIẾP THEO',
                                   exercise: displayExercise,
                                   durationSeconds: _currentIndex == 0 ? 10 : 3,
                                   paused: _haltForExitDialog,
@@ -384,10 +391,13 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
                                   inRest: _inRest,
                                   isPaused: _isPaused,
                                   onPlayPauseToggle: _togglePause,
-                                  isTimeBased: (displayItem.durationSeconds ?? 0) > 0,
+                                  isTimeBased:
+                                      (displayItem.durationSeconds ?? 0) > 0,
                                   remainingSeconds: _remainingSeconds,
-                                  exerciseTotalSeconds: displayItem.durationSeconds ?? 0,
-                                  restTotalSeconds: _currentItem.restSeconds ?? 0,
+                                  exerciseTotalSeconds:
+                                      displayItem.durationSeconds ?? 0,
+                                  restTotalSeconds:
+                                      _currentItem.restSeconds ?? 0,
                                   isPreview: _inRest,
                                 ),
                         ),
@@ -399,24 +409,42 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
                             : (_started ? _next : _start),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size.fromHeight(64),
-                          backgroundColor: _inRest ? Colors.orange : AppColors.primary,
+                          backgroundColor: _inRest
+                              ? Colors.orange
+                              : AppColors.primary,
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppBorderRadius.xl)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppBorderRadius.xl,
+                            ),
+                          ),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(_inRest ? Icons.skip_next_rounded : (_started ? Icons.arrow_forward_rounded : Icons.play_arrow_rounded), size: 22),
+                            Icon(
+                              _inRest
+                                  ? Icons.skip_next_rounded
+                                  : (_started
+                                        ? Icons.arrow_forward_rounded
+                                        : Icons.play_arrow_rounded),
+                              size: 22,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               _inCountdown
                                   ? 'Bắt đầu ngay'
                                   : (_started
-                                      ? (_inRest
-                                          ? 'Bỏ qua nghỉ'
-                                          : (hasNext ? 'Tiếp theo' : 'Hoàn thành'))
-                                      : 'Bắt đầu ngay'),
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                                        ? (_inRest
+                                              ? 'Bỏ qua nghỉ'
+                                              : (hasNext
+                                                    ? 'Tiếp theo'
+                                                    : 'Hoàn thành'))
+                                        : 'Bắt đầu ngay'),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ],
                         ),
@@ -460,7 +488,11 @@ class _SessionHeader extends StatelessWidget {
   final int totalItems;
   final VoidCallback onExit;
 
-  const _SessionHeader({required this.currentIndex, required this.totalItems, required this.onExit});
+  const _SessionHeader({
+    required this.currentIndex,
+    required this.totalItems,
+    required this.onExit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -471,17 +503,47 @@ class _SessionHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('BÀI TẬP', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.primary.withValues(alpha: 0.6), letterSpacing: 1.2)),
+            Text(
+              'BÀI TẬP',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                color: AppColors.primary.withValues(alpha: 0.6),
+                letterSpacing: 1.2,
+              ),
+            ),
             const SizedBox(height: 2),
             Row(
               children: [
-                Text('${currentIndex + 1}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.black, height: 1.1)),
-                Text(' / $totalItems', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.black.withValues(alpha: 0.3))),
+                Text(
+                  '${currentIndex + 1}',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.black,
+                    height: 1.1,
+                  ),
+                ),
+                Text(
+                  ' / $totalItems',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.black.withValues(alpha: 0.3),
+                  ),
+                ),
               ],
             ),
           ],
         ),
-        IconButton(onPressed: onExit, icon: const Icon(Icons.close_rounded, color: AppColors.black, size: 22)),
+        IconButton(
+          onPressed: onExit,
+          icon: const Icon(
+            Icons.close_rounded,
+            color: AppColors.black,
+            size: 22,
+          ),
+        ),
       ],
     );
   }
@@ -490,7 +552,10 @@ class _SessionHeader extends StatelessWidget {
 class _SessionProgressBar extends StatelessWidget {
   final int currentIndex;
   final int totalItems;
-  const _SessionProgressBar({required this.currentIndex, required this.totalItems});
+  const _SessionProgressBar({
+    required this.currentIndex,
+    required this.totalItems,
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -14,7 +14,6 @@ import 'widgets/auth_date_picker_field.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   final Future<void> Function() onSignupSuccess;
-
   const RegisterScreen({super.key, required this.onSignupSuccess});
 
   @override

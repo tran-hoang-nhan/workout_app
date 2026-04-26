@@ -3,8 +3,7 @@ import '../services/api_client.dart';
 
 class DailyStatsRepository {
   final ApiClient _apiClient;
-  DailyStatsRepository({ApiClient? apiClient})
-    : _apiClient = apiClient ?? ApiClient();
+  DailyStatsRepository({ApiClient? apiClient}): _apiClient = apiClient ?? ApiClient();
 
   Future<DailyStats?> getDailyStats(String userId, DateTime date) async {
     return _apiClient.getDailyStats(userId, date);
@@ -15,7 +14,6 @@ class DailyStatsRepository {
     DateTime start,
     DateTime end,
   ) async {
-    // For now returning empty or proxying
     return [];
   }
 

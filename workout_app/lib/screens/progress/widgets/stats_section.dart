@@ -36,12 +36,10 @@ class StatsSection extends ConsumerWidget {
           data: (workoutStats) {
             return todayStatsAsync.when(
               data: (stats) {
-                final steps = stats?.stepsCount ?? 0;
                 final calories = workoutStats.calories;
                 final minutes = workoutStats.minutes;
 
                 // Goals
-                const stepGoal = 10000;
                 final calorieGoal = healthCalculations.tdee > 0
                     ? healthCalculations.tdee
                     : 2000;
@@ -168,71 +166,6 @@ class StatsSection extends ConsumerWidget {
               backgroundColor: color.withValues(alpha: 0.1),
               valueColor: AlwaysStoppedAnimation<Color>(color),
               minHeight: 8,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSimpleStatCard(
-    BuildContext context, {
-    required String title,
-    required String value,
-    required String unit,
-    required double progress,
-    required Color color,
-    required IconData icon,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _cardDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 18),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              color: AppColors.black,
-            ),
-          ),
-          Text(
-            unit,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: AppColors.grey.withValues(alpha: 0.5),
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: AppColors.grey,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: color.withValues(alpha: 0.1),
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-              minHeight: 4,
             ),
           ),
         ],
