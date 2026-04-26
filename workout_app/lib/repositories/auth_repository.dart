@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:shared/shared.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
-import '../services/api_client.dart';
+import '../api/api_client.dart';
 
 class AuthRepository {
   final ApiClient _apiClient;

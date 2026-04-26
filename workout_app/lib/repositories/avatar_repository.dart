@@ -1,4 +1,4 @@
-import '../services/api_client.dart';
+import '../api/api_client.dart';
 
 class AvatarRepository {
   final ApiClient _apiClient;

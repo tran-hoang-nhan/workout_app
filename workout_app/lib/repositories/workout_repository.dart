@@ -1,5 +1,5 @@
 import 'package:shared/shared.dart';
-import '../services/api_client.dart';
+import '../api/api_client.dart';
 
 /// Repository responsible for interacting with workout-related API endpoints.
 class WorkoutRepository {

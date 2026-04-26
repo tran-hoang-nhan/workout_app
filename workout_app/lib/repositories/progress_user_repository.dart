@@ -1,5 +1,5 @@
 import 'package:shared/shared.dart';
-import '../services/api_client.dart';
+import '../api/api_client.dart';
 
 class ProgressUserRepository {
   final ApiClient _apiClient;

@@ -84,13 +84,38 @@ class HealthRepository {
           'p_sleep_time': params.sleepTime,
         },
       );
-      await _supabase
-          .from('health')
-          .upsert(params.toJson(), onConflict: 'user_id');
-      await _supabase.from('profiles').update({
-        'gender': params.gender,
+
+      // Keep health-table payload aligned with actual health columns.
+      final healthData = <String, dynamic>{
+        'user_id': params.userId,
+        'age': params.age,
+        'weight': params.weight,
+        'height': params.height,
+        'activity_level': params.activityLevel,
+        'diet_type': params.dietType,
+        'water_intake': params.waterIntake,
+        'injuries': params.injuries,
+        'medical_conditions': params.medicalConditions,
+        'allergies': params.allergies,
+        'water_reminder_enabled': params.waterReminderEnabled,
+        'water_reminder_interval': params.waterReminderInterval,
+        'wake_time': params.wakeTime,
+        'sleep_time': params.sleepTime,
+      }..removeWhere((_, value) => value == null);
+
+      await _supabase.from('health').upsert(healthData, onConflict: 'user_id');
+
+      final profileUpdates = <String, dynamic>{
+        if (params.gender != null) 'gender': params.gender,
         'goal': params.goal,
-      }).eq('id', params.userId);
+      };
+
+      if (profileUpdates.isNotEmpty) {
+        await _supabase
+            .from('profiles')
+            .update(profileUpdates)
+            .eq('id', params.userId);
+      }
     } catch (e) {
       rethrow;
     }
@@ -117,33 +142,52 @@ class HealthRepository {
   ) async {
     final startStr = start.toIso8601String().split('T')[0];
     final endStr = end.toIso8601String().split('T')[0];
-    final response = await _supabase.from('daily_summaries').select().eq('user_id', userId).gte('date', startStr).lte('date', endStr).order('date', ascending: true);
+    final response = await _supabase
+        .from('daily_summaries')
+        .select()
+        .eq('user_id', userId)
+        .gte('date', startStr)
+        .lte('date', endStr)
+        .order('date', ascending: true);
     final rows = List<Map<String, dynamic>>.from(response as List);
     return rows.map(DailyStats.fromJson).toList();
   }
 
   /// Saves or updates one daily stats row.
   Future<void> saveDailyStats(DailyStats stats) async {
-    await _supabase.from('daily_summaries').upsert(stats.toJson(), onConflict: 'user_id, date');
+    await _supabase
+        .from('daily_summaries')
+        .upsert(stats.toJson(), onConflict: 'user_id, date');
   }
 
   /// Returns weight history ordered by most recent date first.
   Future<List<BodyMetric>> getWeightHistory(String userId) async {
-    final response = await _supabase.from('body_metrics').select().eq('user_id', userId).order(
-      'recorded_at',
-      ascending: false,
-    ); 
-    return (response as List).map((json) => BodyMetric.fromJson(json as Map<String, dynamic>)).toList();
+    final response = await _supabase
+        .from('body_metrics')
+        .select()
+        .eq('user_id', userId)
+        .order(
+          'recorded_at',
+          ascending: false,
+        );
+    return (response as List)
+        .map((json) => BodyMetric.fromJson(json as Map<String, dynamic>))
+        .toList();
   }
 
   /// Inserts a new weight record and optional BMI value.
-  Future<void> addWeightRecord({required String userId, required double weight, required DateTime date, double? bmi,}) async {
+  Future<void> addWeightRecord({
+    required String userId,
+    required double weight,
+    required DateTime date,
+    double? bmi,
+  }) async {
     final dateStr = date.toIso8601String().split('T')[0];
     await _supabase.from('body_metrics').insert({
       'user_id': userId,
       'weight': weight,
       if (bmi != null) 'bmi': bmi,
-      'recorded_at': dateStr, 
+      'recorded_at': dateStr,
     });
   }
 }
