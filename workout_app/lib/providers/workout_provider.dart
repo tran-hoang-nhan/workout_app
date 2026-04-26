@@ -16,38 +16,27 @@ final workoutsProvider = FutureProvider<List<Workout>>((ref) async {
   return await service.getAllWorkouts();
 });
 
-final workoutsByLevelProvider = FutureProvider.family<List<Workout>, String>((
-  ref,
-  level,
-) async {
+final workoutsByLevelProvider = FutureProvider.family<List<Workout>, String>((ref, level,) async {
   final service = ref.watch(workoutServiceProvider);
   return await service.getWorkoutsByLevel(level);
 });
 
-final workoutDetailProvider = FutureProvider.family<WorkoutDetail, int>((
-  ref,
-  id,
-) async {
+final workoutDetailProvider = FutureProvider.family<WorkoutDetail, int>((ref, id,) async {
   final service = ref.watch(workoutServiceProvider);
   return await service.getWorkoutDetail(id);
 });
 
-final aiSuggestionHistoryProvider =
-    FutureProvider<List<AISuggestionHistory>>((ref) async {
+final aiSuggestionHistoryProvider = FutureProvider<List<AISuggestionHistory>>((ref) async {
   return ref.watch(workoutServiceProvider).getAISuggestionsHistory();
 });
 
-final searchWorkoutsProvider = FutureProvider.family<List<Workout>, String>((
-  ref,
-  query,
-) async {
+final searchWorkoutsProvider = FutureProvider.family<List<Workout>, String>((ref, query,) async {
   if (query.isEmpty) return [];
   final service = ref.watch(workoutServiceProvider);
   return await service.searchWorkouts(query);
 });
 
-final workoutsByCategoryProvider = FutureProvider.family<List<Workout>, String>(
-  (ref, category) async {
+final workoutsByCategoryProvider = FutureProvider.family<List<Workout>, String>((ref, category) async {
     final service = ref.watch(workoutServiceProvider);
     return await service.getWorkoutsByCategory(category);
   },

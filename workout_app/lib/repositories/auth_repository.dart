@@ -7,10 +7,7 @@ class AuthRepository {
   final ApiClient _apiClient;
   final SupabaseClient _supabase;
 
-  AuthRepository({ApiClient? apiClient, SupabaseClient? supabase})
-    : _apiClient = apiClient ?? ApiClient(),
-      _supabase = supabase ?? Supabase.instance.client;
-
+  AuthRepository({ApiClient? apiClient, SupabaseClient? supabase}): _apiClient = apiClient ?? ApiClient(), _supabase = supabase ?? Supabase.instance.client;
   AppUser? get currentUser {
     final user = _supabase.auth.currentUser;
     if (user == null) return null;
@@ -48,11 +45,7 @@ class AuthRepository {
     await _supabase.auth.signOut();
   }
 
-  Future<Map<String, dynamic>> verifyOTP({
-    required String email,
-    required String token,
-    required String type,
-  }) async {
+  Future<Map<String, dynamic>> verifyOTP({required String email, required String token, required String type,}) async {
     final response = await _apiClient.verifyOtp(email, token, type);
     if (response['session'] != null) {
       await _updateSession(response['session'] as Map<String, dynamic>);
@@ -76,12 +69,8 @@ class AuthRepository {
     await _apiClient.resetPassword(email);
   }
 
-  Future<Map<String, dynamic>> completeRegistration({
-    required SignUpParams signUpParams,
-    required HealthUpdateParams healthParams,
-  }) async {
-    final response =
-        await _apiClient.completeRegistration(signUpParams, healthParams);
+  Future<Map<String, dynamic>> completeRegistration({required SignUpParams signUpParams, required HealthUpdateParams healthParams,}) async {
+    final response = await _apiClient.completeRegistration(signUpParams, healthParams);
     if (response['session'] != null) {
       await _updateSession(response['session'] as Map<String, dynamic>);
     }

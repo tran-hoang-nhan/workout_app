@@ -24,8 +24,7 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
       NotificationModel(
         id: 'w1',
         title: 'Đã đến giờ uống nước! 💧',
-        message:
-            'Hãy bổ sung 250ml nước để cơ thể khỏe mạnh và tràn đầy năng lượng nhé.',
+        message: 'Hãy bổ sung 250ml nước để cơ thể khỏe mạnh và tràn đầy năng lượng nhé.',
         createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
         type: NotificationType.water,
         isRead: false,

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:dart_frog/dart_frog.dart';
 import 'package:shared/shared.dart';
 import 'package:supabase/supabase.dart' hide HttpMethod;
@@ -57,7 +56,7 @@ Future<Response> onRequest(RequestContext context) async {
     );
   } catch (e) {
     return Response.json(
-        statusCode: HttpStatus.internalServerError,
-        body: {'error': e.toString()},);
+      statusCode: HttpStatus.internalServerError,
+      body: {'error': e.toString()},);
   }
 }

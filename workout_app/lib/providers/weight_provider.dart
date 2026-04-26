@@ -14,9 +14,7 @@ final weightServiceProvider = Provider<WeightService>((ref) {
   return WeightService(repository: repo);
 });
 
-final weightHistoryProvider = FutureProvider.autoDispose<List<BodyMetric>>((
-  ref,
-) async {
+final weightHistoryProvider = FutureProvider.autoDispose<List<BodyMetric>>((ref,) async {
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) return [];
   final service = ref.watch(weightServiceProvider);
@@ -30,16 +28,12 @@ final userHeightProvider = FutureProvider.autoDispose<double>((ref) async {
   return (await repo.getUserHeight(userId)) ?? 0.0;
 });
 
-final loadWeightDataProvider = FutureProvider.autoDispose<WeightData>((
-  ref,
-) async {
+final loadWeightDataProvider = FutureProvider.autoDispose<WeightData>((ref,) async {
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) {
-    debugPrint('[loadWeightDataProvider] No userId found');
     return WeightData(weight: 0, height: 0, weightHistory: []);
   }
 
-  debugPrint('[loadWeightDataProvider] Fetching data for user: $userId');
   final service = ref.watch(weightServiceProvider);
   final repo = ref.watch(weightRepositoryProvider);
 
@@ -51,17 +45,12 @@ final loadWeightDataProvider = FutureProvider.autoDispose<WeightData>((
 
     final history = results[0] as List<BodyMetric>;
     final latestMetric = results[1] as BodyMetric?;
-
-    debugPrint('[loadWeightDataProvider] History count: ${history.length}');
-    debugPrint('[loadWeightDataProvider] Latest metric: $latestMetric');
-
     double currentWeight = latestMetric?.weight ?? 0.0;
     if (history.isNotEmpty && currentWeight == 0.0) {
       currentWeight = history.first.weight;
     }
 
     final height = (await repo.getUserHeight(userId)) ?? 0.0;
-    debugPrint('[loadWeightDataProvider] User height: $height');
 
     return WeightData(
       weight: currentWeight,

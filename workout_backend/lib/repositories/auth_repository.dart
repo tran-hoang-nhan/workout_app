@@ -29,10 +29,7 @@ class AuthRepository {
   }
 
   /// Creates a profile record for a newly registered user.
-  Future<void> createUserProfile({
-    required String id,
-    required SignUpParams params,
-  }) async {
+  Future<void> createUserProfile({required String id, required SignUpParams params,}) async {
     await _supabase.from('profiles').insert({
       'id': id,
       'email': params.email,
@@ -45,20 +42,11 @@ class AuthRepository {
     });
   }
 
-  /// Gets a user profile and merges health metrics when available.
   Future<AppUser?> getUserProfile(String userId) async {
-    final response = await _supabase
-        .from('profiles')
-        .select()
-        .eq('id', userId)
-        .maybeSingle();
+    final response = await _supabase.from('profiles').select().eq('id', userId).maybeSingle();
     if (response == null) return null;
 
-    final healthResponse = await _supabase
-        .from('health')
-        .select('weight, height, age')
-        .eq('user_id', userId)
-        .maybeSingle();
+    final healthResponse = await _supabase.from('health').select('weight, height, age').eq('user_id', userId).maybeSingle();
     final userData = Map<String, dynamic>.from(response);
     if (healthResponse != null) {
       userData['weight'] = healthResponse['weight'];
@@ -68,7 +56,6 @@ class AuthRepository {
     return AppUser.fromJson(userData);
   }
 
-  /// Updates editable user profile fields.
   Future<void> updateUserProfile(UpdateProfileParams params) async {
     final updates = <String, dynamic>{};
     if (params.fullName != null) updates['full_name'] = params.fullName;

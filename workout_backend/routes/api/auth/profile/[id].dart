@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:dart_frog/dart_frog.dart';
 import 'package:shared/shared.dart';
 import 'package:supabase/supabase.dart' hide HttpMethod;
@@ -15,8 +14,8 @@ Future<Response> onRequest(RequestContext context, String id) async {
       return Response.json(body: profile?.toJson());
     } catch (e) {
       return Response.json(
-          statusCode: HttpStatus.internalServerError,
-          body: {'error': e.toString()},);
+        statusCode: HttpStatus.internalServerError,
+        body: {'error': e.toString()},);
     }
   }
 
@@ -30,7 +29,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
         if (params.gender != null) 'gender': params.gender,
         if (params.goal != null) 'goal': params.goal,
         if (params.dateOfBirth != null)
-          'date_of_birth': params.dateOfBirth?.toIso8601String(),
+        'date_of_birth': params.dateOfBirth?.toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', id);
 

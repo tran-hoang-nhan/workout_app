@@ -7,7 +7,6 @@ import 'widgets/index.dart';
 
 class HealthOnboardingScreen extends ConsumerStatefulWidget {
   final Future<void> Function() onComplete;
-
   const HealthOnboardingScreen({super.key, required this.onComplete});
 
   @override
@@ -15,8 +14,7 @@ class HealthOnboardingScreen extends ConsumerStatefulWidget {
       _HealthOnboardingScreenState();
 }
 
-class _HealthOnboardingScreenState
-    extends ConsumerState<HealthOnboardingScreen> {
+class _HealthOnboardingScreenState extends ConsumerState<HealthOnboardingScreen> {
   int currentStep = 1;
   final totalSteps = 4;
 

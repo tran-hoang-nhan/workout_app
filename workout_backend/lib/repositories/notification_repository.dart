@@ -9,26 +9,13 @@ class NotificationRepository {
 
   /// Gets all notifications for a user.
   Future<List<NotificationModel>> getNotifications(String userId) async {
-    final response = await _supabase
-        .from('notifications')
-        .select()
-        .eq('user_id', userId)
-        .order('created_at', ascending: false);
-    return (response as List<dynamic>)
-        .map(
-          (e) => NotificationModel.fromJson(
-            Map<String, dynamic>.from(e as Map),
-          ),
-        )
-        .toList();
+    final response = await _supabase.from('notifications').select().eq('user_id', userId).order('created_at', ascending: false);
+    return (response as List<dynamic>).map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e as Map),),).toList();
   }
 
   /// Marks a notification as read.
   Future<void> markAsRead(String notificationId) async {
-    await _supabase
-        .from('notifications')
-        .update({'is_read': true})
-        .eq('id', notificationId);
+    await _supabase.from('notifications').update({'is_read': true}).eq('id', notificationId);
   }
 
   /// Saves a notification to the database.

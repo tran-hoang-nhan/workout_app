@@ -3,32 +3,17 @@ import '../services/api_client.dart';
 
 class ProgressUserRepository {
   final ApiClient _apiClient;
-  ProgressUserRepository({ApiClient? apiClient})
-    : _apiClient = apiClient ?? ApiClient();
+  ProgressUserRepository({ApiClient? apiClient}): _apiClient = apiClient ?? ApiClient();
 
   Future<ProgressUser?> getDailyProgress(String userId, DateTime date) async {
     return _apiClient.getDailyProgress(userId, date);
   }
 
-  Future<List<ProgressUser>> getProgressRange(
-    String userId,
-    DateTime start,
-    DateTime end,
-  ) async {
-    // Proxy or local logic
+  Future<List<ProgressUser>> getProgressRange(String userId, DateTime start, DateTime end,) async {
     return [];
   }
 
-  Future<void> updateActivityProgress({
-    required String userId,
-    required DateTime date,
-    int? addWaterMl,
-    int? addWaterGlasses,
-    int? addSteps,
-    double? addEnergy,
-    int? addDuration,
-    int? addWorkouts,
-  }) async {
+  Future<void> updateActivityProgress({required String userId, required DateTime date, int? addWaterMl, int? addWaterGlasses, int? addSteps, double? addEnergy, int? addDuration, int? addWorkouts,}) async {
     await _apiClient.updateActivityProgress(
       userId: userId,
       date: date,
@@ -41,8 +26,7 @@ class ProgressUserRepository {
     );
   }
 
-  Future<ProgressUser?> getProgress(String userId, DateTime date) =>
-      getDailyProgress(userId, date);
+  Future<ProgressUser?> getProgress(String userId, DateTime date) => getDailyProgress(userId, date);
 
   Future<void> saveDailyProgress(ProgressUser progress) async {
     await _apiClient.updateActivityProgress(

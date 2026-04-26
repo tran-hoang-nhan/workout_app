@@ -7,7 +7,6 @@ import 'widgets/progress_header.dart';
 import 'widgets/calendar_slider.dart';
 import 'widgets/stats_section.dart';
 import 'widgets/user_level_section.dart';
-import '../../widgets/loading_animation.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});

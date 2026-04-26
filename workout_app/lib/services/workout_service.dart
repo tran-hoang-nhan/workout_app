@@ -62,7 +62,6 @@ class WorkoutService {
       final workouts = await _workoutRepository.getWorkoutsByCategory(forApi);
       debugPrint('[WorkoutService] getWorkoutsByCategory returned ${workouts.length} items');
       return workouts;
-      return workouts;
     } catch (e) {
       debugPrint('[WorkoutService] Error in getWorkoutsByCategory: $e');
       return []; // Return empty list on error to keep UI stable

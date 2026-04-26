@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared/shared.dart' as shared;
-import 'package:shared/shared.dart'
-    show AppUser, SignInParams, SignUpParams, UpdateProfileParams;
+import 'package:shared/shared.dart' show AppUser, SignInParams, SignUpParams, UpdateProfileParams;
 import '../services/auth_service.dart';
 import '../repositories/auth_repository.dart';
 
@@ -22,32 +20,22 @@ final authStateProvider = StreamProvider<shared.AuthState>((ref) {
 });
 
 final currentUserIdProvider = StreamProvider<String?>((ref) async* {
-  debugPrint('[currentUserIdProvider] Initializing...');
   final authService = ref.watch(authServiceProvider);
   final initialUser = authService.currentUser?.id;
-  debugPrint('[currentUserIdProvider] Initial user: $initialUser');
   yield initialUser;
   await for (final state in authService.authStateStream) {
     final userId = state.session?.user.id;
-    debugPrint(
-      '[currentUserIdProvider] Auth Event: ${state.event}, User: $userId',
-    );
     yield userId;
   }
 });
 
 final currentUserProvider = FutureProvider<AppUser?>((ref) async {
-  debugPrint('[currentUserProvider] Initializing...');
   final userIdAsync = await ref.watch(currentUserIdProvider.future);
-  debugPrint('[currentUserProvider] Awaited currentUserIdProvider: $userIdAsync');
   if (userIdAsync == null) {
-      debugPrint('[currentUserProvider] User is null, returning null.');
-      return null;
+    return null;
   }
   final authService = ref.read(authServiceProvider);
-  debugPrint('[currentUserProvider] Fetching profile for $userIdAsync');
   final profile = await authService.getUserProfile(userIdAsync);
-  debugPrint('[currentUserProvider] Fetched profile: ${profile != null}');
   return profile;
 });
 
@@ -103,11 +91,7 @@ class AuthController extends AsyncNotifier<void> {
     return !result.hasError;
   }
 
-  Future<void> updatePassword(
-    String newPassword, {
-    String? confirmPassword,
-  }) async {
-    debugPrint('[AuthController] updatePassword starting...');
+  Future<void> updatePassword(String newPassword, { String? confirmPassword,}) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final authService = ref.read(authServiceProvider);
@@ -115,13 +99,9 @@ class AuthController extends AsyncNotifier<void> {
         newPassword,
         confirmPassword: confirmPassword,
       );
-      debugPrint('[AuthController] updatePassword completed successfully.');
     });
 
     if (state.hasError) {
-      debugPrint(
-        '[AuthController] updatePassword failed with error: ${state.error}',
-      );
     }
   }
 }

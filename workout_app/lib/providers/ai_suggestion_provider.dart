@@ -46,12 +46,7 @@ class AISuggestionNotifier extends Notifier<AISuggestionState> {
   }
 
   void init({AISuggestionHistory? historyItem}) {
-    // If we're already viewing this specific history item, don't re-init
-    // Or if we have a new chat active, don't clear unless requested.
-    // For simplicity and to fix the bug where stale state prevents history loading:
     if (historyItem == null && state.messages.isNotEmpty) return;
-
-    // Reset to initial state for a fresh view
     state = AISuggestionState.initial();
 
     if (historyItem != null) {
@@ -66,8 +61,6 @@ class AISuggestionNotifier extends Notifier<AISuggestionState> {
 
   void loadHistoryItem(AISuggestionHistory item) {
     final List<ChatMessage> historyMessages = [];
-
-    // Add initial system message and user confirmation for consistency
     historyMessages.add(ChatMessage(
       type: MessageType.ai,
       content: 'Hệ thống AI đã sẵn sàng. Trước khi bắt đầu, hãy xác nhận thông tin '
@@ -161,16 +154,14 @@ class AISuggestionNotifier extends Notifier<AISuggestionState> {
 
     try {
       final healthState = ref.read(healthFormProvider);
-      final workoutPlan = await ref
-          .read(workoutRepositoryProvider)
-          .createWorkoutSuggestion(
-            weight: healthState.weight,
-            height: healthState.height,
-            goal: healthState.goal,
-            dietType: healthState.dietType,
-            medicalConditions: healthState.medicalConditions,
-            requirement: requirement.trim().isEmpty ? null : requirement,
-          );
+      final workoutPlan = await ref.read(workoutRepositoryProvider).createWorkoutSuggestion(
+        weight: healthState.weight,
+        height: healthState.height,
+        goal: healthState.goal,
+        dietType: healthState.dietType,
+        medicalConditions: healthState.medicalConditions,
+        requirement: requirement.trim().isEmpty ? null : requirement,
+      );
 
       state = state.copyWith(currentStep: AISuggestionStep.results);
       _addSystemMessage(
@@ -189,8 +180,7 @@ class AISuggestionNotifier extends Notifier<AISuggestionState> {
       );
 
       if (workoutPlan.exercises.isNotEmpty) {
-        final exercisesText =
-            workoutPlan.exercises.map((e) => '- ${e.name}').join('\n');
+        final exercisesText = workoutPlan.exercises.map((e) => '- ${e.name}').join('\n');
         _addSystemMessage('Các bài tập bao gồm:\n$exercisesText');
       }
 
@@ -248,7 +238,6 @@ class AISuggestionNotifier extends Notifier<AISuggestionState> {
   }
 }
 
-final aiSuggestionProvider =
-    NotifierProvider<AISuggestionNotifier, AISuggestionState>(
+final aiSuggestionProvider = NotifierProvider<AISuggestionNotifier, AISuggestionState>(
   AISuggestionNotifier.new,
 );

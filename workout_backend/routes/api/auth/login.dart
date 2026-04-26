@@ -28,6 +28,6 @@ Future<Response> onRequest(RequestContext context) async {
     );
   } catch (e) {
     return Response.json(
-        statusCode: HttpStatus.unauthorized, body: {'error': e.toString()},);
+      statusCode: HttpStatus.unauthorized, body: {'error': e.toString()},);
   }
 }

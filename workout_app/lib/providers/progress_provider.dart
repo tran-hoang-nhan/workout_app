@@ -22,9 +22,7 @@ final syncDailySummaryProvider = FutureProvider<void>((ref) async {
   ref.invalidate(dailyStatsProvider(yesterday));
 });
 
-final workoutHistoryProvider = FutureProvider<List<WorkoutHistory>>((
-  ref,
-) async {
+final workoutHistoryProvider = FutureProvider<List<WorkoutHistory>>((ref,) async {
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) return [];
   final repo = ref.watch(progressRepositoryProvider);
@@ -43,20 +41,15 @@ final progressStatsProvider = FutureProvider<ProgressStats>((ref) async {
   }
   final repo = ref.watch(progressRepositoryProvider);
   final stats = await repo.getProgressStats(userId);
-  return stats ??
-      ProgressStats(
-        totalCalories: 0,
-        totalDuration: 0,
-        totalWorkouts: 0,
-        avgCaloriesPerSession: 0,
-      );
+  return stats ?? ProgressStats(
+    totalCalories: 0,
+    totalDuration: 0,
+    totalWorkouts: 0,
+    avgCaloriesPerSession: 0,
+  );
 });
 
-final dailyWorkoutStatsProvider =
-    Provider.family<AsyncValue<({double calories, int minutes})>, DateTime>((
-      ref,
-      date,
-    ) {
+final dailyWorkoutStatsProvider = Provider.family<AsyncValue<({double calories, int minutes})>, DateTime>((ref, date,) {
       final historyAsync = ref.watch(workoutHistoryProvider);
       return historyAsync.whenData((history) {
         final targetDate = DateTime(date.year, date.month, date.day);

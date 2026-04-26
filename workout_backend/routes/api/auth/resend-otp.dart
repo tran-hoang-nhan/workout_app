@@ -16,8 +16,7 @@ Future<Response> onRequest(RequestContext context) async {
   try {
     await supabase.auth.resend(
       email: email,
-      type: OtpType.values
-          .firstWhere((e) => e.name == typeStr, orElse: () => OtpType.signup),
+      type: OtpType.values.firstWhere((e) => e.name == typeStr, orElse: () => OtpType.signup),
     );
     return Response(statusCode: HttpStatus.noContent);
   } catch (e) {

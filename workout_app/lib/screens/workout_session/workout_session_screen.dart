@@ -67,7 +67,6 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      // Tự động tạm dừng khi app vào background
       if (_started && !_inCountdown && !_isPaused) {
         _togglePause(false);
       }

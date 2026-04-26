@@ -3,15 +3,13 @@ import '../services/api_client.dart';
 
 class ProgressRepository {
   final ApiClient _apiClient;
-  ProgressRepository({ApiClient? apiClient})
-    : _apiClient = apiClient ?? ApiClient();
+  ProgressRepository({ApiClient? apiClient}): _apiClient = apiClient ?? ApiClient();
 
   Future<List<WorkoutHistory>> getWorkoutHistory(String userId) async {
     return _apiClient.getWorkoutHistory(userId);
   }
 
-  Future<List<WorkoutHistory>> getProgressHistory(String userId) =>
-      getWorkoutHistory(userId);
+  Future<List<WorkoutHistory>> getProgressHistory(String userId) => getWorkoutHistory(userId);
 
   Future<void> logWorkout(WorkoutHistory history) async {
     await _apiClient.logWorkout(history);

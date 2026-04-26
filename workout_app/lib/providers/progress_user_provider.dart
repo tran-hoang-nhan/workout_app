@@ -7,10 +7,9 @@ import '../utils/app_error.dart';
 import './health_provider.dart';
 import './notification_provider.dart';
 
-final progressUserControllerProvider =
-    AsyncNotifierProvider<ProgressUserController, void>(() {
-      return ProgressUserController();
-    });
+final progressUserControllerProvider = AsyncNotifierProvider<ProgressUserController, void>(() {
+  return ProgressUserController();
+});
 
 class ProgressUserController extends AsyncNotifier<void> {
   @override
@@ -24,7 +23,6 @@ class ProgressUserController extends AsyncNotifier<void> {
       final rawNow = DateTime.now();
       final now = DateTime(rawNow.year, rawNow.month, rawNow.day);
 
-      // Correctly handle negative delta to not go below 0
       final prevProgress = await repo.getDailyProgress(userId, now);
       final currentWaterMl = prevProgress?.waterMl ?? 0;
 
@@ -49,9 +47,6 @@ class ProgressUserController extends AsyncNotifier<void> {
         if (healthData != null) {
           final prevProgress = await repo.getDailyProgress(userId, now);
           final currentWaterMl = (prevProgress?.waterMl ?? 0);
-          debugPrint(
-            "💧 Syncing reminders after manual input: newTotal=${currentWaterMl}ml",
-          );
           await healthService.syncWaterReminders(
             enabled: healthData.waterReminderEnabled,
             intervalHours: healthData.waterReminderInterval,
@@ -79,10 +74,7 @@ final progressUserRepositoryProvider = Provider<ProgressUserRepository>((ref) {
   return ProgressUserRepository();
 });
 
-final progressDailyProvider = FutureProvider.family<ProgressUser?, DateTime>((
-  ref,
-  rawDate,
-) async {
+final progressDailyProvider = FutureProvider.family<ProgressUser?, DateTime>((ref, rawDate,) async {
   final date = DateTime(rawDate.year, rawDate.month, rawDate.day);
   final userId = await ref.watch(currentUserIdProvider.future);
   if (userId == null) return null;

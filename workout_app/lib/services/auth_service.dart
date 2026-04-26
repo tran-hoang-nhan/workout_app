@@ -6,14 +6,10 @@ import '../repositories/auth_repository.dart';
 class AuthService {
   final AuthRepository _repository;
 
-  AuthService({AuthRepository? repository})
-    : _repository = repository ?? AuthRepository();
+  AuthService({AuthRepository? repository}): _repository = repository ?? AuthRepository();
 
   bool get isAuthenticated => _repository.currentUser != null;
-  Stream<shared.AuthState> get authStateStream =>
-      _repository.onAuthStateChange.map(
-        (state) => shared.AuthState(session: state.session, event: state.event),
-      );
+  Stream<shared.AuthState> get authStateStream => _repository.onAuthStateChange.map((state) => shared.AuthState(session: state.session, event: state.event),);
   AppUser? get currentUser => _repository.currentUser;
 
   Future<AppUser?> signIn(SignInParams params) async {
@@ -36,13 +32,9 @@ class AuthService {
     await _repository.signOut();
   }
 
-  Future<AppUser?> getUserProfile(String userId) =>
-      _repository.getUserProfile(userId);
+  Future<AppUser?> getUserProfile(String userId) => _repository.getUserProfile(userId);
 
-  Future<void> updateUserProfile(
-    String userId,
-    UpdateProfileParams params,
-  ) async {
+  Future<void> updateUserProfile(String userId, UpdateProfileParams params,) async {
     await _repository.updateProfile(userId, params);
   }
 
@@ -54,10 +46,7 @@ class AuthService {
     await _repository.resetPassword(email);
   }
 
-  Future<void> updatePassword(
-    String password, {
-    String? confirmPassword,
-  }) async {
+  Future<void> updatePassword(String password, { String? confirmPassword,}) async {
     await _repository.updatePassword(password);
   }
 }

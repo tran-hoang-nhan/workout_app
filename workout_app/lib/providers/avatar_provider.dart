@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../services/avatar_service.dart';
 import './auth_provider.dart';
@@ -28,49 +27,33 @@ class AvatarController extends AsyncNotifier<void> {
     );
 
     if (image == null) {
-      debugPrint('AvatarController: No image selected');
       return;
     }
 
-    debugPrint('AvatarController: Image selected: ${image.path}');
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final user = await ref.read(currentUserProvider.future);
       if (user == null) throw Exception('Chưa đăng nhập');
       final bytes = await image.readAsBytes();
-      final fileName =
-          'avatar_${DateTime.now().millisecondsSinceEpoch}_${image.name}';
-      await ref
-          .read(avatarServiceProvider)
-          .uploadAvatar(userId: user.id, bytes: bytes, fileName: fileName);
-      debugPrint(
-        'AvatarController: Upload completed, invalidating currentUserProvider',
-      );
+      final fileName = 'avatar_${DateTime.now().millisecondsSinceEpoch}_${image.name}';
+      await ref.read(avatarServiceProvider).uploadAvatar(userId: user.id, bytes: bytes, fileName: fileName);
       ref.invalidate(currentUserProvider);
     });
 
     if (state.hasError) {
-      debugPrint(
-        'AvatarController Error (pickAndUploadAvatar): ${state.error}',
-      );
     }
   }
 
   Future<void> removeAvatar() async {
-    debugPrint('AvatarController: Starting removeAvatar');
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final user = await ref.read(currentUserProvider.future);
       if (user == null) throw Exception('Chưa đăng nhập');
       await ref.read(avatarServiceProvider).removeAvatar(user.id);
-      debugPrint(
-        'AvatarController: Removal completed, invalidating currentUserProvider',
-      );
       ref.invalidate(currentUserProvider);
     });
 
     if (state.hasError) {
-      debugPrint('AvatarController Error (removeAvatar): ${state.error}');
     }
   }
 }
