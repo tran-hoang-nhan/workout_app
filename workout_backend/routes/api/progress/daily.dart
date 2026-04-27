@@ -35,8 +35,6 @@ Future<Response> onRequest(RequestContext context) async {
         date: DateTime.parse(body['date'] as String),
         addWaterMl: body['addWaterMl'] as int?,
         addWaterGlasses: body['addWaterGlasses'] as int?,
-        addSteps: body['addSteps'] as int?,
-        addEnergy: (body['addEnergy'] as num?)?.toDouble(),
         addDuration: body['addDuration'] as int?,
         addWorkouts: body['addWorkouts'] as int?,
       );

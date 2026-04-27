@@ -40,7 +40,6 @@ class DailyStats {
   final DateTime date;
   final double activeEnergyBurned;
   final int activeMinutes;
-  final int stepsCount;
   final double distanceMeters;
   final int? avgHeartRate;
   final int? minHeartRate;
@@ -54,7 +53,6 @@ class DailyStats {
     required this.date,
     this.activeEnergyBurned = 0,
     this.activeMinutes = 0,
-    this.stepsCount = 0,
     this.distanceMeters = 0,
     this.avgHeartRate,
     this.minHeartRate,
@@ -70,7 +68,6 @@ class DailyStats {
       date: DateTime.parse(json['date'] as String),
       activeEnergyBurned: (json['active_energy_burned'] as num?)?.toDouble() ?? 0,
       activeMinutes: json['active_minutes'] as int? ?? 0,
-      stepsCount: json['steps_count'] as int? ?? 0,
       distanceMeters: (json['distance_meters'] as num?)?.toDouble() ?? 0,
       avgHeartRate: json['avg_heart_rate'] as int?,
       minHeartRate: json['min_heart_rate'] as int?,
@@ -87,7 +84,6 @@ class DailyStats {
       'date': date.toIso8601String().split('T')[0],
       'active_energy_burned': activeEnergyBurned,
       'active_minutes': activeMinutes,
-      'steps_count': stepsCount,
       'distance_meters': distanceMeters,
       'avg_heart_rate': avgHeartRate,
       'min_heart_rate': minHeartRate,
@@ -148,7 +144,7 @@ class HealthData {
       injuries: List<String>.from(json['injuries'] ?? []),
       medicalConditions: List<String>.from(json['medical_conditions'] ?? []),
       allergies: List<String>.from(json['allergies'] ?? []),
-      waterIntake: json['water_intake'] as int? ?? 2000,
+      waterIntake: json['water_intake_goal'] as int? ?? 2000,
       waterReminderEnabled: json['water_reminder_enabled'] as bool? ?? false,
       waterReminderInterval: json['water_reminder_interval'] as int? ?? 2,
       wakeTime: json['wake_time'] as String?,
@@ -169,7 +165,7 @@ class HealthData {
       'injuries': injuries,
       'medical_conditions': medicalConditions,
       'allergies': allergies,
-      'water_intake': waterIntake,
+      'water_intake_goal': waterIntake,
       'water_reminder_enabled': waterReminderEnabled,
       'water_reminder_interval': waterReminderInterval,
       'wake_time': wakeTime,

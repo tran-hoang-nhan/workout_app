@@ -19,7 +19,7 @@ class NotificationService {
     final sleepHour = int.tryParse(sleepTime.split(':')[0]) ?? 23;
     final now = DateTime.now();
     final nowHour = now.hour;
-    final isActive = nowHour >= wakeHour && nowHour < sleepHour;
+    final isActive = true; // Luôn kích hoạt để demo
     if (!isActive) {
       DateTime nextWake = DateTime(now.year, now.month, now.day, wakeHour, 0);
       if (nowHour >= sleepHour) {
@@ -46,17 +46,30 @@ class NotificationService {
       return;
     }
 
-    bool created = await AwesomeNotifications().createNotification(
+    // 1. Gửi ngay 1 thông báo tức thì để kiểm tra (Background test)
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 11,
+        channelKey: waterChannelKey,
+        title: 'Kích hoạt thành công! 💧',
+        body: 'Thông báo nhắc nước đã được đặt mỗi 60 giây.',
+        notificationLayout: NotificationLayout.Default,
+        category: NotificationCategory.Reminder,
+      ),
+    );
+
+    // 2. Lập lịch định kỳ mỗi 60 giây
+    await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 10,
         channelKey: waterChannelKey,
         title: 'Thời gian uống nước! 💧',
-        body:'Đã đến lúc bổ sung nước rồi. Hãy uống một cốc nước để cơ thể khỏe mạnh nhé!',
+        body:
+            'Đã đến lúc bổ sung nước rồi. Hãy uống một cốc nước để cơ thể khỏe mạnh nhé!',
         notificationLayout: NotificationLayout.Default,
         category: NotificationCategory.Reminder,
         wakeUpScreen: true,
       ),
-
       actionButtons: [
         NotificationActionButton(
           key: 'DRANK_WATER',
@@ -64,9 +77,8 @@ class NotificationService {
           actionType: ActionType.Default,
         ),
       ],
-
       schedule: NotificationInterval(
-        interval: Duration(hours: safeInterval),
+        interval: const Duration(seconds: 60),
         timeZone: localTimeZone,
         repeats: true,
         allowWhileIdle: true,

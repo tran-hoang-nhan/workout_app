@@ -30,7 +30,8 @@ class HealthService {
     if (_notifications == null) return;
     await _notifications.cancelAllWaterReminders();
     if (!enabled) return;
-    if (goalWaterMl > 0 && currentWaterMl >= goalWaterMl) return;
+    // if (goalWaterMl > 0 && currentWaterMl >= goalWaterMl) return; // Disabled for demo
+    print("🚀 Scheduling water reminders for demo...");
     final safeInterval = intervalHours > 0 ? intervalHours : 2;
     final normalizedWakeTime = _normalizeTimeOrDefault(wakeTime, '07:00');
     final normalizedSleepTime = _normalizeTimeOrDefault(sleepTime, '23:00');

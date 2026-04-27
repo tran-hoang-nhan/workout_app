@@ -39,8 +39,9 @@ class _AddWaterDialogState extends State<AddWaterDialog> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       backgroundColor: AppColors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -156,6 +157,7 @@ class _AddWaterDialogState extends State<AddWaterDialog> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: AppColors.grey.withValues(alpha: 0.3)),
                       ),
                     ),
                     child: const Text(
@@ -191,6 +193,7 @@ class _AddWaterDialogState extends State<AddWaterDialog> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

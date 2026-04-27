@@ -9,13 +9,14 @@ class HealthRepository {
     final healthResponse = await _supabase.from('health').select().eq('user_id', userId).maybeSingle();
     if (healthResponse == null) return null;
 
-    final profileResponse = await _supabase.from('profiles').select('gender').eq('id', userId).maybeSingle();
+    final profileResponse = await _supabase.from('profiles').select('gender, goal').eq('id', userId).maybeSingle();
 
     final healthMap = Map<String, dynamic>.from(healthResponse as Map);
     final profileMap = profileResponse == null ? null : Map<String, dynamic>.from(profileResponse as Map);
 
     healthMap['user_id'] = userId;
     healthMap['gender'] = profileMap?['gender'] ?? healthMap['gender'];
+    healthMap['goal'] = profileMap?['goal'] ?? healthMap['goal'];
 
     return HealthData.fromJson(healthMap);
   }
@@ -63,7 +64,11 @@ class HealthRepository {
           'p_sleep_time': params.sleepTime,
         },
       );
-      await _supabase.from('health').upsert(params.toJson(), onConflict: 'user_id');
+      final healthJson = params.toJson();
+      healthJson.remove('gender');
+      healthJson.remove('goal');
+
+      await _supabase.from('health').upsert(healthJson, onConflict: 'user_id');
       await _supabase.from('profiles').update({'gender': params.gender,'goal': params.goal,}).eq('id', params.userId);
     } catch (e) {
       rethrow;

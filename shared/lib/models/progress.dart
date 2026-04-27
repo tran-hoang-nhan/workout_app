@@ -5,7 +5,6 @@ class ProgressUser {
   final int workoutsCompleted;
   final int totalDurationSeconds;
   final double totalCaloriesBurned;
-  final int steps;
   final int waterGlasses;
   final int waterMl;
 
@@ -16,7 +15,6 @@ class ProgressUser {
     this.workoutsCompleted = 0,
     this.totalDurationSeconds = 0,
     this.totalCaloriesBurned = 0.0,
-    this.steps = 0,
     this.waterGlasses = 0,
     this.waterMl = 0,
   });
@@ -28,7 +26,6 @@ class ProgressUser {
     int? workoutsCompleted,
     int? totalDurationSeconds,
     double? totalCaloriesBurned,
-    int? steps,
     int? waterGlasses,
     int? waterMl,
   }) {
@@ -39,7 +36,6 @@ class ProgressUser {
       workoutsCompleted: workoutsCompleted ?? this.workoutsCompleted,
       totalDurationSeconds: totalDurationSeconds ?? this.totalDurationSeconds,
       totalCaloriesBurned: totalCaloriesBurned ?? this.totalCaloriesBurned,
-      steps: steps ?? this.steps,
       waterGlasses: waterGlasses ?? this.waterGlasses,
       waterMl: waterMl ?? this.waterMl,
     );
@@ -53,7 +49,6 @@ class ProgressUser {
       workoutsCompleted: json['workouts_completed'] as int? ?? 0,
       totalDurationSeconds: json['total_duration_seconds'] as int? ?? 0,
       totalCaloriesBurned: (json['total_calories_burned'] as num?)?.toDouble() ?? 0.0,
-      steps: json['steps'] as int? ?? 0,
       waterGlasses: json['water_glasses'] as int? ?? 0,
       waterMl: json['water_ml'] as int? ?? 0,
     );
@@ -67,7 +62,6 @@ class ProgressUser {
       'workouts_completed': workoutsCompleted,
       'total_duration_seconds': totalDurationSeconds,
       'total_calories_burned': totalCaloriesBurned,
-      'steps': steps,
       'water_glasses': waterGlasses,
       'water_ml': waterMl,
     };

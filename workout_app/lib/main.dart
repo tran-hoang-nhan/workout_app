@@ -160,10 +160,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     ref.read(currentDateProvider.notifier).updateDate();
 
     AwesomeNotifications().setListeners(
-      onActionReceivedMethod: (receivedAction) {
-        if (!mounted) return Future.value();
-        return NotificationController.onActionReceivedMethod(receivedAction);
-      },
+      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
       onNotificationCreatedMethod:
           NotificationController.onNotificationCreatedMethod,
       onNotificationDisplayedMethod:

@@ -13,13 +13,12 @@ class ProgressUserRepository {
     return [];
   }
 
-  Future<void> updateActivityProgress({required String userId, required DateTime date, int? addWaterMl, int? addWaterGlasses, int? addSteps, double? addEnergy, int? addDuration, int? addWorkouts,}) async {
+  Future<void> updateActivityProgress({required String userId, required DateTime date, int? addWaterMl, int? addWaterGlasses, double? addEnergy, int? addDuration, int? addWorkouts,}) async {
     await _apiClient.updateActivityProgress(
       userId: userId,
       date: date,
       addWaterMl: addWaterMl,
       addWaterGlasses: addWaterGlasses,
-      addSteps: addSteps,
       addEnergy: addEnergy,
       addDuration: addDuration,
       addWorkouts: addWorkouts,
@@ -33,7 +32,6 @@ class ProgressUserRepository {
       userId: progress.userId,
       date: progress.date,
       addWaterMl: progress.waterMl,
-      addSteps: progress.steps,
       addWorkouts: progress.workoutsCompleted,
       addDuration: progress.totalDurationSeconds,
       addEnergy: progress.totalCaloriesBurned,
