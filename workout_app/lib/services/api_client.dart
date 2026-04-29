@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared/shared.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 class ApiClient {
   String get _baseUrl {
     if (kIsWeb) return 'http://localhost:8080/api';

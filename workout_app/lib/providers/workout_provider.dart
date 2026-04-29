@@ -1,5 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared/shared.dart';
+import './auth_provider.dart';
+import './daily_stats_provider.dart';
+import './progress_user_provider.dart';
+import '../utils/logger.dart';
 import '../repositories/workout_repository.dart';
 import '../services/workout_service.dart';
 
@@ -41,3 +45,40 @@ final workoutsByCategoryProvider = FutureProvider.family<List<Workout>, String>(
     return await service.getWorkoutsByCategory(category);
   },
 );
+
+final workoutSessionControllerProvider = Provider<WorkoutSessionController>((ref) {
+  return WorkoutSessionController(ref);
+});
+
+class WorkoutSessionController {
+  final Ref _ref;
+  WorkoutSessionController(this._ref);
+
+  Future<void> logWorkoutCompletion({
+    required Workout workout,
+    required double calories,
+    required int durationSeconds,
+  }) async {
+    try {
+      final userId = await _ref.read(currentUserIdProvider.future);
+      if (userId == null) return;
+
+      final history = WorkoutHistory(
+        userId: userId,
+        workoutId: workout.id != 0 ? workout.id : null,
+        workoutTitleSnapshot: workout.title,
+        totalCaloriesBurned: calories,
+        durationSeconds: durationSeconds,
+        completedAt: DateTime.now(),
+      );
+
+      await _ref.read(workoutServiceProvider).logWorkout(history);
+
+      final now = DateTime.now();
+      _ref.invalidate(progressDailyProvider(now));
+      _ref.invalidate(dailyStatsProvider(now));
+    } catch (e) {
+      logger.e('[WorkoutSession] Error logging workout: $e');
+    }
+  }
+}

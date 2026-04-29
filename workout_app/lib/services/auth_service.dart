@@ -1,11 +1,9 @@
 import 'package:shared/shared.dart' as shared;
-import 'package:shared/shared.dart'
-    show AppUser, SignInParams, SignUpParams, UpdateProfileParams;
+import 'package:shared/shared.dart' show AppUser, SignInParams, SignUpParams, UpdateProfileParams;
 import '../repositories/auth_repository.dart';
 
 class AuthService {
   final AuthRepository _repository;
-
   AuthService({AuthRepository? repository}): _repository = repository ?? AuthRepository();
 
   bool get isAuthenticated => _repository.currentUser != null;
@@ -32,7 +30,8 @@ class AuthService {
     await _repository.signOut();
   }
 
-  Future<AppUser?> getUserProfile(String userId) => _repository.getUserProfile(userId);
+  Future<AppUser?> getUserProfile(String userId) => 
+    _repository.getUserProfile(userId);
 
   Future<void> updateUserProfile(String userId, UpdateProfileParams params,) async {
     await _repository.updateProfile(userId, params);

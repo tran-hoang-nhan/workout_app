@@ -4,11 +4,13 @@ import '../../../constants/app_constants.dart';
 class ChatInput extends StatelessWidget {
   final TextEditingController controller;
   final Function(String) onSubmitted;
+  final bool isEnabled;
 
   const ChatInput({
     super.key,
     required this.controller,
     required this.onSubmitted,
+    this.isEnabled = true,
   });
 
   @override
@@ -37,7 +39,8 @@ class ChatInput extends StatelessWidget {
                 ),
                 child: TextField(
                   controller: controller,
-                  onSubmitted: onSubmitted,
+                  enabled: isEnabled,
+                  onSubmitted: isEnabled ? onSubmitted : null,
                   decoration: const InputDecoration(
                     hintText: 'Hỏi thêm điều gì đó...',
                     border: InputBorder.none,
@@ -48,13 +51,13 @@ class ChatInput extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFFF7F00),
+              decoration: BoxDecoration(
+                color: isEnabled ? const Color(0xFFFF7F00) : Colors.grey,
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 icon: const Icon(Icons.send, color: Colors.white, size: 20),
-                onPressed: () => onSubmitted(controller.text),
+                onPressed: isEnabled ? () => onSubmitted(controller.text) : null,
               ),
             ),
           ],

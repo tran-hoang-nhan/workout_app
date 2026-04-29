@@ -11,7 +11,7 @@ class NotificationService {
     }
   }
 
-  Future<void> scheduleWaterReminder({required int intervalHours, String wakeTime = '07:00', String sleepTime = '23:00',}) async {
+  Future<void> scheduleWaterReminder({required int intervalHours, String wakeTime = '07:00', String sleepTime = '23:00', bool isActive = true,}) async {
     String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
     final safeInterval = intervalHours > 0 ? intervalHours : 2;
     await AwesomeNotifications().cancel(10);
@@ -19,7 +19,7 @@ class NotificationService {
     final sleepHour = int.tryParse(sleepTime.split(':')[0]) ?? 23;
     final now = DateTime.now();
     final nowHour = now.hour;
-    final isActive = true; // Luôn kích hoạt để demo
+
     if (!isActive) {
       DateTime nextWake = DateTime(now.year, now.month, now.day, wakeHour, 0);
       if (nowHour >= sleepHour) {
@@ -52,20 +52,19 @@ class NotificationService {
         id: 11,
         channelKey: waterChannelKey,
         title: 'Kích hoạt thành công! 💧',
-        body: 'Thông báo nhắc nước đã được đặt mỗi 60 giây.',
+        body: 'Thông báo nhắc nước đã được đặt mỗi $safeInterval phút.',
         notificationLayout: NotificationLayout.Default,
         category: NotificationCategory.Reminder,
       ),
     );
 
-    // 2. Lập lịch định kỳ mỗi 60 giây
+    // 2. Lập lịch định kỳ theo khoảng thời gian demo
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 10,
         channelKey: waterChannelKey,
         title: 'Thời gian uống nước! 💧',
-        body:
-            'Đã đến lúc bổ sung nước rồi. Hãy uống một cốc nước để cơ thể khỏe mạnh nhé!',
+        body: 'Đã đến lúc bổ sung nước rồi. Hãy uống một cốc nước để cơ thể khỏe mạnh nhé!',
         notificationLayout: NotificationLayout.Default,
         category: NotificationCategory.Reminder,
         wakeUpScreen: true,
@@ -78,22 +77,10 @@ class NotificationService {
         ),
       ],
       schedule: NotificationInterval(
-        interval: const Duration(seconds: 60),
+        interval: Duration(minutes: safeInterval),
         timeZone: localTimeZone,
         repeats: true,
         allowWhileIdle: true,
-      ),
-    );
-  }
-
-  Future<void> sendTestNotification() async {
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: 11,
-        channelKey: waterChannelKey,
-        title: 'Test Notification',
-        body: 'This is a test notification to verify the channel.',
-        notificationLayout: NotificationLayout.Default,
       ),
     );
   }

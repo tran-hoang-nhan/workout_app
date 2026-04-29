@@ -155,8 +155,7 @@ class WorkoutRepository {
 
   /// Searching workout
   Future<List<Workout>> searchWorkouts(String query) async {
-    final response = await _supabase
-        .from('workouts')
+    final response = await _supabase.from('workouts')
         .select()
         .or('title.ilike.*$query*,description.ilike.*$query*')
         .order('id', ascending: true);
@@ -237,14 +236,12 @@ class WorkoutRepository {
     for (final w in workouts) {
       bool matched = false;
       if (textMatches(w.title, w.description, titleKeywords)) {
-        print('DEBUG: [WorkoutRepository] Workout "${w.title}" (id: ${w.id}) matched by TITLE');
         matched = true;
       } else {
         final eids = workoutToExerciseIds[w.id] ?? const <int>[];
         for (final eid in eids) {
           final mg = idToMuscle[eid] ?? '';
           if (muscleMatches(mg, muscleKeywords)) {
-            print('DEBUG: [WorkoutRepository] Workout "${w.title}" (id: ${w.id}) matched by EXERCISE muscle_group: "$mg"');
             matched = true;
             break;
           }
@@ -253,7 +250,6 @@ class WorkoutRepository {
       if (matched) out.add(w);
     }
 
-    print('DEBUG: [WorkoutRepository] Final matched count: ${out.length}');
     out.sort((a, b) => a.id.compareTo(b.id));
     return out;
   }

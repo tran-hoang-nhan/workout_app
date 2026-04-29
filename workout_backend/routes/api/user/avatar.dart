@@ -26,10 +26,8 @@ Future<Response> onRequest(RequestContext context) async {
 
         // 1. Upload to storage (upsert)
         await supabase.storage.from('avatars').uploadBinary(
-              path,
-            Uint8List.fromList(bytes),
-              fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
-            );
+          path, Uint8List.fromList(bytes),
+          fileOptions: const FileOptions(cacheControl: '3600', upsert: true),);
 
         // 2. Get public URL
         final publicUrl = supabase.storage.from('avatars').getPublicUrl(path);
@@ -42,9 +40,7 @@ Future<Response> onRequest(RequestContext context) async {
 
         return Response.json(body: {'avatar_url': publicUrl});
       } else {
-        // Fallback to JSON update (current behavior)
-        final body =
-            Map<String, dynamic>.from(await context.request.json() as Map);
+        final body = Map<String, dynamic>.from(await context.request.json() as Map);
         final userId = body['user_id'] as String;
         final avatarUrl = body['avatar_url'] as String?;
 

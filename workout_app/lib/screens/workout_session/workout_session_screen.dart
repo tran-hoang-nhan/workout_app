@@ -9,10 +9,8 @@ import 'package:workout_app/screens/workout_session/widgets/workout_preparation_
 import 'package:workout_app/screens/workout_session/widgets/exit_workout_dialog.dart';
 import 'package:workout_app/constants/app_constants.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import '../../providers/auth_provider.dart';
 import '../../providers/workout_provider.dart';
-import '../../providers/progress_user_provider.dart';
-import '../../providers/daily_stats_provider.dart';
+import '../../utils/workout_session_utils.dart';
 
 class WorkoutSessionScreen extends ConsumerStatefulWidget {
   final Workout workout;
@@ -75,6 +73,15 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
 
   WorkoutItem get _currentItem => widget.items[_currentIndex];
 
+  double get _currentCalories => WorkoutSessionUtils.calculateCalories(
+        inRest: _inRest,
+        currentIndex: _currentIndex,
+        exercises: widget.exercises,
+        accumulatedCalories: _accumulatedCalories,
+        lastStepStartTime: _lastStepStartTime,
+        inCountdown: _inCountdown,
+      );
+
   void _startPreparation() {
     setState(() {
       _inCountdown = true;
@@ -128,7 +135,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
       }
     } else {
       // Trước khi hoàn thành, cộng nốt calo cuối cùng
-      _accumulatedCalories = _caloriesBurnedSoFar();
+      _accumulatedCalories = _currentCalories;
       _showCompletion();
     }
   }
@@ -173,7 +180,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
     if (_isPaused) {
       _timer?.cancel();
       _sessionStopwatch.stop();
-      _accumulatedCalories = _caloriesBurnedSoFar();
+      _accumulatedCalories = _currentCalories;
       _targetEndTime = null;
       _lastStepStartTime = null;
     } else {
@@ -187,7 +194,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
   }
 
   void _handleTimerFinished() {
-    _accumulatedCalories = _caloriesBurnedSoFar();
+    _accumulatedCalories = _currentCalories;
     _lastStepStartTime = DateTime.now();
 
     final isLast = _currentIndex >= widget.items.length - 1;
@@ -202,7 +209,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
     HapticFeedback.lightImpact();
     _timer?.cancel();
     
-    _accumulatedCalories = _caloriesBurnedSoFar();
+    _accumulatedCalories = _currentCalories;
     _lastStepStartTime = DateTime.now();
 
     if (_inRest) {
@@ -222,30 +229,13 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
 
   Future<void> _showCompletion() async {
     final actualSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
-    final calories = _caloriesBurnedSoFar();
+    final calories = _currentCalories;
     
-    // Log workout completion to backend
-    try {
-      final authService = ref.read(authServiceProvider);
-      final userId = authService.currentUser?.id;
-      if (userId != null) {
-        final history = WorkoutHistory(
-          userId: userId,
-          workoutId: widget.workout.id != 0 ? widget.workout.id : null,
-          workoutTitleSnapshot: widget.workout.title,
-          totalCaloriesBurned: calories,
+    await ref.read(workoutSessionControllerProvider).logWorkoutCompletion(
+          workout: widget.workout,
+          calories: calories,
           durationSeconds: actualSeconds,
-          completedAt: DateTime.now(),
         );
-        await ref.read(workoutServiceProvider).logWorkout(history);
-        
-        // Invalidate progress providers to refresh UI
-        final now = DateTime.now();
-        ref.invalidate(progressDailyProvider(now));
-        ref.invalidate(dailyStatsProvider(now));
-      }
-    } catch (e) {
-    }
 
     HapticFeedback.mediumImpact();
 
@@ -259,26 +249,6 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
     );
   }
 
-  /// Tính Calo dựa trên caloriesPerMinute của từng bài tập hoặc mặc định 7.0.
-  double _caloriesBurnedSoFar() {
-    double currentRate = 7.0; // Default
-    if (_inRest) {
-      currentRate = 3.0; // Rest burns less
-    } else if (_currentIndex < widget.exercises.length) {
-      currentRate = widget.exercises[_currentIndex].caloriesPerMinute ?? 7.0;
-    }
-
-    double currentStepCalories = 0;
-    if (_lastStepStartTime != null && !_inCountdown) {
-      final now = DateTime.now();
-      final ms = now.difference(_lastStepStartTime!).inMilliseconds;
-      if (ms > 0) {
-        currentStepCalories = (ms / 60000.0) * currentRate;
-      }
-    }
-
-    return _accumulatedCalories + currentStepCalories;
-  }
 
   Future<void> _handleExit() async {
     final hadPausedBefore = _isPaused;
@@ -291,7 +261,7 @@ class _WorkoutSessionScreenState extends ConsumerState<WorkoutSessionScreen> wit
     }
 
     final elapsedSeconds = (_sessionStopwatch.elapsedMilliseconds / 1000).floor();
-    final calories = _caloriesBurnedSoFar();
+    final calories = _currentCalories;
 
     final shouldExit = await showExitWorkoutDialog(
       context,

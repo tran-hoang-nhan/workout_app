@@ -27,10 +27,19 @@ class AISuggestionsScreen extends ConsumerStatefulWidget {
 class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _chatController = TextEditingController();
+  late final ProviderSubscription<AISuggestionState> _aiListener;
 
   @override
   void initState() {
     super.initState();
+    _aiListener = ref.listenManual<AISuggestionState>(
+      aiSuggestionProvider,
+      (prev, next) {
+      if (prev?.messages.length != next.messages.length) {
+        _scrollToBottom();
+      }
+      },
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(aiSuggestionProvider.notifier).init(historyItem: widget.historyItem);
     });
@@ -38,6 +47,8 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
 
   @override
   void dispose() {
+    _aiListener.close();
+    _scrollController.dispose();
     _chatController.dispose();
     super.dispose();
   }
@@ -125,13 +136,6 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
           final aiState = ref.watch(aiSuggestionProvider);
           final notifier = ref.read(aiSuggestionProvider.notifier);
 
-          // Scroll to bottom when messages change
-          ref.listen<AISuggestionState>(aiSuggestionProvider, (prev, next) {
-            if (prev?.messages.length != next.messages.length) {
-              _scrollToBottom();
-            }
-          });
-
           return Column(
             children: [
               Expanded(
@@ -158,6 +162,7 @@ class _AISuggestionsScreenState extends ConsumerState<AISuggestionsScreen> {
                   aiState.currentStep == AISuggestionStep.results)
                 ChatInput(
                   controller: _chatController,
+                  isEnabled: aiState.currentStep != AISuggestionStep.generating,
                   onSubmitted: (val) {
                     _chatController.clear();
                     notifier.handleRequirementSubmit(val);

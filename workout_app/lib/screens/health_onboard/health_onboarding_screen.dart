@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../providers/auth_provider.dart';
 import '../../constants/app_constants.dart';
 import '../../providers/health_provider.dart';
 import 'widgets/index.dart';
@@ -18,26 +18,44 @@ class _HealthOnboardingScreenState extends ConsumerState<HealthOnboardingScreen>
   int currentStep = 1;
   final totalSteps = 4;
 
-  // Step 1: Basic Info
+  late final TextEditingController _injuriesController;
+  late final TextEditingController _medicalConditionsController;
+  late final TextEditingController _allergiesController;
+
   int age = 25;
   double weight = 65;
   double height = 170;
   String gender = 'male';
 
-  // Step 2: Activity & Goals
   String activityLevel = 'Trung bình';
   String goal = 'Duy trì';
 
-  // Step 3: Lifestyle
   String dietType = 'normal';
   int waterIntake = 2000;
 
-  // Step 4: Health Conditions (simple text input)
   String injuries = '';
   String medicalConditions = '';
   String allergies = '';
 
   bool isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _injuriesController = TextEditingController(text: injuries);
+    _medicalConditionsController = TextEditingController(
+      text: medicalConditions,
+    );
+    _allergiesController = TextEditingController(text: allergies);
+  }
+
+  @override
+  void dispose() {
+    _injuriesController.dispose();
+    _medicalConditionsController.dispose();
+    _allergiesController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -217,7 +235,6 @@ class _HealthOnboardingScreenState extends ConsumerState<HealthOnboardingScreen>
           onChanged: (val) => setState(() => dietType = val ?? dietType),
         ),
         const SizedBox(height: AppSpacing.lg),
-        const SizedBox(height: AppSpacing.lg),
         SliderFieldWidget(
           label: 'Mục tiêu uống nước (ml/ngày)',
           value: waterIntake.toDouble(),
@@ -257,22 +274,22 @@ class _HealthOnboardingScreenState extends ConsumerState<HealthOnboardingScreen>
         const SizedBox(height: AppSpacing.lg),
         _buildTextField(
           label: 'Chấn thương hiện tại',
-          value: injuries,
-          onChanged: (val) => setState(() => injuries = val),
+          controller: _injuriesController,
+          onChanged: (val) => injuries = val,
           placeholder: 'VD: Đau đầu gối trái',
         ),
         const SizedBox(height: AppSpacing.lg),
         _buildTextField(
           label: 'Tình trạng sức khỏe',
-          value: medicalConditions,
-          onChanged: (val) => setState(() => medicalConditions = val),
+          controller: _medicalConditionsController,
+          onChanged: (val) => medicalConditions = val,
           placeholder: 'VD: Hen suyễn, tiểu đường',
         ),
         const SizedBox(height: AppSpacing.lg),
         _buildTextField(
           label: 'Dị ứng thực phẩm',
-          value: allergies,
-          onChanged: (val) => setState(() => allergies = val),
+          controller: _allergiesController,
+          onChanged: (val) => allergies = val,
           placeholder: 'VD: Đậu phộng, hải sản',
         ),
       ],
@@ -281,7 +298,7 @@ class _HealthOnboardingScreenState extends ConsumerState<HealthOnboardingScreen>
 
   Widget _buildTextField({
     required String label,
-    required String value,
+    required TextEditingController controller,
     required Function(String) onChanged,
     required String placeholder,
   }) {
@@ -311,8 +328,7 @@ class _HealthOnboardingScreenState extends ConsumerState<HealthOnboardingScreen>
             ],
           ),
           child: TextField(
-            controller: TextEditingController(text: value)
-              ..selection = TextSelection.collapsed(offset: value.length),
+            controller: controller,
             onChanged: onChanged,
             style: const TextStyle(color: AppColors.black),
             maxLines: 2,
@@ -337,7 +353,7 @@ class _HealthOnboardingScreenState extends ConsumerState<HealthOnboardingScreen>
   Future<void> _handleComplete() async {
     setState(() => isSaving = true);
     try {
-      final userId = Supabase.instance.client.auth.currentUser?.id;
+      final userId = await ref.read(currentUserIdProvider.future);
       if (userId == null) return;
       await ref
           .read(healthFormProvider.notifier)

@@ -5,7 +5,6 @@ import '../providers/profile_provider.dart';
 import '../providers/health_provider.dart';
 import '../repositories/profile_repository.dart';
 import '../utils/app_error.dart';
-
 class ProfileService {
   final Ref _ref;
   final ProfileRepository _profileRepo;

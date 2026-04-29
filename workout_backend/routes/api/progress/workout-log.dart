@@ -21,7 +21,6 @@ Future<Response> onRequest(RequestContext context) async {
     await repository.logWorkout(history);
     historyLogged = true;
   } catch (e) {
-    // Log history failure but don't stop progress update
     print('[WorkoutLog] Failed to log detailed workout history: $e');
   }
   
@@ -37,7 +36,6 @@ Future<Response> onRequest(RequestContext context) async {
     
     return Response(statusCode: HttpStatus.noContent);
   } catch (e) {
-    print('[WorkoutLog] Failed to update daily progress: $e');
     // If progress update fails, return error only if history also failed
     if (!historyLogged) {
       return Response.json(

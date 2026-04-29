@@ -8,8 +8,6 @@ import 'package:shared/shared.dart';
 
 enum ChartType { weight, bmi }
 
-enum TimeRange { days7, days30, all }
-
 class WeightProgressChart extends StatefulWidget {
   const WeightProgressChart({super.key});
 
@@ -19,7 +17,7 @@ class WeightProgressChart extends StatefulWidget {
 
 class _WeightProgressChartState extends State<WeightProgressChart> {
   ChartType _selectedChart = ChartType.weight;
-  TimeRange _selectedRange = TimeRange.days7;
+  WeightHistoryRange _selectedRange = WeightHistoryRange.days7;
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +60,13 @@ class _WeightProgressChartState extends State<WeightProgressChart> {
             height: 200,
             child: Consumer(
               builder: (context, ref, child) {
-                final historyAsync = ref.watch(weightHistoryProvider);
+                final historyAsync = ref.watch(
+                  filteredWeightHistoryProvider(_selectedRange),
+                );
 
                 return historyAsync.when(
                   data: (history) {
-                    final filteredData = _filterData(history);
-                    if (filteredData.isEmpty) {
+                    if (history.isEmpty) {
                       return const Center(
                         child: Text(
                           'Chưa có dữ liệu thông số',
@@ -75,7 +74,7 @@ class _WeightProgressChartState extends State<WeightProgressChart> {
                         ),
                       );
                     }
-                    return _buildLineChart(filteredData);
+                    return _buildLineChart(history);
                   },
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
@@ -139,16 +138,16 @@ class _WeightProgressChartState extends State<WeightProgressChart> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildRangeChip('7 ngày', TimeRange.days7),
+        _buildRangeChip('7 ngày', WeightHistoryRange.days7),
         const SizedBox(width: 8),
-        _buildRangeChip('30 ngày', TimeRange.days30),
+        _buildRangeChip('30 ngày', WeightHistoryRange.days30),
         const SizedBox(width: 8),
-        _buildRangeChip('Tất cả', TimeRange.all),
+        _buildRangeChip('Tất cả', WeightHistoryRange.all),
       ],
     );
   }
 
-  Widget _buildRangeChip(String label, TimeRange range) {
+  Widget _buildRangeChip(String label, WeightHistoryRange range) {
     final isSelected = _selectedRange == range;
     return GestureDetector(
       onTap: () => setState(() => _selectedRange = range),
@@ -173,27 +172,6 @@ class _WeightProgressChartState extends State<WeightProgressChart> {
         ),
       ),
     );
-  }
-
-  List<BodyMetric> _filterData(List<BodyMetric> data) {
-    if (data.isEmpty) return [];
-
-    final sortedData = data.toList()
-      ..sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
-
-    final now = DateTime.now();
-    switch (_selectedRange) {
-      case TimeRange.days7:
-        return sortedData
-            .where((m) => now.difference(m.recordedAt).inDays <= 7)
-            .toList();
-      case TimeRange.days30:
-        return sortedData
-            .where((m) => now.difference(m.recordedAt).inDays <= 30)
-            .toList();
-      case TimeRange.all:
-        return sortedData;
-    }
   }
 
   Widget _buildLineChart(List<BodyMetric> data) {

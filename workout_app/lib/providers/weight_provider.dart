@@ -5,6 +5,8 @@ import '../repositories/weight_repository.dart';
 import '../services/weight_service.dart';
 import './auth_provider.dart';
 
+enum WeightHistoryRange { days7, days30, all }
+
 final weightRepositoryProvider = Provider<WeightRepository>((ref) {
   return WeightRepository();
 });
@@ -19,6 +21,11 @@ final weightHistoryProvider = FutureProvider.autoDispose<List<BodyMetric>>((ref,
   if (userId == null) return [];
   final service = ref.watch(weightServiceProvider);
   return service.loadHistory(userId);
+});
+
+final filteredWeightHistoryProvider = Provider.family<AsyncValue<List<BodyMetric>>, WeightHistoryRange>((ref, range) {
+  final historyAsync = ref.watch(weightHistoryProvider);
+  return historyAsync.whenData((history) => _filterHistory(history, range));
 });
 
 final userHeightProvider = FutureProvider.autoDispose<double>((ref) async {
@@ -72,6 +79,26 @@ class WeightData {
     required this.height,
     required this.weightHistory,
   });
+}
+
+List<BodyMetric> _filterHistory(List<BodyMetric> data, WeightHistoryRange range) {
+  if (data.isEmpty) return [];
+
+  final sortedData = data.toList()..sort((a, b) => a.recordedAt.compareTo(b.recordedAt));
+
+  final now = DateTime.now();
+  switch (range) {
+    case WeightHistoryRange.days7:
+      return sortedData
+          .where((m) => now.difference(m.recordedAt).inDays <= 7)
+          .toList();
+    case WeightHistoryRange.days30:
+      return sortedData
+          .where((m) => now.difference(m.recordedAt).inDays <= 30)
+          .toList();
+    case WeightHistoryRange.all:
+      return sortedData;
+  }
 }
 
 class WeightController extends AsyncNotifier<void> {

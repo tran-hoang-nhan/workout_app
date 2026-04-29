@@ -16,7 +16,21 @@ class ProgressRepository {
   }
 
   Future<void> syncDailySummary(String userId, DateTime date) async {
-    // Implement or proxy
+    final targetDate = DateTime(date.year, date.month, date.day);
+    final progress = await _apiClient.getDailyProgress(userId, targetDate);
+    final totalCalories = progress?.totalCaloriesBurned ?? 0.0;
+    final durationSeconds = progress?.totalDurationSeconds ?? 0;
+    final activeMinutes = (durationSeconds / 60).round();
+
+    final stats = DailyStats(
+      userId: userId,
+      date: targetDate,
+      activeEnergyBurned: totalCalories,
+      activeMinutes: activeMinutes,
+      distanceMeters: 0,
+    );
+
+    await _apiClient.saveDailyStats(stats);
   }
 
   Future<ProgressStats?> getProgressStats(String userId) async {
