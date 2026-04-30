@@ -27,7 +27,6 @@ class ProgressRepository {
       date: targetDate,
       activeEnergyBurned: totalCalories,
       activeMinutes: activeMinutes,
-      distanceMeters: 0,
     );
 
     await _apiClient.saveDailyStats(stats);

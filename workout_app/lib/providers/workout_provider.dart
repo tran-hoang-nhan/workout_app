@@ -3,6 +3,8 @@ import 'package:shared/shared.dart';
 import './auth_provider.dart';
 import './daily_stats_provider.dart';
 import './progress_user_provider.dart';
+import './progress_provider.dart';
+import './health_provider.dart';
 import '../utils/logger.dart';
 import '../repositories/workout_repository.dart';
 import '../services/workout_service.dart';
@@ -75,8 +77,15 @@ class WorkoutSessionController {
       await _ref.read(workoutServiceProvider).logWorkout(history);
 
       final now = DateTime.now();
+      
       _ref.invalidate(progressDailyProvider(now));
       _ref.invalidate(dailyStatsProvider(now));
+      _ref.invalidate(workoutHistoryProvider);
+      _ref.invalidate(progressStatsProvider);
+      _ref.invalidate(progressWeeklyProvider);
+      _ref.invalidate(weeklyStatsProvider);
+      _ref.invalidate(healthDataProvider);
+      _ref.invalidate(aiSuggestionHistoryProvider);
     } catch (e) {
       logger.e('[WorkoutSession] Error logging workout: $e');
     }

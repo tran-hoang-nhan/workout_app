@@ -8,7 +8,7 @@ import 'widgets/health_header.dart';
 import 'widgets/health_alerts.dart';
 import 'widgets/input_section.dart';
 import 'widgets/bmi_card.dart';
-import 'widgets/heart_rate_card.dart';
+
 import 'widgets/water_card.dart';
 import 'widgets/water_intake_card.dart';
 import 'widgets/calorie_goals.dart';
@@ -112,7 +112,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               BMICard(calculations: calculations),
               const SizedBox(height: AppSpacing.md),
 
-              // Steps & Water Row
+              // Water Card section
               healthDataAsync.when(
                 loading: () => SizedBox(
                   height: cardHeight,
@@ -138,19 +138,10 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                     ),
                   ),
                 ),
-                data: (_) => Row(
-                  children: [
-                    HeartRateCard(
-                      calculations: calculations,
-                      height: cardHeight,
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    WaterCard(
-                      currentMl: currentMl,
-                      goalMl: formState.waterIntake,
-                      height: cardHeight,
-                    ),
-                  ],
+                data: (_) => WaterCard(
+                  currentMl: currentMl,
+                  goalMl: formState.waterIntake,
+                  height: cardHeight,
                 ),
               ),
               const SizedBox(height: AppSpacing.md),

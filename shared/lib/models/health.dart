@@ -40,12 +40,6 @@ class DailyStats {
   final DateTime date;
   final double activeEnergyBurned;
   final int activeMinutes;
-  final double distanceMeters;
-  final int? avgHeartRate;
-  final int? minHeartRate;
-  final int? maxHeartRate;
-  final int? restingHeartRate;
-  final Map<String, dynamic>? heartRateZones;
 
   DailyStats({
     this.id,
@@ -53,12 +47,6 @@ class DailyStats {
     required this.date,
     this.activeEnergyBurned = 0,
     this.activeMinutes = 0,
-    this.distanceMeters = 0,
-    this.avgHeartRate,
-    this.minHeartRate,
-    this.maxHeartRate,
-    this.restingHeartRate,
-    this.heartRateZones,
   });
 
   factory DailyStats.fromJson(Map<String, dynamic> json) {
@@ -68,12 +56,6 @@ class DailyStats {
       date: DateTime.parse(json['date'] as String),
       activeEnergyBurned: (json['active_energy_burned'] as num?)?.toDouble() ?? 0,
       activeMinutes: json['active_minutes'] as int? ?? 0,
-      distanceMeters: (json['distance_meters'] as num?)?.toDouble() ?? 0,
-      avgHeartRate: json['avg_heart_rate'] as int?,
-      minHeartRate: json['min_heart_rate'] as int?,
-      maxHeartRate: json['max_heart_rate'] as int?,
-      restingHeartRate: json['resting_heart_rate'] as int?,
-      heartRateZones: json['heart_rate_zones'] as Map<String, dynamic>?,
     );
   }
 
@@ -84,12 +66,6 @@ class DailyStats {
       'date': date.toIso8601String().split('T')[0],
       'active_energy_burned': activeEnergyBurned,
       'active_minutes': activeMinutes,
-      'distance_meters': distanceMeters,
-      'avg_heart_rate': avgHeartRate,
-      'min_heart_rate': minHeartRate,
-      'max_heart_rate': maxHeartRate,
-      'resting_heart_rate': restingHeartRate,
-      'heart_rate_zones': heartRateZones,
     };
   }
 }
@@ -180,11 +156,6 @@ class HealthCalculations {
   final double bmr;
   final double tdee;
   final int maxHeartRate;
-  final ({int min, int max}) zone1;
-  final ({int min, int max}) zone2;
-  final ({int min, int max}) zone3;
-  final ({int min, int max}) zone4;
-  final ({int min, int max}) zone5;
 
   HealthCalculations({
     required this.bmi,
@@ -192,10 +163,5 @@ class HealthCalculations {
     required this.bmr,
     required this.tdee,
     required this.maxHeartRate,
-    required this.zone1,
-    required this.zone2,
-    required this.zone3,
-    required this.zone4,
-    required this.zone5,
   });
 }

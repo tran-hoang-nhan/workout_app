@@ -1,76 +1,40 @@
 import 'package:shared/shared.dart';
 import 'package:supabase/supabase.dart';
 
-/// Repository for workout history and daily progress data.
 class ProgressRepository {
-  /// Creates a progress repository backed by Supabase.
   ProgressRepository(this._supabase);
   final SupabaseClient _supabase;
 
-  // --- Workout History ---
-  /// Returns workout history entries for the given user.
   Future<List<WorkoutHistory>> getWorkoutHistory(String userId) async {
-    final response = await _supabase
-        .from('workout_history')
-        .select()
-        .eq('user_id', userId)
-        .order('completed_at', ascending: false);
-    return (response as List)
-        .map((data) => WorkoutHistory.fromJson(data as Map<String, dynamic>))
-        .toList();
+    final response = await _supabase.from('workout_history').select().eq('user_id', userId).order('completed_at', ascending: false);
+    return (response as List).map((data) => WorkoutHistory.fromJson(data as Map<String, dynamic>)).toList();
   }
 
-  /// Alias for historical progress retrieval used by legacy endpoints.
   Future<List<WorkoutHistory>> getProgressHistory(String userId) =>
       getWorkoutHistory(userId);
 
-  /// Stores one completed workout history row.
   Future<void> logWorkout(WorkoutHistory history) async {
     await _supabase.from('workout_history').insert(history.toJson());
   }
 
-  // --- Daily Progress Tracking (from ProgressUserRepository) ---
-  /// Returns one daily progress entry for the provided date.
   Future<ProgressUser?> getProgress(String userId, DateTime date) async {
     final dateStr = date.toIso8601String().split('T')[0];
-    final response = await _supabase
-        .from('progress_user')
-        .select()
-        .eq('user_id', userId)
-        .eq('date', dateStr)
-        .maybeSingle();
+    final response = await _supabase.from('progress_user').select().eq('user_id', userId).eq('date', dateStr).maybeSingle();
     if (response == null) return null;
     return ProgressUser.fromJson(response);
   }
 
-  /// Returns daily progress entries in the inclusive date range.
-  Future<List<ProgressUser>> getProgressRange(
-    String userId,
-    DateTime start,
-    DateTime end,
-  ) async {
+  Future<List<ProgressUser>> getProgressRange(String userId, DateTime start, DateTime end,) async {
     final startStr = start.toIso8601String().split('T')[0];
     final endStr = end.toIso8601String().split('T')[0];
-    final response = await _supabase
-        .from('progress_user')
-        .select()
-        .eq('user_id', userId)
-        .gte('date', startStr)
-        .lte('date', endStr)
-        .order('date', ascending: true);
-    return (response as List)
-        .map((json) => ProgressUser.fromJson(json as Map<String, dynamic>))
-        .toList();
+    final response = await _supabase.from('progress_user').select().eq('user_id', userId).gte('date', startStr).lte('date', endStr).order('date', ascending: true);
+    return (response as List).map((json) => ProgressUser.fromJson(json as Map<String, dynamic>)).toList();
   }
 
-  /// Upserts a full progress row for a date.
   Future<void> saveProgress(ProgressUser progress) async {
-    await _supabase
-        .from('progress_user')
-        .upsert(progress.toJson(), onConflict: 'user_id, date');
+    await _supabase.from('progress_user').upsert(progress.toJson(), onConflict: 'user_id, date');
   }
 
-  /// Increments activity counters for one date.
   Future<void> updateActivityProgress({required String userId, required DateTime date, int? addWaterMl, int? addWaterGlasses, double? addEnergy, int? addDuration, int? addWorkouts,}) async {
     final existing = await getProgress(userId, date);
     final dateStr = date.toIso8601String().split('T')[0];
