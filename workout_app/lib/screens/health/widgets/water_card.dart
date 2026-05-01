@@ -22,11 +22,10 @@ class WaterCard extends ConsumerWidget {
     final progress = (goalMl > 0) ? (currentMl / goalMl).clamp(0.0, 1.0) : 0.0;
     final remaining = (goalMl - currentMl).clamp(0, goalMl);
 
-    return Expanded(
-      child: Container(
-        height: height,
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: _cardDecoration(),
+    return Container(
+      height: height,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: _cardDecoration(),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -123,8 +122,7 @@ class WaterCard extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   void _updateWater(BuildContext context, WidgetRef ref, int deltaMl) async {

@@ -8,8 +8,8 @@ import 'widgets/health_header.dart';
 import 'widgets/health_alerts.dart';
 import 'widgets/input_section.dart';
 import 'widgets/bmi_card.dart';
-
 import 'widgets/water_card.dart';
+import 'widgets/heart_rate_card.dart';
 import 'widgets/water_intake_card.dart';
 import 'widgets/calorie_goals.dart';
 import '../../providers/progress_user_provider.dart';
@@ -138,10 +138,23 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                     ),
                   ),
                 ),
-                data: (_) => WaterCard(
-                  currentMl: currentMl,
-                  goalMl: formState.waterIntake,
-                  height: cardHeight,
+                data: (_) => Row(
+                  children: [
+                    Expanded(
+                      child: HeartRateCard(
+                        calculations: calculations,
+                        height: cardHeight,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: WaterCard(
+                        currentMl: currentMl,
+                        goalMl: formState.waterIntake,
+                        height: cardHeight,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
